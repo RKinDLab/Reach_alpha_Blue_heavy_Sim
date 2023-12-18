@@ -1,0 +1,191 @@
+<?xml version="1.0"?>
+<robot name="alpha_5" xmlns:xacro="http://ros.org/wiki/xacro">
+    <xacro:macro name="alpha_5" params="parent *origin name:=alpha_5">
+        <joint name="${name}_joint" type="fixed">
+            <xacro:insert_block name="origin" />
+            <parent link="${parent}"/>
+            <child link="${name}_base_link" />
+        </joint>
+        
+        <material name="alpha_black">
+            <color rgba="0.3 0.3 0.3 1"/>
+        </material>
+        <link name="${name}_base_link"/>
+        <link name="${name}_m3_inline_link">
+            <inertial>
+                <origin xyz="-75e-3 -6e-3 -3e-3" rpy="0 0 0"/>
+                <mass value="0.341"/>
+                <inertia ixx="83.66e-6"  ixy="14.45e-6"  ixz="-38.270e-6" iyy="998.81e-6" iyz="3.14e-6" izz="1003.60e-6" />
+            </inertial>
+            <visual>
+                <geometry>
+                    <mesh filename="package://ros2_control_demo_example_3/meshes/M3-INLINE.stl"/>
+                </geometry>
+                <origin rpy="0 0 0" xyz="0 0 0"/>
+                <material name="alpha_black"/>
+            </visual>
+            <collision>
+                <geometry>
+                    <cylinder length="0.150" radius="0.020" />
+                </geometry>
+                <origin rpy="0 1.57075 0" xyz="-0.075 0 0" />
+            </collision>
+
+        </link>
+        <joint name="${name}_base_link_joint" type="fixed">
+            <parent link="${name}_base_link"/>
+            <child link="${name}_m3_inline_link"/>
+            <origin rpy="0 0 0"/>
+        </joint>
+        <link name="${name}_m2_1_1_link">
+            <inertial>
+                <origin xyz="0.042 0.009 0.142" rpy="0 0 0"/>
+                <mass value="0.194"/>
+                <inertia ixx="8.000"  ixy="-0.283"  ixz="0.289" iyy="7.922" iyz="0.074" izz="0.318" />
+            </inertial>        
+            <visual>
+                <geometry>
+                    <mesh filename="package://ros2_control_demo_example_3/meshes/M2-1-1.stl"/>
+                </geometry>
+                <origin rpy="0 0 0" xyz="0 0 0"/>
+                <material name="${name}_black"/>
+            </visual>
+            <collision>
+                <geometry>
+                    <cylinder length="0.066" radius="0.020" />
+                </geometry>
+                <origin rpy="0 0 0" xyz="0 0 0.000" />
+            </collision>
+        </link>
+        <joint name="${name}_axis_e" type="revolute">
+            <parent link="${name}_m3_inline_link"/>
+            <child link="${name}_m2_1_1_link"/>
+            <origin xyz="0 0 0.014"/>
+            <axis xyz="0 0 1"/>
+            <limit effort="9.0" lower="0.0" upper="6.3" velocity="0.5"/>
+        </joint>
+        <link name="${name}_m2_joint_link">
+            <inertial>
+                <origin xyz="0.013 -0.003 -0.021" rpy="0 0 0"/>
+                <mass value="0.429"/>
+                <inertia ixx="0.795"  ixy="-2.240"  ixz="0.412" iyy="0.574" iyz="-0.359" izz="0.511" />
+            </inertial>        
+            <visual>
+                <geometry>
+                    <mesh filename="package://ros2_control_demo_example_3/meshes/M2.stl"/>
+                </geometry>
+                <origin rpy="0 0 0" xyz="0 0 0"/>
+                <material name="${name}_black"/>
+            </visual>
+            <collision>
+                <geometry>
+                    <cylinder length="0.145" radius="0.020" />
+                </geometry>
+                <origin rpy="0 0 0" xyz="-0.02 0 -0.0725" />
+            </collision>
+            <collision>
+                <geometry>
+                    <cylinder length="0.040" radius="0.020" />
+                </geometry>
+                <origin rpy="1.5707 0 0" xyz="0 0 0" />
+            </collision>
+
+            <collision>
+                <geometry>
+                    <cylinder length="0.040" radius="0.020" />
+                </geometry>
+                <origin rpy="1.5707 0 0" xyz="-0.040 0 -0.1453" />
+            </collision>
+        </link>
+        <joint name="${name}_axis_d" type="revolute">
+            <parent link="${name}_m2_1_1_link"/>
+            <child link="${name}_m2_joint_link"/>
+            <origin xyz="-0.02 0 0.033"/>
+            <axis xyz="0 1 0"/>
+            <limit effort="9.0" lower="0.0" upper="3.8" velocity="0.5"/>
+        </joint>
+        <link name="${name}_m2_1_2_link">
+            <inertial>
+                <origin xyz="0.027 0.034 0.030" rpy="0 0 0"/>
+                <mass value="0.115"/>
+                <inertia ixx="0.529"  ixy="-0.899"  ixz="-0.072" iyy="0.255" iyz="-0.064" izz="0.692" />
+            </inertial>        
+            <visual>
+                <geometry>
+                    <mesh filename="package://ros2_control_demo_example_3/meshes/M2-1-3.stl"/>
+                </geometry>
+                <origin rpy="0 0 0" xyz="0 0 0"/>
+                <material name="${name}_black"/>
+            </visual>
+
+            <collision>
+                <geometry>
+                    <cylinder length="0.033" radius="0.020" />
+                </geometry>
+                <origin rpy="0 0 0" xyz="0.02 0 0.0165" />
+            </collision>
+        </link>
+        <joint name="${name}_axis_c" type="revolute">
+            <parent link="${name}_m2_joint_link"/>
+            <child link="${name}_m2_1_2_link"/>
+            <origin xyz="-0.04 0 -0.1453" rpy="0 0 3.14159"/>
+            <axis xyz="0 1 0"/>
+            <limit effort="9.0" lower="0.0" upper="3.5" velocity="0.5"/>
+        </joint>
+        <link name="${name}_m1_link">
+            <inertial>
+                <origin xyz="-0.027 0.006 -0.004" rpy="0 0 0"/>
+                <mass value="0.333"/>
+                <inertia ixx="0.268"  ixy="-0.144"  ixz="0.049" iyy="0.387" iyz="-0.211" izz="0.260" />
+            </inertial>
+            <visual>
+                <geometry>
+                    <mesh filename="package://ros2_control_demo_example_3/meshes/RS1-100-101-123.stl"/>
+                </geometry>
+                <origin rpy="0 -1.5707 0" xyz="0 0 0"/>
+                <material name="${name}_black"/>
+            </visual>
+
+            <collision>
+                <geometry>
+                    <cylinder length="0.10975" radius="0.020" />
+                </geometry>
+                <origin rpy="0 0 0" xyz="0.00 0 0.054875" />
+            </collision>
+        </link>
+        <joint name="${name}_axis_b" type="revolute">
+            <parent link="${name}_m2_1_2_link"/>
+            <child link="${name}_m1_link"/>
+            <origin xyz="0.02 0 0.033" rpy="0 0 2.09439"/>
+            <axis xyz="0 0 -1"/>
+            <limit effort="9.0" lower="0.0" upper="6.2" velocity="0.5"/>
+        </joint>
+        <material name="${name}_jaws_black">
+            <color rgba="0.3 0.3 0.3 1"/>
+        </material>
+        <joint name="${name}_jaws_joint" type="fixed">
+            <origin rpy="0 0 0" xyz="0 0 0.09975"/>
+            <parent link="${name}_m1_link"/>
+            <child link="${name}_jaws_base_link"/>
+        </joint>
+        <link name="${name}_jaws_base_link">
+
+
+        </link>
+        <link name="${name}_push_rod"/>
+        <joint name="${name}_axis_a" type="prismatic">
+            <origin rpy="0 0 0" xyz="0 0 0.009"/>
+            <parent link="${name}_jaws_base_link"/>
+            <child link="${name}_push_rod"/>
+            <axis xyz="0 0 1"/>
+            <limit effort="10" lower="0" upper="0.015" velocity="10"/>
+        </joint>
+
+        <xacro:include filename="$(find ros2_control_demo_example_3)/urdf/end_effectors/standard_jaws.urdf.xacro"/>
+        <xacro:alpha_standard_jaws parent="${name}_jaws_base_link" name="${name}_standard_jaws" axis_a="${name}_axis_a">
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+        </xacro:alpha_standard_jaws>
+
+
+    </xacro:macro>
+</robot>

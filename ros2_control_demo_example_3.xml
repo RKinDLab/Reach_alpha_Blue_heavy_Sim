@@ -1,0 +1,16 @@
+<library path="ros2_control_demo_example_3">
+  <class name="ros2_control_demo_example_3/RRBotSystemMultiInterfaceHardware"
+         type="ros2_control_demo_example_3::RRBotSystemMultiInterfaceHardware"
+         base_class_type="hardware_interface::SystemInterface">
+    <description>
+      The ros2_control reach robot simulation example using a multi-interface hardware interface-type.
+    </description>
+  </class>
+  <class name="ros2_control_demo_example_3/ReachSystemMultiInterfaceHardware"
+         type="ros2_control_demo_example_3::ReachSystemMultiInterfaceHardware"
+         base_class_type="hardware_interface::SystemInterface">
+    <description>
+      The ros2_control reach robot (reach alpha 5 example) using a multi-interface hardware interface-type.
+    </description>
+  </class>
+</library>
