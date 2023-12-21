@@ -36,19 +36,17 @@ namespace ros2_control_demo_example_3
       return hardware_interface::CallbackReturn::ERROR;
     }
 
-    // BEGIN: This part here is for exemplary purposes - Please do not copy to your production code
     cfg_.device = info_.hardware_parameters["device"];
     cfg_.baud_rate = stoi(info_.hardware_parameters["baud_rate"]);
 
     hw_joint_structs_.reserve(info_.joints.size());
     control_level_.resize(info_.joints.size(), mode_level_t::MODE_DISABLE);
 
-
     comms_.connect(cfg_.device, cfg_.baud_rate);
     bool is_connected = comms_.connected();
     RCLCPP_INFO(
-    rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "serial is connected : %s",
-    is_connected ? "true" : "false");
+        rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "serial is connected : %s",
+        is_connected ? "true" : "false");
 
     int ind_j_ = 0;
     for (const hardware_interface::ComponentInfo &joint : info_.joints)
@@ -67,14 +65,13 @@ namespace ros2_control_demo_example_3
 
       if (!(joint.command_interfaces[0].name == hardware_interface::HW_IF_POSITION ||
             joint.command_interfaces[0].name == hardware_interface::HW_IF_VELOCITY ||
-            joint.command_interfaces[0].name == custom_hardware_interface::HW_IF_CURRENT
-            ))
+            joint.command_interfaces[0].name == custom_hardware_interface::HW_IF_CURRENT))
       {
         RCLCPP_FATAL(
             rclcpp::get_logger("ReachSystemMultiInterfaceHardware"),
             "Joint '%s' has %s command interface. Expected %s, %s, %s or %s.", joint.name.c_str(),
             joint.command_interfaces[0].name.c_str(), hardware_interface::HW_IF_POSITION,
-            hardware_interface::HW_IF_VELOCITY, custom_hardware_interface::HW_IF_CURRENT , hardware_interface::HW_IF_ACCELERATION);
+            hardware_interface::HW_IF_VELOCITY, custom_hardware_interface::HW_IF_CURRENT, hardware_interface::HW_IF_ACCELERATION);
         return hardware_interface::CallbackReturn::ERROR;
       }
 
@@ -219,7 +216,7 @@ namespace ros2_control_demo_example_3
     //       cfg_.hw_start_sec_ - i);
     // }
     // END: This part here is for exemplary purposes - Please do not copy to your production code
-// [1.92466658e-02, 1.45291960e+00 ,4.35027387e-03, 5.73423624e+00]
+    // [1.92466658e-02, 1.45291960e+00 ,4.35027387e-03, 5.73423624e+00]
     // Set some default values
     for (std::size_t i = 0; i < info_.joints.size(); i++)
     {
@@ -284,6 +281,8 @@ namespace ros2_control_demo_example_3
   hardware_interface::return_type ReachSystemMultiInterfaceHardware::read(
       const rclcpp::Time & /*time*/, const rclcpp::Duration &period)
   {
+    // double reader = 0.0;
+    // uint8_t device_id = 0x03;
     for (std::size_t i = 0; i < info_.joints.size(); i++)
     {
       switch (control_level_[i])
@@ -302,6 +301,13 @@ namespace ros2_control_demo_example_3
             (hw_joint_structs_[i].position_command_ - hw_joint_structs_[i].position_state_) / 20;
         break;
       case mode_level_t::MODE_VELOCITY:
+
+        // comms_.readEncoderValues(device_id, PacketID_POSITION, reader);
+
+        // RCLCPP_INFO(
+        //     rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "%d encoder reading is : %f",
+        //     device_id, reader);
+
         hw_joint_structs_[i].acceleration_state_ = 0;
         hw_joint_structs_[i].current_state_ = 0;
         hw_joint_structs_[i].velocity_state_ = hw_joint_structs_[i].velocity_command_;
@@ -309,13 +315,13 @@ namespace ros2_control_demo_example_3
         break;
       case mode_level_t::MODE_CURRENT:
         hw_joint_structs_[i].current_state_ = hw_joint_structs_[i].current_command_;
-        hw_joint_structs_[i].acceleration_state_ = hw_joint_structs_[i].current_command_ / 2; //dummy
+        hw_joint_structs_[i].acceleration_state_ = hw_joint_structs_[i].current_command_ / 2; // dummy
         hw_joint_structs_[i].velocity_state_ += (hw_joint_structs_[i].acceleration_state_ * period.seconds()) / 20;
         hw_joint_structs_[i].position_state_ += (hw_joint_structs_[i].velocity_state_ * period.seconds()) / 20;
         break;
       case mode_level_t::MODE_STANDBY:
         hw_joint_structs_[i].current_state_ = hw_joint_structs_[i].current_command_;
-        hw_joint_structs_[i].acceleration_state_ = hw_joint_structs_[i].current_command_ / 2; //dummy
+        hw_joint_structs_[i].acceleration_state_ = hw_joint_structs_[i].current_command_ / 2; // dummy
         hw_joint_structs_[i].velocity_state_ += (hw_joint_structs_[i].acceleration_state_ * period.seconds()) / 20;
         hw_joint_structs_[i].position_state_ += (hw_joint_structs_[i].velocity_state_ * period.seconds()) / 20;
         break;
@@ -323,9 +329,9 @@ namespace ros2_control_demo_example_3
       // BEGIN: This part here is for exemplary purposes - Please do not copy to your production code
       // RCLCPP_INFO(
       //   rclcpp::get_logger("ReachSystemMultiInterfaceHardware"),
-      //   "Got pos: %.5f, vel: %.5f, acc: %.5f, cur: %.5f for joint %s!", 
+      //   "Got pos: %.5f, vel: %.5f, acc: %.5f, cur: %.5f for joint %s!",
       //   hw_joint_structs_[i].position_state_,
-      //   hw_joint_structs_[i].velocity_state_, 
+      //   hw_joint_structs_[i].velocity_state_,
       //   hw_joint_structs_[i].acceleration_state_,
       //   hw_joint_structs_[i].current_state_, info_.joints[i].name.c_str());
       // END: This part here is for exemplary purposes - Please do not copy to your production code
