@@ -9,13 +9,13 @@ class Joint
 public:
     std::string name;
     uint8_t device_id;
-    double position_command_;
-    double velocity_command_;
-    double current_command_;
-    double position_state_;
-    double velocity_state_;
-    double current_state_;
-    double acceleration_state_;
+    double position_command_ = 0;
+    double velocity_command_ = 0;
+    double current_command_ = 0;
+    double position_state_ = 0;
+    double velocity_state_ = 0;
+    double current_state_ = 0;
+    double acceleration_state_ = 0;
 
     Joint() = default;
 

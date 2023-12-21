@@ -46,9 +46,8 @@ namespace ros2_control_demo_example_3
     struct Config
     {
       // Parameters for the RRBot simulation
-      double hw_start_sec_;
-      double hw_stop_sec_;
-      double hw_slowdown_;
+      std::string device;
+      double baud_rate;
     };
 
   public:

@@ -36,46 +36,25 @@ namespace ros2_control_demo_example_3
       return hardware_interface::CallbackReturn::ERROR;
     }
 
-    comms_.connect("/dev/ttyUSB0", 115200);
-    bool is_connected = comms_.connected();
-
-    RCLCPP_INFO(
-    rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "serial is connected : %s",
-    is_connected ? "true" : "false");
-
-    uint8_t standby = 0x00;
-    uint8_t device_id = 0x03;
-
-    comms_.setMode(standby); // mode set to standby
-
-    double reader = 0.0;
-    comms_.readEncoderValues(device_id, PacketID_POSITION, reader);
-
-    RCLCPP_INFO(
-    rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "%d encoder reading is : %f",
-    device_id, reader);
-
-    double cmd = 200.0;
-    comms_.sendMsg(device_id, PacketID_CURRENT, cmd);
-
-    comms_.disconnect();
-    RCLCPP_INFO(
-    rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "serial is closed");
-
-
     // BEGIN: This part here is for exemplary purposes - Please do not copy to your production code
-    cfg_.hw_start_sec_ = stod(info_.hardware_parameters["example_param_hw_start_duration_sec"]);
-    cfg_.hw_stop_sec_ = stod(info_.hardware_parameters["example_param_hw_stop_duration_sec"]);
-    cfg_.hw_slowdown_ = stod(info_.hardware_parameters["example_param_hw_slowdown"]);
+    cfg_.device = info_.hardware_parameters["device"];
+    cfg_.baud_rate = stoi(info_.hardware_parameters["baud_rate"]);
 
     hw_joint_structs_.reserve(info_.joints.size());
     control_level_.resize(info_.joints.size(), mode_level_t::MODE_DISABLE);
+
+
+    comms_.connect(cfg_.device, cfg_.baud_rate);
+    bool is_connected = comms_.connected();
+    RCLCPP_INFO(
+    rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "serial is connected : %s",
+    is_connected ? "true" : "false");
 
     int ind_j_ = 0;
     for (const hardware_interface::ComponentInfo &joint : info_.joints)
     {
       hw_joint_structs_.emplace_back(joint.name, ind_j_++);
-      // ReachSystemMultiInterfaceHardware has exactly 3 state interfaces
+      // RRBotSystemMultiInterface has exactly 3 state interfaces
       // and 3 command interfaces on each joint
       if (joint.command_interfaces.size() != 3)
       {
@@ -232,15 +211,15 @@ namespace ros2_control_demo_example_3
     RCLCPP_INFO(
         rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "Activating... please wait...");
 
-    for (int i = 0; i < cfg_.hw_start_sec_; i++)
-    {
-      rclcpp::sleep_for(std::chrono::seconds(1));
-      RCLCPP_INFO(
-          rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "%.1f seconds left...",
-          cfg_.hw_start_sec_ - i);
-    }
+    // for (int i = 0; i < cfg_.hw_start_sec_; i++)
+    // {
+    //   rclcpp::sleep_for(std::chrono::seconds(1));
+    //   RCLCPP_INFO(
+    //       rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "%.1f seconds left...",
+    //       cfg_.hw_start_sec_ - i);
+    // }
     // END: This part here is for exemplary purposes - Please do not copy to your production code
-
+// [1.92466658e-02, 1.45291960e+00 ,4.35027387e-03, 5.73423624e+00]
     // Set some default values
     for (std::size_t i = 0; i < info_.joints.size(); i++)
     {
@@ -288,13 +267,13 @@ namespace ros2_control_demo_example_3
     RCLCPP_INFO(
         rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "Deactivating... please wait...");
 
-    for (int i = 0; i < cfg_.hw_stop_sec_; i++)
-    {
-      rclcpp::sleep_for(std::chrono::seconds(1));
-      RCLCPP_INFO(
-          rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "%.1f seconds left...",
-          cfg_.hw_stop_sec_ - i);
-    }
+    // for (int i = 0; i < cfg_.hw_stop_sec_; i++)
+    // {
+    //   rclcpp::sleep_for(std::chrono::seconds(1));
+    //   RCLCPP_INFO(
+    //       rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "%.1f seconds left...",
+    //       cfg_.hw_stop_sec_ - i);
+    // }
 
     RCLCPP_INFO(rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "Successfully deactivated!");
     // END: This part here is for exemplary purposes - Please do not copy to your production code
@@ -311,7 +290,7 @@ namespace ros2_control_demo_example_3
       {
       case mode_level_t::MODE_DISABLE:
         // RCLCPP_INFO(
-        //   rclcpp::get_logger("ReachSystemMultiInterfaceHardware"),
+        //   rclcpp::get_logger("RRBotSystemMultiInterfaceHardware"),
         //   "Nothing is using the hardware interface!");
         return hardware_interface::return_type::OK;
         break;
@@ -320,32 +299,35 @@ namespace ros2_control_demo_example_3
         hw_joint_structs_[i].current_state_ = 0;
         hw_joint_structs_[i].velocity_state_ = 0;
         hw_joint_structs_[i].position_state_ +=
-            (hw_joint_structs_[i].position_command_ - hw_joint_structs_[i].position_state_) / cfg_.hw_slowdown_;
+            (hw_joint_structs_[i].position_command_ - hw_joint_structs_[i].position_state_) / 20;
         break;
       case mode_level_t::MODE_VELOCITY:
         hw_joint_structs_[i].acceleration_state_ = 0;
         hw_joint_structs_[i].current_state_ = 0;
         hw_joint_structs_[i].velocity_state_ = hw_joint_structs_[i].velocity_command_;
-        hw_joint_structs_[i].position_state_ += (hw_joint_structs_[i].velocity_state_ * period.seconds()) / cfg_.hw_slowdown_;
+        hw_joint_structs_[i].position_state_ += (hw_joint_structs_[i].velocity_state_ * period.seconds()) / 20;
         break;
       case mode_level_t::MODE_CURRENT:
         hw_joint_structs_[i].current_state_ = hw_joint_structs_[i].current_command_;
         hw_joint_structs_[i].acceleration_state_ = hw_joint_structs_[i].current_command_ / 2; //dummy
-        hw_joint_structs_[i].velocity_state_ += (hw_joint_structs_[i].acceleration_state_ * period.seconds()) / cfg_.hw_slowdown_;
-        hw_joint_structs_[i].position_state_ += (hw_joint_structs_[i].velocity_state_ * period.seconds()) / cfg_.hw_slowdown_;
+        hw_joint_structs_[i].velocity_state_ += (hw_joint_structs_[i].acceleration_state_ * period.seconds()) / 20;
+        hw_joint_structs_[i].position_state_ += (hw_joint_structs_[i].velocity_state_ * period.seconds()) / 20;
         break;
       case mode_level_t::MODE_STANDBY:
         hw_joint_structs_[i].current_state_ = hw_joint_structs_[i].current_command_;
         hw_joint_structs_[i].acceleration_state_ = hw_joint_structs_[i].current_command_ / 2; //dummy
-        hw_joint_structs_[i].velocity_state_ += (hw_joint_structs_[i].acceleration_state_ * period.seconds()) / cfg_.hw_slowdown_;
-        hw_joint_structs_[i].position_state_ += (hw_joint_structs_[i].velocity_state_ * period.seconds()) / cfg_.hw_slowdown_;
+        hw_joint_structs_[i].velocity_state_ += (hw_joint_structs_[i].acceleration_state_ * period.seconds()) / 20;
+        hw_joint_structs_[i].position_state_ += (hw_joint_structs_[i].velocity_state_ * period.seconds()) / 20;
         break;
       }
       // BEGIN: This part here is for exemplary purposes - Please do not copy to your production code
       // RCLCPP_INFO(
       //   rclcpp::get_logger("ReachSystemMultiInterfaceHardware"),
-      //   "Got pos: %.5f, vel: %.5f, acc: %.5f, cur: %.5f for joint %s!", hw_states_positions_[i],
-      //   hw_states_velocities_[i], hw_states_accelerations_[i],hw_states_currents_[i], info_.joints[i].name.c_str());
+      //   "Got pos: %.5f, vel: %.5f, acc: %.5f, cur: %.5f for joint %s!", 
+      //   hw_joint_structs_[i].position_state_,
+      //   hw_joint_structs_[i].velocity_state_, 
+      //   hw_joint_structs_[i].acceleration_state_,
+      //   hw_joint_structs_[i].current_state_, info_.joints[i].name.c_str());
       // END: This part here is for exemplary purposes - Please do not copy to your production code
     }
     return hardware_interface::return_type::OK;
@@ -355,15 +337,18 @@ namespace ros2_control_demo_example_3
       const rclcpp::Time & /*time*/, const rclcpp::Duration & /*period*/)
   {
     // BEGIN: This part here is for exemplary purposes - Please do not copy to your production code
-    for (std::size_t i = 0; i < info_.joints.size(); i++)
-    {
-      // Simulate sending commands to the hardware
-      // RCLCPP_INFO(
-      //   rclcpp::get_logger("ReachSystemMultiInterfaceHardware"),
-      //   "Got the commands pos: %.5f, vel: %.5f, cur: %.5f for joint %s, control_lvl:%u",
-      //   hw_commands_positions_[i], hw_commands_velocities_[i], hw_commands_currents_[i], info_.joints[i].name.c_str(),
-      //   control_level_[i]);
-    }
+    // for (std::size_t i = 0; i < info_.joints.size(); i++)
+    // {
+    //   // Simulate sending commands to the hardware
+    //   RCLCPP_INFO(
+    //     rclcpp::get_logger("ReachSystemMultiInterfaceHardware"),
+    //     "Got the commands pos: %.5f, vel: %.5f, cur: %.5f for joint %s, control_lvl:%u",
+    //     hw_joint_structs_[i].position_command_,
+    //     hw_joint_structs_[i].velocity_command_,
+    //     hw_joint_structs_[i].current_command_,
+    //     info_.joints[i].name.c_str(),
+    //     control_level_[i]);
+    // }
     // END: This part here is for exemplary purposes - Please do not copy to your production code
 
     return hardware_interface::return_type::OK;

@@ -213,7 +213,7 @@ namespace ros2_control_demo_example_3
           cfg_.hw_start_sec_ - i);
     }
     // END: This part here is for exemplary purposes - Please do not copy to your production code
-
+// [1.92466658e-02, 1.45291960e+00 ,4.35027387e-03, 5.73423624e+00]
     // Set some default values
     for (std::size_t i = 0; i < info_.joints.size(); i++)
     {
@@ -317,8 +317,11 @@ namespace ros2_control_demo_example_3
       // BEGIN: This part here is for exemplary purposes - Please do not copy to your production code
       // RCLCPP_INFO(
       //   rclcpp::get_logger("RRBotSystemMultiInterfaceHardware"),
-      //   "Got pos: %.5f, vel: %.5f, acc: %.5f, cur: %.5f for joint %s!", hw_states_positions_[i],
-      //   hw_states_velocities_[i], hw_states_accelerations_[i],hw_states_currents_[i], info_.joints[i].name.c_str());
+      //   "Got pos: %.5f, vel: %.5f, acc: %.5f, cur: %.5f for joint %s!", 
+      //   hw_joint_structs_[i].position_state_,
+      //   hw_joint_structs_[i].velocity_state_, 
+      //   hw_joint_structs_[i].acceleration_state_,
+      //   hw_joint_structs_[i].current_state_, info_.joints[i].name.c_str());
       // END: This part here is for exemplary purposes - Please do not copy to your production code
     }
     return hardware_interface::return_type::OK;
@@ -328,15 +331,18 @@ namespace ros2_control_demo_example_3
       const rclcpp::Time & /*time*/, const rclcpp::Duration & /*period*/)
   {
     // BEGIN: This part here is for exemplary purposes - Please do not copy to your production code
-    for (std::size_t i = 0; i < info_.joints.size(); i++)
-    {
-      // Simulate sending commands to the hardware
-      // RCLCPP_INFO(
-      //   rclcpp::get_logger("RRBotSystemMultiInterfaceHardware"),
-      //   "Got the commands pos: %.5f, vel: %.5f, cur: %.5f for joint %s, control_lvl:%u",
-      //   hw_commands_positions_[i], hw_commands_velocities_[i], hw_commands_currents_[i], info_.joints[i].name.c_str(),
-      //   control_level_[i]);
-    }
+    // for (std::size_t i = 0; i < info_.joints.size(); i++)
+    // {
+    //   // Simulate sending commands to the hardware
+    //   RCLCPP_INFO(
+    //     rclcpp::get_logger("RRBotSystemMultiInterfaceHardware"),
+    //     "Got the commands pos: %.5f, vel: %.5f, cur: %.5f for joint %s, control_lvl:%u",
+    //     hw_joint_structs_[i].position_command_,
+    //     hw_joint_structs_[i].velocity_command_,
+    //     hw_joint_structs_[i].current_command_,
+    //     info_.joints[i].name.c_str(),
+    //     control_level_[i]);
+    // }
     // END: This part here is for exemplary purposes - Please do not copy to your production code
 
     return hardware_interface::return_type::OK;
