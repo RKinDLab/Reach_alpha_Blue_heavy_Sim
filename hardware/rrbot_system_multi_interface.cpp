@@ -44,10 +44,18 @@ namespace ros2_control_demo_example_3
     hw_joint_structs_.reserve(info_.joints.size());
     control_level_.resize(info_.joints.size(), mode_level_t::MODE_DISABLE);
 
-    int ind_j_ = 0;
     for (const hardware_interface::ComponentInfo &joint : info_.joints)
     {
-      hw_joint_structs_.emplace_back(joint.name, ind_j_++);
+      std::string device_id_value = joint.parameters.at("device_id");
+      double default_position = stod(joint.parameters.at("home"));
+      uint8_t device_id = static_cast<uint8_t>(std::stoul(device_id_value, nullptr, 16));
+
+      RCLCPP_INFO(
+          rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "Device with id %u found",static_cast<unsigned int>(device_id));
+      RCLCPP_INFO(
+          rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "Device default position is %f", default_position);
+
+      hw_joint_structs_.emplace_back(joint.name, device_id, default_position);
       // RRBotSystemMultiInterface has exactly 3 state interfaces
       // and 3 command interfaces on each joint
       if (joint.command_interfaces.size() != 3)
@@ -204,22 +212,12 @@ namespace ros2_control_demo_example_3
     // BEGIN: This part here is for exemplary purposes - Please do not copy to your production code
     RCLCPP_INFO(
         rclcpp::get_logger("RRBotSystemMultiInterfaceHardware"), "Activating... please wait...");
-
-    for (int i = 0; i < cfg_.hw_start_sec_; i++)
-    {
-      rclcpp::sleep_for(std::chrono::seconds(1));
-      RCLCPP_INFO(
-          rclcpp::get_logger("RRBotSystemMultiInterfaceHardware"), "%.1f seconds left...",
-          cfg_.hw_start_sec_ - i);
-    }
-    // END: This part here is for exemplary purposes - Please do not copy to your production code
-// [1.92466658e-02, 1.45291960e+00 ,4.35027387e-03, 5.73423624e+00]
-    // Set some default values
+        
     for (std::size_t i = 0; i < info_.joints.size(); i++)
     {
-      if (std::isnan(hw_joint_structs_[i].position_state_))
+      if (std::isnan(hw_joint_structs_[i].position_state_) || hw_joint_structs_[i].position_state_ == 0)
       {
-        hw_joint_structs_[i].position_state_ = 0;
+        hw_joint_structs_[i].position_state_ = hw_joint_structs_[i].default_position_;
       }
       if (std::isnan(hw_joint_structs_[i].velocity_state_))
       {

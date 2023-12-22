@@ -9,6 +9,7 @@ class Joint
 public:
     std::string name;
     uint8_t device_id;
+    double default_position_ = 0;
     double position_command_ = 0;
     double velocity_command_ = 0;
     double current_command_ = 0;
@@ -20,10 +21,12 @@ public:
     Joint() = default;
 
     // constructor with member initializer list and move semantics for string
-    Joint(std::string joint_name, int joint_id)
-        : name(std::move(joint_name)), device_id(joint_id) {}
+    Joint(std::string joint_name, int joint_id, double joint_default)
+        : name(std::move(joint_name)), device_id(joint_id), default_position_(joint_default) {}
 
     void calcAcceleration(const double &prev_velocity_, const double &period_seconds);
+
+    void setSimHome();
 
 };
 
