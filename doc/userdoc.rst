@@ -67,11 +67,17 @@ Tutorial steps
         joint2/velocity [available] [claimed]
     state interfaces
         alpha_axis_a/acceleration
-        alpha_axis_a/acceleration
+        alpha_axis_a/current
         alpha_axis_a/position
-        joint2/acceleration
-        joint2/position
-        joint2/velocity
+        alpha_axis_a/velocity
+        alpha_axis_b/acceleration
+        alpha_axis_b/current
+        alpha_axis_b/position
+        alpha_axis_b/velocity
+        alpha_axis_c/acceleration
+        alpha_axis_c/current
+        alpha_axis_c/position
+        alpha_axis_c/velocity
 
    Marker ``[claimed]`` by command interfaces means that a controller has access to command *RRBot*.
 
