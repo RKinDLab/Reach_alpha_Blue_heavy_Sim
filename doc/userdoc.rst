@@ -128,7 +128,7 @@ Tutorial steps
 
           ros2 topic pub /forward_velocity_controller/commands std_msgs/msg/Float64MultiArray "{data: [0.05,0.2,0,0.5,0.1]}" --once
 
-      * when using ``forward_acceleration_controller`` controller
+      * when using ``forward_current_controller`` controller
 
         .. code-block:: shell
 
