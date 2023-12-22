@@ -1,28 +1,23 @@
-:github_url: https://github.com/ros-controls/ros2_control_demos/blob/{REPOS_FILE_BRANCH}/example_3/doc/userdoc.rst
+:github_url: https://github.com/Eddy-Morgan/reach-alpha-ros2-control/blob/master/doc/userdoc.rst
 
 .. _ros2_control_demos_example_3_userdoc:
 
 ************************************************
-Example 3: Robots with multiple interfaces
+Reach Alpha 5 with multiple interfaces
 ************************************************
 
 The example shows how to implement multi-interface robot hardware taking care about interfaces used.
 
-For *example_3*, the hardware interface plugin is implemented having multiple interfaces.
+For *reach alpha 5*, the hardware interface plugin is implemented having multiple interfaces.
 
 * The communication is done using proprietary API to communicate with the robot control box.
-* Data for all joints is exchanged at once.
-* Examples: KUKA FRI, ABB Yumi, Schunk LWA4p, etc.
-
-Two illegal controllers demonstrate how hardware interface declines faulty claims to access joint command interfaces.
-
-.. include:: ../../doc/run_from_docker.rst
+* Data for all joints can be exchanged at once or independently.
 
 
 Tutorial steps
 --------------------------
 
-1. To check that *RRBot* descriptions are working properly use following launch commands
+1. To check that *reach alpha 5* descriptions are working properly use following launch commands
 
    .. code-block:: shell
 
