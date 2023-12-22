@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "ros2_control_demo_example_3/rrbot_system_multi_interface.hpp"
+#include "ros2_control_reach_5/rrbot_system_multi_interface.hpp"
 
 #include <chrono>
 #include <cmath>
@@ -24,7 +24,7 @@
 #include "hardware_interface/types/hardware_interface_type_values.hpp"
 #include "rclcpp/rclcpp.hpp"
 
-namespace ros2_control_demo_example_3
+namespace ros2_control_reach_5
 {
   hardware_interface::CallbackReturn RRBotSystemMultiInterfaceHardware::on_init(
       const hardware_interface::HardwareInfo &info)
@@ -346,10 +346,10 @@ namespace ros2_control_demo_example_3
     return hardware_interface::return_type::OK;
   }
 
-} // namespace ros2_control_demo_example_3
+} // namespace ros2_control_reach_5
 
 #include "pluginlib/class_list_macros.hpp"
 
 PLUGINLIB_EXPORT_CLASS(
-    ros2_control_demo_example_3::RRBotSystemMultiInterfaceHardware,
+    ros2_control_reach_5::RRBotSystemMultiInterfaceHardware,
     hardware_interface::SystemInterface)

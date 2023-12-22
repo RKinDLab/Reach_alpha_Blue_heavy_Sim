@@ -8,14 +8,14 @@
 
       <hardware>
         <xacro:if value="${use_mock_hardware}">
-          <plugin>ros2_control_demo_example_3/RRBotSystemMultiInterfaceHardware</plugin>
+          <plugin>ros2_control_reach_5/RRBotSystemMultiInterfaceHardware</plugin>
           <param name="example_param_hw_start_duration_sec">0.0</param>
           <param name="example_param_hw_stop_duration_sec">3.0</param>
           <param name="example_param_hw_slowdown">${slowdown}</param>
         </xacro:if>
 
         <xacro:unless value="${use_mock_hardware}">
-          <plugin>ros2_control_demo_example_3/ReachSystemMultiInterfaceHardware</plugin>
+          <plugin>ros2_control_reach_5/ReachSystemMultiInterfaceHardware</plugin>
           <param name="device">${device}</param>
           <param name="baud_rate">${baud_rate}</param>
         </xacro:unless>

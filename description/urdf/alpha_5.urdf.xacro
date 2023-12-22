@@ -19,7 +19,7 @@
             </inertial>
             <visual>
                 <geometry>
-                    <mesh filename="package://ros2_control_demo_example_3/meshes/M3-INLINE.stl"/>
+                    <mesh filename="package://ros2_control_reach_5/meshes/M3-INLINE.stl"/>
                 </geometry>
                 <origin rpy="0 0 0" xyz="0 0 0"/>
                 <material name="alpha_black"/>
@@ -45,7 +45,7 @@
             </inertial>        
             <visual>
                 <geometry>
-                    <mesh filename="package://ros2_control_demo_example_3/meshes/M2-1-1.stl"/>
+                    <mesh filename="package://ros2_control_reach_5/meshes/M2-1-1.stl"/>
                 </geometry>
                 <origin rpy="0 0 0" xyz="0 0 0"/>
                 <material name="${name}_black"/>
@@ -72,7 +72,7 @@
             </inertial>        
             <visual>
                 <geometry>
-                    <mesh filename="package://ros2_control_demo_example_3/meshes/M2.stl"/>
+                    <mesh filename="package://ros2_control_reach_5/meshes/M2.stl"/>
                 </geometry>
                 <origin rpy="0 0 0" xyz="0 0 0"/>
                 <material name="${name}_black"/>
@@ -112,7 +112,7 @@
             </inertial>        
             <visual>
                 <geometry>
-                    <mesh filename="package://ros2_control_demo_example_3/meshes/M2-1-3.stl"/>
+                    <mesh filename="package://ros2_control_reach_5/meshes/M2-1-3.stl"/>
                 </geometry>
                 <origin rpy="0 0 0" xyz="0 0 0"/>
                 <material name="${name}_black"/>
@@ -140,7 +140,7 @@
             </inertial>
             <visual>
                 <geometry>
-                    <mesh filename="package://ros2_control_demo_example_3/meshes/RS1-100-101-123.stl"/>
+                    <mesh filename="package://ros2_control_reach_5/meshes/RS1-100-101-123.stl"/>
                 </geometry>
                 <origin rpy="0 -1.5707 0" xyz="0 0 0"/>
                 <material name="${name}_black"/>
@@ -181,7 +181,7 @@
             <limit effort="10" lower="0" upper="0.015" velocity="10"/>
         </joint>
 
-        <xacro:include filename="$(find ros2_control_demo_example_3)/urdf/end_effectors/standard_jaws.urdf.xacro"/>
+        <xacro:include filename="$(find ros2_control_reach_5)/urdf/end_effectors/standard_jaws.urdf.xacro"/>
         <xacro:alpha_standard_jaws parent="${name}_jaws_base_link" name="${name}_standard_jaws" axis_a="${name}_axis_a">
             <origin xyz="0 0 0" rpy="0 0 0"/>
         </xacro:alpha_standard_jaws>

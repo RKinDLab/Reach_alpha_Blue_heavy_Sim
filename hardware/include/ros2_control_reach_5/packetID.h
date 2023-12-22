@@ -1,5 +1,5 @@
-#ifndef ROS2_CONTROL_DEMO_EXAMPLE_3__PACKETID_H_
-#define ROS2_CONTROL_DEMO_EXAMPLE_3__PACKETID_H_
+#ifndef ROS2_CONTROL_REACH_5__PACKETID_H_
+#define ROS2_CONTROL_REACH_5__PACKETID_H_
 
 // Enumeration for Packet IDs
 typedef enum {
@@ -113,4 +113,4 @@ typedef enum {
     PacketID_RESET = 0xFD
 } PacketID;
 
-#endif // ROS2_CONTROL_DEMO_EXAMPLE_3__PACKETID_H_
+#endif // ROS2_CONTROL_REACH_5__PACKETID_H_

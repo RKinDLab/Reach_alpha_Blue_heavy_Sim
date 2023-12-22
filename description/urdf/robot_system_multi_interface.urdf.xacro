@@ -14,10 +14,10 @@ https://github.com/ros-simulation/gazebo_ros_demos/blob/kinetic-devel/rrbot_desc
   <xacro:arg name="baud_rate" default="115200"/>
 
   <!-- Import RRBot macro -->
-  <xacro:include filename="$(find ros2_control_demo_example_3)/urdf/alpha_5.urdf.xacro"/>
+  <xacro:include filename="$(find ros2_control_reach_5)/urdf/alpha_5.urdf.xacro"/>
 
   <!-- Import RRBot ros2_control description -->
-  <xacro:include filename="$(find ros2_control_demo_example_3)/ros2_control/robot_system_multi_interface.ros2_control.xacro" />
+  <xacro:include filename="$(find ros2_control_reach_5)/ros2_control/robot_system_multi_interface.ros2_control.xacro" />
 
   <!-- Used for fixing robot -->
   <link name="base_link"/>

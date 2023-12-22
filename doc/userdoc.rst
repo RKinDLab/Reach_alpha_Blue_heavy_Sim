@@ -26,7 +26,7 @@ Tutorial steps
 
    .. code-block:: shell
 
-    ros2 launch ros2_control_demo_example_3 view_robot.launch.py
+    ros2 launch ros2_control_reach_5 view_robot.launch.py
 
    .. note::
     Getting the following output in terminal is OK: ``Warning: Invalid frame ID "odom" passed to canTransform argument target_frame - frame does not exist``.
@@ -38,7 +38,7 @@ Tutorial steps
 
    .. code-block:: shell
 
-    ros2 launch ros2_control_demo_example_3 rrbot_system_multi_interface.launch.py
+    ros2 launch ros2_control_reach_5 rrbot_system_multi_interface.launch.py
 
    Useful launch-file options:
 
@@ -128,7 +128,7 @@ Tutorial steps
 
       .. code-block:: shell
 
-         ros2 launch ros2_control_demo_example_3 test_forward_position_controller.launch.py
+         ros2 launch ros2_control_reach_5 test_forward_position_controller.launch.py
 
    You should now see orange and yellow blocks moving in *RViz*.
    Also, you should see changing states in the terminal where launch file is started, e.g.

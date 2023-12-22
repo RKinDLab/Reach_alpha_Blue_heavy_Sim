@@ -5,8 +5,8 @@
 #include "packetID.h"
 #include <iostream>
 
-#ifndef ROS2_CONTROL_DEMO_EXAMPLE_3__BPL_PROTOCOL_H_
-#define ROS2_CONTROL_DEMO_EXAMPLE_3__BPL_PROTOCOL_H_
+#ifndef ROS2_CONTROL_REACH_5__BPL_PROTOCOL_H_
+#define ROS2_CONTROL_REACH_5__BPL_PROTOCOL_H_
 
 #define MAX_PACKET_LENGTH 256
 #define HEADER_SIZE 4
@@ -385,4 +385,4 @@ int decodePackets(struct Packet *packets, uint8_t *inputData, size_t inputDatale
     return packetCount;
 }
 
-#endif /* ROS2_CONTROL_DEMO_EXAMPLE_3__BPL_PROTOCOL_H_ */
+#endif /* ROS2_CONTROL_REACH_5__BPL_PROTOCOL_H_ */

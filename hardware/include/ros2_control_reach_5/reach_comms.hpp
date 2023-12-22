@@ -1,5 +1,5 @@
-#ifndef ROS2_CONTROL_DEMO_EXAMPLE_3__REACH_COMMS_HPP_
-#define ROS2_CONTROL_DEMO_EXAMPLE_3__REACH_COMMS_HPP_
+#ifndef ROS2_CONTROL_REACH_5__REACH_COMMS_HPP_
+#define ROS2_CONTROL_REACH_5__REACH_COMMS_HPP_
 
 #include <iostream>
 #include <boost/asio.hpp>
@@ -23,4 +23,4 @@ private:
     boost::asio::serial_port serial_conn_; ///< Underlying serial connection
 };
 
-#endif // ROS2_CONTROL_DEMO_EXAMPLE_3__REACH_COMMS_HPP_
+#endif // ROS2_CONTROL_REACH_5__REACH_COMMS_HPP_

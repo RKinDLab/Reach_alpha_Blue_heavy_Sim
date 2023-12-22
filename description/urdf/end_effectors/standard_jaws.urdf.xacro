@@ -15,7 +15,7 @@
         <link name="${name}_base_link">
             <visual>
                 <geometry>
-                    <mesh filename="package://ros2_control_demo_example_3/meshes/end_effectors/RS1-124.stl"/>
+                    <mesh filename="package://ros2_control_reach_5/meshes/end_effectors/RS1-124.stl"/>
                 </geometry>
                 <material name="${name}_black"/>
             </visual>
@@ -24,7 +24,7 @@
         <link name="${name}_rs1_130_link">
             <visual>
                 <geometry>
-                    <mesh filename="package://ros2_control_demo_example_3/meshes/end_effectors/RS1-130.stl"/>
+                    <mesh filename="package://ros2_control_reach_5/meshes/end_effectors/RS1-130.stl"/>
                 </geometry>
                 <material name="${name}_black"/>
                 <origin xyz="0 0 0" rpy="0 0 0"/>
@@ -51,7 +51,7 @@
         <link name="${name}_rs1_139_link">
             <visual>
                 <geometry>
-                    <mesh filename="package://ros2_control_demo_example_3/meshes/end_effectors/RS1-139.stl"/>
+                    <mesh filename="package://ros2_control_reach_5/meshes/end_effectors/RS1-139.stl"/>
                 </geometry>
                 <material name="${name}_black"/>
                 <origin xyz="0 0 0" rpy="0 0 0"/>
