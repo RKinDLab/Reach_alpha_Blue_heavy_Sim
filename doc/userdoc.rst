@@ -40,8 +40,8 @@ Tutorial steps
    ``robot_controller:=forward_position_controller``
     starts demo and spawns position controller. Robot can be then controlled using ``forward_position_controller`` as described below.
 
-   ``robot_controller:=forward_acceleration_controller``
-    starts demo and spawns acceleration controller. Robot can be then controlled using ``forward_acceleration_controller`` as described below.
+   ``robot_controller:=forward_current_controller``
+    starts demo and spawns current controller. Robot can be then controlled using ``forward_current_controller`` as described below.
 
    The launch file loads and starts the robot hardware, controllers and opens *RViz*.
    In starting terminal you will see a lot of output from the hardware implementation showing its internal states.
