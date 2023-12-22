@@ -48,7 +48,7 @@ Tutorial steps
    This is only of exemplary purposes and should be avoided as much as possible in a hardware interface implementation.
 
    If you can see two orange and one yellow rectangle in in *RViz* everything has started properly.
-   Still, to be sure, let's introspect the control system before moving *RRBot*.
+   Still, to be sure, let's introspect the control system before moving *reach alpha 5*.
 
 3. Check if the hardware interface loaded properly, by opening another terminal and executing
 
