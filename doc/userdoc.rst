@@ -78,7 +78,15 @@ Tutorial steps
         alpha_axis_c/current
         alpha_axis_c/position
         alpha_axis_c/velocity
-
+        alpha_axis_d/acceleration
+        alpha_axis_d/current
+        alpha_axis_d/position
+        alpha_axis_d/velocity
+        alpha_axis_e/acceleration
+        alpha_axis_e/current
+        alpha_axis_e/position
+        alpha_axis_e/velocity
+        
    Marker ``[claimed]`` by command interfaces means that a controller has access to command *RRBot*.
 
 4. Check which controllers are running
