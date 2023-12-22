@@ -59,12 +59,21 @@ Tutorial steps
    .. code-block:: shell
 
     command interfaces
-        joint1/acceleration [available] [unclaimed]
-        joint1/position [available] [unclaimed]
-        joint1/velocity [available] [claimed]
-        joint2/acceleration [available] [unclaimed]
-        joint2/position [available] [unclaimed]
-        joint2/velocity [available] [claimed]
+        alpha_axis_a/current [available] [unclaimed]
+        alpha_axis_a/position [available] [unclaimed]
+        alpha_axis_a/velocity [available] [unclaimed]
+        alpha_axis_b/current [available] [unclaimed]
+        alpha_axis_b/position [available] [unclaimed]
+        alpha_axis_b/velocity [available] [unclaimed]
+        alpha_axis_c/current [available] [unclaimed]
+        alpha_axis_c/position [available] [unclaimed]
+        alpha_axis_c/velocity [available] [unclaimed]
+        alpha_axis_d/current [available] [unclaimed]
+        alpha_axis_d/position [available] [unclaimed]
+        alpha_axis_d/velocity [available] [unclaimed]
+        alpha_axis_e/current [available] [unclaimed]
+        alpha_axis_e/position [available] [unclaimed]
+        alpha_axis_e/velocity [available] [unclaimed]
     state interfaces
         alpha_axis_a/acceleration
         alpha_axis_a/current
@@ -86,7 +95,6 @@ Tutorial steps
         alpha_axis_e/current
         alpha_axis_e/position
         alpha_axis_e/velocity
-        
    Marker ``[claimed]`` by command interfaces means that a controller has access to command *RRBot*.
 
 4. Check which controllers are running
