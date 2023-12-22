@@ -33,7 +33,7 @@ Tutorial steps
 
    .. code-block:: shell
 
-    ros2 launch ros2_control_reach_5 rrbot_system_multi_interface.launch.py
+    ros2 launch ros2_control_reach_5 robot_system_multi_interface.launch.py use_mock_hardware:=true
 
    Useful launch-file options:
 
