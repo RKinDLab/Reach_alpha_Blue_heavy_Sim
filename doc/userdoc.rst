@@ -120,25 +120,19 @@ Tutorial steps
 
         .. code-block:: shell
 
-          ros2 topic pub /forward_position_controller/commands std_msgs/msg/Float64MultiArray "data:
-          - 0.5
-          - 0.5"
+          ros2 topic pub /forward_position_controller/commands std_msgs/msg/Float64MultiArray "{data: [0.5,2.4,3.0,0.5,2.1]}" --once
 
       * when using ``forward_velocity_controller`` controller (default)
 
         .. code-block:: shell
 
-          ros2 topic pub /forward_velocity_controller/commands std_msgs/msg/Float64MultiArray "data:
-          - 5
-          - 5"
+          ros2 topic pub /forward_velocity_controller/commands std_msgs/msg/Float64MultiArray "{data: [0.05,0.2,0,0.5,0.1]}" --once
 
       * when using ``forward_acceleration_controller`` controller
 
         .. code-block:: shell
 
-          ros2 topic pub /forward_acceleration_controller/commands std_msgs/msg/Float64MultiArray "data:
-          - 10
-          - 10"
+          ros2 topic pub /forward_current_controller/commands std_msgs/msg/Float64MultiArray "{data: [100,80,50,-70,0.0]}" --once
 
 
    #. Or you can start a demo node which sends two goals every 5 seconds in a loop when using ``forward_position_controller`` controller
