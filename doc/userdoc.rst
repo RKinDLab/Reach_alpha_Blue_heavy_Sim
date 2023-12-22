@@ -135,68 +135,91 @@ Tutorial steps
           ros2 topic pub /forward_current_controller/commands std_msgs/msg/Float64MultiArray "{data: [100,80,50,-70,0.0]}" --once
 
 
-   #. Or you can start a demo node which sends two goals every 5 seconds in a loop when using ``forward_position_controller`` controller
+..    #. Or you can start a demo node which sends two goals every 5 seconds in a loop when using ``forward_position_controller`` controller
 
-      .. code-block:: shell
+..       .. code-block:: shell
 
-         ros2 launch ros2_control_reach_5 test_forward_position_controller.launch.py
+..          ros2 launch ros2_control_reach_5 test_forward_position_controller.launch.py
 
-   You should now see orange and yellow blocks moving in *RViz*.
-   Also, you should see changing states in the terminal where launch file is started, e.g.
+..    You should now see orange and yellow blocks moving in *RViz*.
+..    Also, you should see changing states in the terminal where launch file is started, e.g.
 
-   .. code-block:: shell
+..    .. code-block:: shell
 
-      [RRBotSystemMultiInterfaceHardware]: Got the commands pos: 0.78500, vel: 0.00000, acc: 0.00000 for joint 0, control_lvl:1
-      [RRBotSystemMultiInterfaceHardware]: Got the commands pos: 0.78500, vel: 0.00000, acc: 0.00000 for joint 1, control_lvl:1
-      [RRBotSystemMultiInterfaceHardware]: Got pos: 0.78500, vel: 0.00000, acc: 0.00000 for joint 0!
-      [RRBotSystemMultiInterfaceHardware]: Got pos: 0.78500, vel: 0.00000, acc: 0.00000 for joint 1!
+..       [RRBotSystemMultiInterfaceHardware]: Got the commands pos: 0.78500, vel: 0.00000, acc: 0.00000 for joint 0, control_lvl:1
+..       [RRBotSystemMultiInterfaceHardware]: Got the commands pos: 0.78500, vel: 0.00000, acc: 0.00000 for joint 1, control_lvl:1
+..       [RRBotSystemMultiInterfaceHardware]: Got pos: 0.78500, vel: 0.00000, acc: 0.00000 for joint 0!
+..       [RRBotSystemMultiInterfaceHardware]: Got pos: 0.78500, vel: 0.00000, acc: 0.00000 for joint 1!
 
-6. To demonstrate illegal controller configuration, use one of the following launch file arguments:
+.. 6. To demonstrate illegal controller configuration, use one of the following launch file arguments:
 
-   * ``robot_controller:=forward_illegal1_controller`` or
-   * ``robot_controller:=forward_illegal2_controller``
+..    * ``robot_controller:=forward_illegal1_controller`` or
+..    * ``robot_controller:=forward_illegal2_controller``
 
-   You will see the following error messages, because the hardware interface enforces all joints having the same command interface
+..    You will see the following error messages, because the hardware interface enforces all joints having the same command interface
 
-   .. code-block:: shell
+..    .. code-block:: shell
 
-    [ros2_control_node-1] [ERROR] [1676209982.531163501] [resource_manager]: Component 'RRBotSystemMultiInterface' did not accept new command resource combination:
-    [ros2_control_node-1]  Start interfaces:
-    [ros2_control_node-1] [
-    [ros2_control_node-1]   joint1/position
-    [ros2_control_node-1] ]
-    [ros2_control_node-1] Stop interfaces:
-    [ros2_control_node-1] [
-    [ros2_control_node-1] ]
-    [ros2_control_node-1]
-    [ros2_control_node-1] [ERROR] [1676209982.531223835] [controller_manager]: Could not switch controllers since prepare command mode switch was rejected.
-    [spawner-4] [ERROR] [1676209982.531717376] [spawner_forward_illegal1_controller]: Failed to activate controller
+..     [ros2_control_node-1] [ERROR] [1676209982.531163501] [resource_manager]: Component 'RRBotSystemMultiInterface' did not accept new command resource combination:
+..     [ros2_control_node-1]  Start interfaces:
+..     [ros2_control_node-1] [
+..     [ros2_control_node-1]   joint1/position
+..     [ros2_control_node-1] ]
+..     [ros2_control_node-1] Stop interfaces:
+..     [ros2_control_node-1] [
+..     [ros2_control_node-1] ]
+..     [ros2_control_node-1]
+..     [ros2_control_node-1] [ERROR] [1676209982.531223835] [controller_manager]: Could not switch controllers since prepare command mode switch was rejected.
+..     [spawner-4] [ERROR] [1676209982.531717376] [spawner_forward_illegal1_controller]: Failed to activate controller
 
-   Running ``ros2 control list_hardware_interfaces`` shows that no interface is claimed
+..    Running ``ros2 control list_hardware_interfaces`` shows that no interface is claimed
 
-   .. code-block:: shell
+..    .. code-block:: shell
 
-    command interfaces
-          joint1/acceleration [available] [unclaimed]
-          joint1/position [available] [unclaimed]
-          joint1/velocity [available] [unclaimed]
-          joint2/acceleration [available] [unclaimed]
-          joint2/position [available] [unclaimed]
-          joint2/velocity [available] [unclaimed]
-    state interfaces
-          joint1/acceleration
-          joint1/position
-          joint1/velocity
-          joint2/acceleration
-          joint2/position
-          joint2/velocity
+..     command interfaces
+..         alpha_axis_a/current [available] [unclaimed]
+..         alpha_axis_a/position [available] [unclaimed]
+..         alpha_axis_a/velocity [available] [unclaimed]
+..         alpha_axis_b/current [available] [unclaimed]
+..         alpha_axis_b/position [available] [unclaimed]
+..         alpha_axis_b/velocity [available] [unclaimed]
+..         alpha_axis_c/current [available] [unclaimed]
+..         alpha_axis_c/position [available] [unclaimed]
+..         alpha_axis_c/velocity [available] [unclaimed]
+..         alpha_axis_d/current [available] [unclaimed]
+..         alpha_axis_d/position [available] [unclaimed]
+..         alpha_axis_d/velocity [available] [unclaimed]
+..         alpha_axis_e/current [available] [unclaimed]
+..         alpha_axis_e/position [available] [unclaimed]
+..         alpha_axis_e/velocity [available] [unclaimed]
+..     state interfaces
+..         alpha_axis_a/acceleration
+..         alpha_axis_a/current
+..         alpha_axis_a/position
+..         alpha_axis_a/velocity
+..         alpha_axis_b/acceleration
+..         alpha_axis_b/current
+..         alpha_axis_b/position
+..         alpha_axis_b/velocity
+..         alpha_axis_c/acceleration
+..         alpha_axis_c/current
+..         alpha_axis_c/position
+..         alpha_axis_c/velocity
+..         alpha_axis_d/acceleration
+..         alpha_axis_d/current
+..         alpha_axis_d/position
+..         alpha_axis_d/velocity
+..         alpha_axis_e/acceleration
+..         alpha_axis_e/current
+..         alpha_axis_e/position
+..         alpha_axis_e/velocity
 
-   and ``ros2 control list_controllers`` indicates that the illegal controller was not loaded
+..    and ``ros2 control list_controllers`` indicates that the illegal controller was not loaded
 
-   .. code-block:: shell
+..    .. code-block:: shell
 
-    joint_state_broadcaster[joint_state_broadcaster/JointStateBroadcaster] active
-    forward_illegal1_controller[forward_command_controller/ForwardCommandController] inactive
+..     joint_state_broadcaster[joint_state_broadcaster/JointStateBroadcaster] active
+..     forward_illegal1_controller[forward_command_controller/ForwardCommandController] inactive
 
 .. Files used for this demos
 .. --------------------------
