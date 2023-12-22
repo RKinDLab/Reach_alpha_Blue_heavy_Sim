@@ -26,8 +26,6 @@ public:
 
     void calcAcceleration(const double &prev_velocity_, const double &period_seconds);
 
-    void setSimHome();
-
 };
 
 #endif // ROS2_CONTROL_REACH_5__JOINT_HPP_
