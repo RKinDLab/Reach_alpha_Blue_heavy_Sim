@@ -58,42 +58,58 @@ Tutorial steps
 
    .. code-block:: shell
    command interfaces
-      alpha_axis_a/current [available] [unclaimed]
-      alpha_axis_a/position [available] [unclaimed]
-      alpha_axis_a/velocity [available] [claimed]
-      alpha_axis_b/current [available] [unclaimed]
-      alpha_axis_b/position [available] [unclaimed]
-      alpha_axis_b/velocity [available] [claimed]
-      alpha_axis_c/current [available] [unclaimed]
-      alpha_axis_c/position [available] [unclaimed]
-      alpha_axis_c/velocity [available] [claimed]
-      alpha_axis_d/current [available] [unclaimed]
-      alpha_axis_d/position [available] [unclaimed]
-      alpha_axis_d/velocity [available] [claimed]
-      alpha_axis_e/current [available] [unclaimed]
-      alpha_axis_e/position [available] [unclaimed]
-      alpha_axis_e/velocity [available] [claimed]
+         alpha_axis_a/current [available] [unclaimed]
+         alpha_axis_a/position [available] [unclaimed]
+         alpha_axis_a/velocity [available] [claimed]
+         alpha_axis_b/current [available] [unclaimed]
+         alpha_axis_b/position [available] [unclaimed]
+         alpha_axis_b/velocity [available] [claimed]
+         alpha_axis_c/current [available] [unclaimed]
+         alpha_axis_c/position [available] [unclaimed]
+         alpha_axis_c/velocity [available] [claimed]
+         alpha_axis_d/current [available] [unclaimed]
+         alpha_axis_d/position [available] [unclaimed]
+         alpha_axis_d/velocity [available] [claimed]
+         alpha_axis_e/current [available] [unclaimed]
+         alpha_axis_e/position [available] [unclaimed]
+         alpha_axis_e/velocity [available] [claimed]
    state interfaces
-      alpha_axis_a/acceleration
-      alpha_axis_a/current
-      alpha_axis_a/position
-      alpha_axis_a/velocity
-      alpha_axis_b/acceleration
-      alpha_axis_b/current
-      alpha_axis_b/position
-      alpha_axis_b/velocity
-      alpha_axis_c/acceleration
-      alpha_axis_c/current
-      alpha_axis_c/position
-      alpha_axis_c/velocity
-      alpha_axis_d/acceleration
-      alpha_axis_d/current
-      alpha_axis_d/position
-      alpha_axis_d/velocity
-      alpha_axis_e/acceleration
-      alpha_axis_e/current
-      alpha_axis_e/position
-      alpha_axis_e/velocity
+         alpha_axis_a/acceleration
+         alpha_axis_a/current
+         alpha_axis_a/position
+         alpha_axis_a/velocity
+         alpha_axis_b/acceleration
+         alpha_axis_b/current
+         alpha_axis_b/position
+         alpha_axis_b/velocity
+         alpha_axis_c/acceleration
+         alpha_axis_c/current
+         alpha_axis_c/position
+         alpha_axis_c/velocity
+         alpha_axis_d/acceleration
+         alpha_axis_d/current
+         alpha_axis_d/position
+         alpha_axis_d/velocity
+         alpha_axis_e/acceleration
+         alpha_axis_e/current
+         alpha_axis_e/position
+         alpha_axis_e/velocity
+
+
+    command interfaces
+        joint1/acceleration [available] [unclaimed]
+        joint1/position [available] [unclaimed]
+        joint1/velocity [available] [claimed]
+        joint2/acceleration [available] [unclaimed]
+        joint2/position [available] [unclaimed]
+        joint2/velocity [available] [claimed]
+    state interfaces
+        joint1/acceleration
+        joint1/position
+        joint1/velocity
+        joint2/acceleration
+        joint2/position
+        joint2/velocity
 
    Marker ``[claimed]`` by command interfaces means that a controller has access to command *RRBot*.
 
