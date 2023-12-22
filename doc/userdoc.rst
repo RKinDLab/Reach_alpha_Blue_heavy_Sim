@@ -29,7 +29,7 @@ Tutorial steps
     The ``joint_state_publisher_gui`` provides a GUI to generate  a random configuration for rrbot. It is immediately displayed in *RViz*.
 
 
-2. To start *RRBot* example open a terminal, source your ROS2-workspace and execute its launch file with
+2. To start *reach alpha 5* example open a terminal, source your ROS2-workspace and execute its launch file with
 
    .. code-block:: shell
 
