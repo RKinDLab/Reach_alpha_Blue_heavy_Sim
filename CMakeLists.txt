@@ -26,7 +26,11 @@ add_library(
   hardware/rrbot_system_multi_interface.cpp
   hardware/reach_system_multi_Interface.cpp
   hardware/joint.cpp
-  hardware/reach_comms.cpp
+  hardware/cobs.cpp
+  hardware/crc.cpp
+  hardware/driver.cpp
+  hardware/packet.cpp
+  hardware/serial_client.cpp
 )
 target_compile_features(ros2_control_reach_5 PUBLIC cxx_std_17)
 target_include_directories(ros2_control_reach_5 PUBLIC

@@ -10,8 +10,8 @@ https://github.com/ros-simulation/gazebo_ros_demos/blob/kinetic-devel/rrbot_desc
   <xacro:arg name="use_mock_hardware" default="false" />
   <xacro:arg name="prefix" default="alpha" />
   <xacro:arg name="slowdown" default="100.0" />
-  <xacro:arg name="device" default="/dev/ttyUSB0"/>
-  <xacro:arg name="baud_rate" default="115200"/>
+  <xacro:arg name="serial_port" default="/dev/ttyUSB0"/>
+  <xacro:arg name="state_update_frequency" default="250"/>
 
   <!-- Import RRBot macro -->
   <xacro:include filename="$(find ros2_control_reach_5)/urdf/alpha_5.urdf.xacro"/>
@@ -29,8 +29,8 @@ https://github.com/ros-simulation/gazebo_ros_demos/blob/kinetic-devel/rrbot_desc
   <xacro:robot_system_multi_interface
     name="ReachSystemMultiInterface"
     prefix="$(arg prefix)"
-    device="$(arg device)"
-    baud_rate="$(arg baud_rate)" 
+    serial_port="$(arg serial_port)"
+    state_update_frequency="$(arg state_update_frequency)"
     use_mock_hardware="$(arg use_mock_hardware)"
     slowdown="$(arg slowdown)" />
 
