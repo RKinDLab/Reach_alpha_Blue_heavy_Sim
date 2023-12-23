@@ -36,17 +36,19 @@ def generate_launch_description():
     )
     declared_arguments.append(
         DeclareLaunchArgument(
-            "device",
+            "serial_port",
             default_value="/dev/ttyUSB0",
             description="Start robot with device port to hardware.",
         )
     )
     declared_arguments.append(
-        DeclareLaunchArgument(
-            "baud_rate",
-            default_value="115200",
-            description="the rate at which information is transferred in a communication channel",
-        )
+            DeclareLaunchArgument(
+            "state_update_frequency",
+            default_value="300",
+            description="The frequency (Hz) at which the driver updates the state of the robot."
+                " Note that this should not be less than the read frequency defined by"
+                " the controller configuration.",
+            )
     )
     declared_arguments.append(
         DeclareLaunchArgument(
@@ -79,8 +81,8 @@ def generate_launch_description():
     prefix = LaunchConfiguration("prefix")
     use_mock_hardware = LaunchConfiguration("use_mock_hardware")
     slowdown = LaunchConfiguration("slowdown")
-    device = LaunchConfiguration("device")
-    baud_rate = LaunchConfiguration("baud_rate")
+    serial_port = LaunchConfiguration("serial_port")
+    state_update_frequency = LaunchConfiguration("state_update_frequency")
     robot_controller = LaunchConfiguration("robot_controller")
     gui = LaunchConfiguration("gui")
 
@@ -100,11 +102,11 @@ def generate_launch_description():
             "prefix:=",
             prefix,
             " ",
-            "device:=",
-            device,
+            "serial_port:=",
+            serial_port,
             " ",
-            "baud_rate:=",
-            baud_rate,
+            "state_update_frequency:=",
+            state_update_frequency,
             " ",
             "use_mock_hardware:=",
             use_mock_hardware,
