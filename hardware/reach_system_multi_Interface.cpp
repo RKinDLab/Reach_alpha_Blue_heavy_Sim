@@ -55,8 +55,6 @@ namespace ros2_control_reach_5
 
       RCLCPP_INFO(
           rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "Device with id %u found", static_cast<unsigned int>(device_id));
-      RCLCPP_INFO(
-          rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "Device default position is %f", default_position);
 
       hw_joint_structs_.emplace_back(joint.name, device_id, default_position);
       // RRBotSystemMultiInterface has exactly 3 state interfaces
@@ -124,20 +122,20 @@ namespace ros2_control_reach_5
       return hardware_interface::CallbackReturn::ERROR;
     }
 
-    // // Register callbacks for joint states
-    // driver_.subscribe(
-    //     alpha::driver::PacketId::kPosition,
-    //     [this](const alpha::driver::Packet &packet) -> void
-    //     { updatePositionCb(packet); });
+    // Register callbacks for joint states
+    driver_.subscribe(
+        alpha::driver::PacketId::kPosition,
+        [this](const alpha::driver::Packet &packet) -> void
+        { updatePositionCb(packet, hw_joint_structs_); });
 
-    // driver_.subscribe(
-    //     alpha::driver::PacketId::kVelocity,
-    //     [this](const alpha::driver::Packet &packet) -> void
-    //     { updateVelocityCb(packet); });
+    driver_.subscribe(
+        alpha::driver::PacketId::kVelocity,
+        [this](const alpha::driver::Packet &packet) -> void
+        { updateVelocityCb(packet, hw_joint_structs_); });
 
-    // // Start a thread to request state updates
-    // running_.store(true);
-    // state_request_worker_ = std::thread(&ReachSystemMultiInterfaceHardware::pollState, this, cfg_.state_update_freq_);
+    // Start a thread to request state updates
+    running_.store(true);
+    state_request_worker_ = std::thread(&ReachSystemMultiInterfaceHardware::pollState, this, cfg_.state_update_freq_);
 
     RCLCPP_INFO( // NOLINT
         rclcpp::get_logger("ReachSystemMultiInterfaceHardware"),
@@ -151,9 +149,9 @@ namespace ros2_control_reach_5
     RCLCPP_INFO( // NOLINT
         rclcpp::get_logger("AlphaHardware"), "Shutting down the AlphaHardware system interface.");
 
-    // running_.store(false);
-    // state_request_worker_.join();
-    // driver_.stop();
+    running_.store(false);
+    state_request_worker_.join();
+    driver_.stop();
 
     return hardware_interface::CallbackReturn::SUCCESS;
   }
@@ -264,40 +262,15 @@ namespace ros2_control_reach_5
     // BEGIN: This part here is for exemplary purposes - Please do not copy to your production code
     RCLCPP_INFO(
         rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "Activating... please wait...");
-
-    for (std::size_t i = 0; i < info_.joints.size(); i++)
+    try
     {
-      if (std::isnan(hw_joint_structs_[i].position_state_))
-      {
-        hw_joint_structs_[i].position_state_ = 0;
-      }
-      if (std::isnan(hw_joint_structs_[i].velocity_state_))
-      {
-        hw_joint_structs_[i].velocity_state_ = 0;
-      }
-      if (std::isnan(hw_joint_structs_[i].current_state_))
-      {
-        hw_joint_structs_[i].current_state_ = 0;
-      }
-      if (std::isnan(hw_joint_structs_[i].acceleration_state_))
-      {
-        hw_joint_structs_[i].acceleration_state_ = 0;
-      }
-      if (std::isnan(hw_joint_structs_[i].position_command_))
-      {
-        hw_joint_structs_[i].position_command_ = 0;
-      }
-      if (std::isnan(hw_joint_structs_[i].velocity_command_))
-      {
-        hw_joint_structs_[i].velocity_command_ = 0;
-      }
-      if (std::isnan(hw_joint_structs_[i].current_command_))
-      {
-        hw_joint_structs_[i].current_command_ = 0;
-      }
-      control_modes_[i] = mode_level_t::MODE_DISABLE;
+      driver_.setMode(alpha::driver::Mode::MODE_STANDBY, alpha::driver::DeviceId::kAllJoints);
     }
-
+    catch (const std::exception &e)
+    {
+      RCLCPP_ERROR(rclcpp::get_logger("AlphaHardware"), e.what()); // NOLINT
+      return hardware_interface::CallbackReturn::ERROR;
+    }
     RCLCPP_INFO(
         rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "System successfully activated!");
     return hardware_interface::CallbackReturn::SUCCESS;
@@ -308,6 +281,15 @@ namespace ros2_control_reach_5
   {
     RCLCPP_INFO(
         rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "Deactivating... please wait...");
+    try
+    {
+      driver_.setMode(alpha::driver::Mode::MODE_DISABLE, alpha::driver::DeviceId::kAllJoints);
+    }
+    catch (const std::exception &e)
+    {
+      RCLCPP_ERROR(rclcpp::get_logger("AlphaHardware"), e.what()); // NOLINT
+      return hardware_interface::CallbackReturn::ERROR;
+    }
 
     RCLCPP_INFO(rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "Successfully deactivated!");
 
@@ -315,54 +297,17 @@ namespace ros2_control_reach_5
   }
 
   hardware_interface::return_type ReachSystemMultiInterfaceHardware::read(
-      const rclcpp::Time & /*time*/, const rclcpp::Duration &period)
+      const rclcpp::Time & /*time*/, const rclcpp::Duration & period)
   {
+    // Get access to the real-time states
+    const std::lock_guard<std::mutex> lock(access_async_states_);
     for (std::size_t i = 0; i < info_.joints.size(); i++)
     {
-      switch (control_modes_[i])
-      {
-      case mode_level_t::MODE_DISABLE:
-        // RCLCPP_INFO(
-        //   rclcpp::get_logger("RRBotSystemMultiInterfaceHardware"),
-        //   "Nothing is using the hardware interface!");
-        return hardware_interface::return_type::OK;
-        break;
-      case mode_level_t::MODE_POSITION:
-        hw_joint_structs_[i].acceleration_state_ = 0;
-        hw_joint_structs_[i].current_state_ = 0;
-        hw_joint_structs_[i].velocity_state_ = 0;
-        hw_joint_structs_[i].position_state_ +=
-            (hw_joint_structs_[i].position_command_ - hw_joint_structs_[i].position_state_) / 20;
-        break;
-      case mode_level_t::MODE_VELOCITY:
-
-        hw_joint_structs_[i].acceleration_state_ = 0;
-        hw_joint_structs_[i].current_state_ = 0;
-        hw_joint_structs_[i].velocity_state_ = hw_joint_structs_[i].velocity_command_;
-        hw_joint_structs_[i].position_state_ += (hw_joint_structs_[i].velocity_state_ * period.seconds()) / 20;
-        break;
-      case mode_level_t::MODE_CURRENT:
-        hw_joint_structs_[i].current_state_ = hw_joint_structs_[i].current_command_;
-        hw_joint_structs_[i].acceleration_state_ = hw_joint_structs_[i].current_command_ / 2; // dummy
-        hw_joint_structs_[i].velocity_state_ += (hw_joint_structs_[i].acceleration_state_ * period.seconds()) / 20;
-        hw_joint_structs_[i].position_state_ += (hw_joint_structs_[i].velocity_state_ * period.seconds()) / 20;
-        break;
-      case mode_level_t::MODE_STANDBY:
-        hw_joint_structs_[i].current_state_ = hw_joint_structs_[i].current_command_;
-        hw_joint_structs_[i].acceleration_state_ = hw_joint_structs_[i].current_command_ / 2; // dummy
-        hw_joint_structs_[i].velocity_state_ += (hw_joint_structs_[i].acceleration_state_ * period.seconds()) / 20;
-        hw_joint_structs_[i].position_state_ += (hw_joint_structs_[i].velocity_state_ * period.seconds()) / 20;
-        break;
-      }
-      // BEGIN: This part here is for exemplary purposes - Please do not copy to your production code
-      // RCLCPP_INFO(
-      //   rclcpp::get_logger("ReachSystemMultiInterfaceHardware"),
-      //   "Got pos: %.5f, vel: %.5f, acc: %.5f, cur: %.5f for joint %s!",
-      //   hw_joint_structs_[i].position_state_,
-      //   hw_joint_structs_[i].velocity_state_,
-      //   hw_joint_structs_[i].acceleration_state_,
-      //   hw_joint_structs_[i].current_state_, info_.joints[i].name.c_str());
-      // END: This part here is for exemplary purposes - Please do not copy to your production code
+      double delta_seconds = period.seconds();
+      double prev_velocity_ = hw_joint_structs_[i].velocity_state_;
+      hw_joint_structs_[i].position_state_ = hw_joint_structs_[i].async_position_state_;
+      hw_joint_structs_[i].velocity_state_ = hw_joint_structs_[i].async_velocity_state_;
+      hw_joint_structs_[i].calcAcceleration(prev_velocity_, delta_seconds);
     }
     return hardware_interface::return_type::OK;
   }
@@ -370,25 +315,10 @@ namespace ros2_control_reach_5
   hardware_interface::return_type ReachSystemMultiInterfaceHardware::write(
       const rclcpp::Time & /*time*/, const rclcpp::Duration & /*period*/)
   {
-    // BEGIN: This part here is for exemplary purposes - Please do not copy to your production code
-    // for (std::size_t i = 0; i < info_.joints.size(); i++)
-    // {
-    //   // Simulate sending commands to the hardware
-    //   RCLCPP_INFO(
-    //     rclcpp::get_logger("ReachSystemMultiInterfaceHardware"),
-    //     "Got the commands pos: %.5f, vel: %.5f, cur: %.5f for joint %s, control_lvl:%u",
-    //     hw_joint_structs_[i].position_command_,
-    //     hw_joint_structs_[i].velocity_command_,
-    //     hw_joint_structs_[i].current_command_,
-    //     info_.joints[i].name.c_str(),
-    //     control_level_[i]);
-    // }
-    // END: This part here is for exemplary purposes - Please do not copy to your production code
-
     return hardware_interface::return_type::OK;
   }
 
-  void ReachSystemMultiInterfaceHardware::updatePositionCb(const alpha::driver::Packet &packet)
+  void ReachSystemMultiInterfaceHardware::updatePositionCb(const alpha::driver::Packet &packet, std::vector<Joint> &hw_joint_structs_ref)
   {
     if (packet.getData().size() != 4)
     {
@@ -399,16 +329,25 @@ namespace ros2_control_reach_5
     std::memcpy(&position, &packet.getData()[0], sizeof(position)); // NOLINT
 
     // Convert from mm to m if the message is from the jaws
-    position =
-        packet.getDeviceId() == alpha::driver::DeviceId::kLinearJaws ? position / 1000 : position;
+    position = packet.getDeviceId() == alpha::driver::DeviceId::kLinearJaws ? position / 1000 : position;
 
     const std::lock_guard<std::mutex> lock(access_async_states_);
+    // RCLCPP_INFO(
+    //     rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "async position is %f", position);
 
-    // We assume that the device ID is the index within the vector
-    async_states_positions_[static_cast<std::size_t>(packet.getDeviceId()) - 1] = position;
+    auto deviceId = static_cast<uint8_t>(packet.getDeviceId()); // Cast the device ID to uint8_t
+
+    auto it = std::find_if(hw_joint_structs_ref.begin(), hw_joint_structs_ref.end(),
+                           [deviceId](const Joint &joint)
+                           { return joint.device_id == deviceId; });
+
+    if (it != hw_joint_structs_ref.end())
+    {
+      it->async_position_state_ = position;
+    }
   }
 
-  void ReachSystemMultiInterfaceHardware::updateVelocityCb(const alpha::driver::Packet &packet)
+  void ReachSystemMultiInterfaceHardware::updateVelocityCb(const alpha::driver::Packet &packet, std::vector<Joint> &hw_joint_structs_ref)
   {
     if (packet.getData().size() != 4)
     {
@@ -422,22 +361,25 @@ namespace ros2_control_reach_5
     velocity = packet.getDeviceId() == alpha::driver::DeviceId::kLinearJaws ? velocity / 1000 : velocity;
 
     const std::lock_guard<std::mutex> lock(access_async_states_);
+    // RCLCPP_INFO(
+    //     rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "async velocity is %f", velocity);
 
-    // We assume that the device ID is the index within the vector
-    async_states_velocities_[static_cast<std::size_t>(packet.getDeviceId()) - 1] = velocity;
+    auto deviceId = static_cast<uint8_t>(packet.getDeviceId()); // Cast the device ID to uint8_t
+
+    auto it = std::find_if(hw_joint_structs_ref.begin(), hw_joint_structs_ref.end(),
+                           [deviceId](const Joint &joint)
+                           { return joint.device_id == deviceId; });
+
+    if (it != hw_joint_structs_ref.end())
+    {
+      it->async_velocity_state_ = velocity;
+    }
   }
 
   void ReachSystemMultiInterfaceHardware::pollState(const int freq) const
   {
     while (running_.load())
     {
-      // There are a few important things to note here:
-      //   1. Yes, we could use the kAllJoints device ID, but for some reason, the response rate for
-      //      each joints becomes less reliable when we use kAllJoints. We get better response rates
-      //      from the joints when we split this up.
-      //   2. Yes, we could also create a request with multiple packet IDs, but, again, there are
-      //      bugs in the serial communication when that is used. Specifically, data is more likely
-      //      to become corrupted, resulting in bad reads. So instead we just request them separately.
       driver_.request(alpha::driver::PacketId::kVelocity, alpha::driver::DeviceId::kLinearJaws);
       driver_.request(alpha::driver::PacketId::kVelocity, alpha::driver::DeviceId::kRotateEndEffector);
       driver_.request(alpha::driver::PacketId::kVelocity, alpha::driver::DeviceId::kBendElbow);

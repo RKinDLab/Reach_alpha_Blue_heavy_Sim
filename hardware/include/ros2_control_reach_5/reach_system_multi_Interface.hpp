@@ -128,7 +128,7 @@ namespace ros2_control_reach_5
      *
      * @param packet The position packet that signaled the callback.
      */
-    void updatePositionCb(const alpha::driver::Packet &packet);
+    void updatePositionCb(const alpha::driver::Packet &packet, std::vector<Joint> &hw_joint_structs_ref);
 
     /**
      * @brief Write the current velocity of the robot received from the serial client to the
@@ -136,7 +136,7 @@ namespace ros2_control_reach_5
      *
      * @param packet The velocity packet that signaled the callback.
      */
-    void updateVelocityCb(const alpha::driver::Packet &packet);
+    void updateVelocityCb(const alpha::driver::Packet &packet, std::vector<Joint> &hw_joint_structs_ref);
 
     /**
      * @brief Asynchronously read the current state of the robot by polling the robot serial
@@ -151,13 +151,16 @@ namespace ros2_control_reach_5
     std::thread state_request_worker_;
     std::atomic<bool> running_{false};
 
-    // ros2_control command interfaces
-    std::vector<double> hw_commands_velocities_;
-    std::vector<double> hw_commands_positions_;
+    // // ros2_control command interfaces
+    // std::vector<double> hw_commands_velocities_;
+    // std::vector<double> hw_commands_positions_;
 
-    // ros2_control state interfaces
-    std::vector<double> hw_states_positions_, async_states_positions_;
-    std::vector<double> hw_states_velocities_, async_states_velocities_;
+    // // ros2_control state interfaces
+    // std::vector<double> hw_states_positions_;
+    // std::vector<double> hw_states_velocities_;
+
+    // std::vector<double> async_states_positions_;
+    // std::vector<double> async_states_velocities_;
 
     std::mutex access_async_states_;
   };
