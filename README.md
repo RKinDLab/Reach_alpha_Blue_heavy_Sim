@@ -12,7 +12,7 @@ For detailed information on setup, configuration, and usage, please refer to our
 
 ### Online Documentation
 
-For additional resources, including extended examples and in-depth tutorials, please visit our dedicated section on [control.ros.org](https://control.ros.org/master/doc/ros2_control_demos/example_3/doc/userdoc.html).
+For additional resources, including extended examples and in-depth tutorials, please visit the dedicated ROS section on [control.ros.org](https://control.ros.org/master/doc/ros2_control_demos/example_3/doc/userdoc.html).
 
 ## Disclaimer
 
