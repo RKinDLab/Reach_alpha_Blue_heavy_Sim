@@ -17,6 +17,7 @@ public:
     double velocity_state_ = 0;
     double async_position_state_ = 0;
     double async_velocity_state_ = 0;
+    double async_current_state_ = 0;
     double current_state_ = 0;
     double acceleration_state_ = 0;
 

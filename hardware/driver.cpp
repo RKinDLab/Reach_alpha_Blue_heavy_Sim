@@ -33,7 +33,7 @@ namespace alpha::driver
 
 Driver::Driver()
 {
-  subscribe(PacketId::kModelNumber, [this](const Packet &) -> void {
+  subscribe(PacketId::PacketID_MODEL_NUMBER, [this](const Packet &) -> void {
     const std::lock_guard<std::mutex> lock(last_heartbeat_lock_);
     last_heartbeat_ = std::chrono::steady_clock::now();
   });
@@ -84,29 +84,29 @@ void Driver::setMode(Mode mode, DeviceId device) const
 
   const std::vector<unsigned char> mode_setting = {static_cast<unsigned char>(mode)};
 
-  const Packet packet(PacketId::kMode, device, mode_setting);
+  const Packet packet(PacketId::PacketID_MODE, device, mode_setting);
 
   client_.send(packet);
 }
 
 void Driver::setVelocity(float velocity, DeviceId device) const
 {
-  sendFloat(velocity, PacketId::kVelocity, device);
+  sendFloat(velocity, PacketId::PacketID_VELOCITY, device);
 }
 
 void Driver::setPosition(float position, DeviceId device) const
 {
-  sendFloat(position, PacketId::kPosition, device);
+  sendFloat(position, PacketId::PacketID_POSITION, device);
 }
 
 void Driver::setRelativePosition(float relative_position, DeviceId device) const
 {
-  sendFloat(relative_position, PacketId::kRelativePosition, device);
+  sendFloat(relative_position, PacketId::PacketID_RELATIVE_POSITION, device);
 }
 
 void Driver::setCurrent(float current, DeviceId device) const
 {
-  sendFloat(current, PacketId::kCurrent, device);
+  sendFloat(current, PacketId::PacketID_CURRENT, device);
 }
 
 void Driver::request(PacketId packet_type, DeviceId device) const
@@ -118,7 +118,7 @@ void Driver::request(PacketId packet_type, DeviceId device) const
 
   const std::vector<unsigned char> request_type = {static_cast<unsigned char>(packet_type)};
 
-  const Packet packet(PacketId::kRequest, device, request_type);
+  const Packet packet(PacketId::PacketID_REQUEST_PACKET, device, request_type);
 
   client_.send(packet);
 }
@@ -141,7 +141,7 @@ void Driver::request(std::vector<PacketId> & packet_types, DeviceId device) cons
     request_types.push_back(static_cast<unsigned char>(type));
   }
 
-  const Packet packet(PacketId::kRequest, device, request_types);
+  const Packet packet(PacketId::PacketID_REQUEST_PACKET, device, request_types);
 
   client_.send(packet);
 }
@@ -171,9 +171,9 @@ void Driver::enableHeartbeat(int freq)
 {
   // We request the model number as the heartbeat because there isn't an official heartbeat message
   const std::vector<unsigned char> heartbeat_config = {
-    static_cast<unsigned char>(alpha::driver::PacketId::kModelNumber)};
+    static_cast<unsigned char>(alpha::driver::PacketId::PacketID_MODEL_NUMBER)};
 
-  const Packet packet(PacketId::kHeartbeatSet, DeviceId::kAllJoints, heartbeat_config);
+  const Packet packet(PacketId::PacketID_HEARTBEAT_SET, DeviceId::kAllJoints, heartbeat_config);
 
   client_.send(packet);
 
@@ -185,7 +185,7 @@ void Driver::disableHeartbeat() { setHeartbeatFreq(0); }
 void Driver::setHeartbeatFreq(int freq)
 {
   const std::vector<unsigned char> heartbeat_frequency = {static_cast<unsigned char>(freq)};
-  const Packet packet(PacketId::kHeartbeatFreqency, DeviceId::kAllJoints, heartbeat_frequency);
+  const Packet packet(PacketId::PacketID_HEARTBEAT_FREQUENCY_SET, DeviceId::kAllJoints, heartbeat_frequency);
   client_.send(packet);
 }
 
