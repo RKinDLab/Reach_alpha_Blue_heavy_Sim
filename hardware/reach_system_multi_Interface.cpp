@@ -124,14 +124,19 @@ namespace ros2_control_reach_5
 
     // Register callbacks for joint states
     driver_.subscribe(
-        alpha::driver::PacketId::kPosition,
+        alpha::driver::PacketId::PacketID_POSITION,
         [this](const alpha::driver::Packet &packet) -> void
         { updatePositionCb(packet, hw_joint_structs_); });
 
     driver_.subscribe(
-        alpha::driver::PacketId::kVelocity,
+        alpha::driver::PacketId::PacketID_VELOCITY,
         [this](const alpha::driver::Packet &packet) -> void
         { updateVelocityCb(packet, hw_joint_structs_); });
+
+    driver_.subscribe(
+        alpha::driver::PacketId::PacketID_CURRENT,
+        [this](const alpha::driver::Packet &packet) -> void
+        { updateCurrentCb(packet, hw_joint_structs_); });
 
     // Start a thread to request state updates
     running_.store(true);
@@ -307,7 +312,10 @@ namespace ros2_control_reach_5
       double prev_velocity_ = hw_joint_structs_[i].velocity_state_;
       hw_joint_structs_[i].position_state_ = hw_joint_structs_[i].async_position_state_;
       hw_joint_structs_[i].velocity_state_ = hw_joint_structs_[i].async_velocity_state_;
+      hw_joint_structs_[i].current_state_ = hw_joint_structs_[i].async_current_state_;
       hw_joint_structs_[i].calcAcceleration(prev_velocity_, delta_seconds);
+      //  RCLCPP_INFO(rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), " %d acceleration %f",hw_joint_structs_[i].device_id,
+      //   hw_joint_structs_[i].acceleration_state_);
     }
     return hardware_interface::return_type::OK;
   }
@@ -376,21 +384,57 @@ namespace ros2_control_reach_5
     }
   }
 
+ void ReachSystemMultiInterfaceHardware::updateCurrentCb(const alpha::driver::Packet &packet, std::vector<Joint> &hw_joint_structs_ref)
+  {
+    if (packet.getData().size() != 4)
+    {
+      return;
+    }
+
+    float current;
+    std::memcpy(&current, &packet.getData()[0], sizeof(current)); // NOLINT
+
+    // Convert from mm/s to m/s if the message is from the jaws
+    current = packet.getDeviceId() == alpha::driver::DeviceId::kLinearJaws ? current / 1000 : current;
+
+    const std::lock_guard<std::mutex> lock(access_async_states_);
+    // RCLCPP_INFO(
+    //     rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "async current is %f", current);
+
+    auto deviceId = static_cast<uint8_t>(packet.getDeviceId()); // Cast the device ID to uint8_t
+
+    auto it = std::find_if(hw_joint_structs_ref.begin(), hw_joint_structs_ref.end(),
+                           [deviceId](const Joint &joint)
+                           { return joint.device_id == deviceId; });
+
+    if (it != hw_joint_structs_ref.end())
+    {
+      it->async_current_state_ = current;
+    }
+  }
+
   void ReachSystemMultiInterfaceHardware::pollState(const int freq) const
   {
     while (running_.load())
     {
-      driver_.request(alpha::driver::PacketId::kVelocity, alpha::driver::DeviceId::kLinearJaws);
-      driver_.request(alpha::driver::PacketId::kVelocity, alpha::driver::DeviceId::kRotateEndEffector);
-      driver_.request(alpha::driver::PacketId::kVelocity, alpha::driver::DeviceId::kBendElbow);
-      driver_.request(alpha::driver::PacketId::kVelocity, alpha::driver::DeviceId::kBendShoulder);
-      driver_.request(alpha::driver::PacketId::kVelocity, alpha::driver::DeviceId::kRotateBase);
+      driver_.request(alpha::driver::PacketId::PacketID_VELOCITY, alpha::driver::DeviceId::kLinearJaws);
+      driver_.request(alpha::driver::PacketId::PacketID_VELOCITY, alpha::driver::DeviceId::kRotateEndEffector);
+      driver_.request(alpha::driver::PacketId::PacketID_VELOCITY, alpha::driver::DeviceId::kBendElbow);
+      driver_.request(alpha::driver::PacketId::PacketID_VELOCITY, alpha::driver::DeviceId::kBendShoulder);
+      driver_.request(alpha::driver::PacketId::PacketID_VELOCITY, alpha::driver::DeviceId::kRotateBase);
 
-      driver_.request(alpha::driver::PacketId::kPosition, alpha::driver::DeviceId::kLinearJaws);
-      driver_.request(alpha::driver::PacketId::kPosition, alpha::driver::DeviceId::kRotateEndEffector);
-      driver_.request(alpha::driver::PacketId::kPosition, alpha::driver::DeviceId::kBendElbow);
-      driver_.request(alpha::driver::PacketId::kPosition, alpha::driver::DeviceId::kBendShoulder);
-      driver_.request(alpha::driver::PacketId::kPosition, alpha::driver::DeviceId::kRotateBase);
+      driver_.request(alpha::driver::PacketId::PacketID_POSITION, alpha::driver::DeviceId::kLinearJaws);
+      driver_.request(alpha::driver::PacketId::PacketID_POSITION, alpha::driver::DeviceId::kRotateEndEffector);
+      driver_.request(alpha::driver::PacketId::PacketID_POSITION, alpha::driver::DeviceId::kBendElbow);
+      driver_.request(alpha::driver::PacketId::PacketID_POSITION, alpha::driver::DeviceId::kBendShoulder);
+      driver_.request(alpha::driver::PacketId::PacketID_POSITION, alpha::driver::DeviceId::kRotateBase);
+
+      driver_.request(alpha::driver::PacketId::PacketID_CURRENT, alpha::driver::DeviceId::kLinearJaws);
+      driver_.request(alpha::driver::PacketId::PacketID_CURRENT, alpha::driver::DeviceId::kRotateEndEffector);
+      driver_.request(alpha::driver::PacketId::PacketID_CURRENT, alpha::driver::DeviceId::kBendElbow);
+      driver_.request(alpha::driver::PacketId::PacketID_CURRENT, alpha::driver::DeviceId::kBendShoulder);
+      driver_.request(alpha::driver::PacketId::PacketID_CURRENT, alpha::driver::DeviceId::kRotateBase);
+
 
       std::this_thread::sleep_for(std::chrono::seconds(1 / freq));
     }
