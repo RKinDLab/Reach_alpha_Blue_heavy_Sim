@@ -34,6 +34,7 @@ namespace ros2_control_reach_5
     {
       std::string device_id_value = joint.parameters.at("device_id");
       double default_position = stod(joint.parameters.at("home"));
+
       uint8_t device_id = static_cast<uint8_t>(std::stoul(device_id_value, nullptr, 16));
 
       RCLCPP_INFO(
@@ -41,7 +42,8 @@ namespace ros2_control_reach_5
       RCLCPP_INFO(
           rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "Device default position is %f", default_position);
 
-      hw_joint_structs_.emplace_back(joint.name, device_id, default_position);
+      Joint::State initialState{default_position, 0.0,0.0};
+      hw_joint_structs_.emplace_back(joint.name, device_id, initialState);
       // RRBotSystemMultiInterface has exactly 3 state interfaces
       // and 3 command interfaces on each joint
       if (joint.command_interfaces.size() != 3)
@@ -99,13 +101,13 @@ namespace ros2_control_reach_5
     for (std::size_t i = 0; i < info_.joints.size(); i++)
     {
       state_interfaces.emplace_back(hardware_interface::StateInterface(
-          info_.joints[i].name, hardware_interface::HW_IF_POSITION, &hw_joint_structs_[i].position_state_));
+          info_.joints[i].name, hardware_interface::HW_IF_POSITION, &hw_joint_structs_[i].current_state_.position));
       state_interfaces.emplace_back(hardware_interface::StateInterface(
-          info_.joints[i].name, hardware_interface::HW_IF_VELOCITY, &hw_joint_structs_[i].velocity_state_));
+          info_.joints[i].name, hardware_interface::HW_IF_VELOCITY, &hw_joint_structs_[i].current_state_.velocity));
       state_interfaces.emplace_back(hardware_interface::StateInterface(
-          info_.joints[i].name, hardware_interface::HW_IF_ACCELERATION, &hw_joint_structs_[i].acceleration_state_));
+          info_.joints[i].name, hardware_interface::HW_IF_ACCELERATION, &hw_joint_structs_[i].current_state_.acceleration));
       state_interfaces.emplace_back(hardware_interface::StateInterface(
-          info_.joints[i].name, custom_hardware_interface::HW_IF_CURRENT, &hw_joint_structs_[i].current_state_));
+          info_.joints[i].name, custom_hardware_interface::HW_IF_CURRENT, &hw_joint_structs_[i].current_state_.current));
     }
 
     return state_interfaces;
@@ -118,11 +120,11 @@ namespace ros2_control_reach_5
     for (std::size_t i = 0; i < info_.joints.size(); i++)
     {
       command_interfaces.emplace_back(hardware_interface::CommandInterface(
-          info_.joints[i].name, hardware_interface::HW_IF_POSITION, &hw_joint_structs_[i].position_command_));
+          info_.joints[i].name, hardware_interface::HW_IF_POSITION, &hw_joint_structs_[i].command_state_.position));
       command_interfaces.emplace_back(hardware_interface::CommandInterface(
-          info_.joints[i].name, hardware_interface::HW_IF_VELOCITY, &hw_joint_structs_[i].velocity_command_));
+          info_.joints[i].name, hardware_interface::HW_IF_VELOCITY, &hw_joint_structs_[i].command_state_.velocity));
       command_interfaces.emplace_back(hardware_interface::CommandInterface(
-          info_.joints[i].name, custom_hardware_interface::HW_IF_CURRENT, &hw_joint_structs_[i].current_command_));
+          info_.joints[i].name, custom_hardware_interface::HW_IF_CURRENT, &hw_joint_structs_[i].command_state_.current));
     }
 
     return command_interfaces;
@@ -173,8 +175,8 @@ namespace ros2_control_reach_5
       {
         if (key.find(info_.joints[i].name) != std::string::npos)
         {
-          hw_joint_structs_[i].velocity_command_ = 0;
-          hw_joint_structs_[i].current_command_ = 0;
+          hw_joint_structs_[i].command_state_.velocity = 0;
+          hw_joint_structs_[i].command_state_.current = 0;
           control_level_[i] = mode_level_t::MODE_DISABLE; // Revert to undefined
         }
       }
@@ -201,33 +203,33 @@ namespace ros2_control_reach_5
         
     for (std::size_t i = 0; i < info_.joints.size(); i++)
     {
-      if (std::isnan(hw_joint_structs_[i].position_state_) || hw_joint_structs_[i].position_state_ == 0)
+      if (std::isnan(hw_joint_structs_[i].current_state_.position) || hw_joint_structs_[i].current_state_.position == 0)
       {
-        hw_joint_structs_[i].position_state_ = hw_joint_structs_[i].default_position_;
+        hw_joint_structs_[i].current_state_.position = hw_joint_structs_[i].default_state_.position;
       }
-      if (std::isnan(hw_joint_structs_[i].velocity_state_))
+      if (std::isnan(hw_joint_structs_[i].current_state_.velocity))
       {
-        hw_joint_structs_[i].velocity_state_ = 0;
+        hw_joint_structs_[i].current_state_.velocity = 0;
       }
-      if (std::isnan(hw_joint_structs_[i].current_state_))
+      if (std::isnan(hw_joint_structs_[i].current_state_.current))
       {
-        hw_joint_structs_[i].current_state_ = 0;
+        hw_joint_structs_[i].current_state_.current = 0;
       }
-      if (std::isnan(hw_joint_structs_[i].acceleration_state_))
+      if (std::isnan(hw_joint_structs_[i].current_state_.acceleration))
       {
-        hw_joint_structs_[i].acceleration_state_ = 0;
+        hw_joint_structs_[i].current_state_.acceleration = 0;
       }
-      if (std::isnan(hw_joint_structs_[i].position_command_))
+      if (std::isnan(hw_joint_structs_[i].command_state_.position))
       {
-        hw_joint_structs_[i].position_command_ = 0;
+        hw_joint_structs_[i].command_state_.position = 0;
       }
-      if (std::isnan(hw_joint_structs_[i].velocity_command_))
+      if (std::isnan(hw_joint_structs_[i].command_state_.velocity))
       {
-        hw_joint_structs_[i].velocity_command_ = 0;
+        hw_joint_structs_[i].command_state_.velocity = 0;
       }
-      if (std::isnan(hw_joint_structs_[i].current_command_))
+      if (std::isnan(hw_joint_structs_[i].command_state_.current))
       {
-        hw_joint_structs_[i].current_command_ = 0;
+        hw_joint_structs_[i].command_state_.current = 0;
       }
       control_level_[i] = mode_level_t::MODE_DISABLE;
     }
@@ -273,29 +275,29 @@ namespace ros2_control_reach_5
         return hardware_interface::return_type::OK;
         break;
       case mode_level_t::MODE_POSITION:
-        hw_joint_structs_[i].acceleration_state_ = 0;
-        hw_joint_structs_[i].current_state_ = 0;
-        hw_joint_structs_[i].velocity_state_ = 0;
-        hw_joint_structs_[i].position_state_ +=
-            (hw_joint_structs_[i].position_command_ - hw_joint_structs_[i].position_state_) / cfg_.hw_slowdown_;
+        hw_joint_structs_[i].current_state_.acceleration = 0;
+        hw_joint_structs_[i].current_state_.current = 0;
+        hw_joint_structs_[i].current_state_.velocity = 0;
+        hw_joint_structs_[i].current_state_.position +=
+            (hw_joint_structs_[i].command_state_.position - hw_joint_structs_[i].current_state_.position) / cfg_.hw_slowdown_;
         break;
       case mode_level_t::MODE_VELOCITY:
-        hw_joint_structs_[i].acceleration_state_ = 0;
-        hw_joint_structs_[i].current_state_ = 0;
-        hw_joint_structs_[i].velocity_state_ = hw_joint_structs_[i].velocity_command_;
-        hw_joint_structs_[i].position_state_ += (hw_joint_structs_[i].velocity_state_ * period.seconds()) / cfg_.hw_slowdown_;
+        hw_joint_structs_[i].current_state_.acceleration = 0;
+        hw_joint_structs_[i].current_state_.current  = 0;
+        hw_joint_structs_[i].current_state_.velocity = hw_joint_structs_[i].command_state_.velocity;
+        hw_joint_structs_[i].current_state_.position += (hw_joint_structs_[i].current_state_.velocity * period.seconds()) / cfg_.hw_slowdown_;
         break;
       case mode_level_t::MODE_CURRENT:
-        hw_joint_structs_[i].current_state_ = hw_joint_structs_[i].current_command_;
-        hw_joint_structs_[i].acceleration_state_ = hw_joint_structs_[i].current_command_ / 2; //dummy
-        hw_joint_structs_[i].velocity_state_ += (hw_joint_structs_[i].acceleration_state_ * period.seconds()) / cfg_.hw_slowdown_;
-        hw_joint_structs_[i].position_state_ += (hw_joint_structs_[i].velocity_state_ * period.seconds()) / cfg_.hw_slowdown_;
+        hw_joint_structs_[i].current_state_.current  = hw_joint_structs_[i].command_state_.current;
+        hw_joint_structs_[i].current_state_.acceleration = hw_joint_structs_[i].command_state_.current / 2; //dummy
+        hw_joint_structs_[i].current_state_.velocity += (hw_joint_structs_[i].current_state_.acceleration * period.seconds()) / cfg_.hw_slowdown_;
+        hw_joint_structs_[i].current_state_.position += (hw_joint_structs_[i].current_state_.velocity * period.seconds()) / cfg_.hw_slowdown_;
         break;
       case mode_level_t::MODE_STANDBY:
-        hw_joint_structs_[i].current_state_ = hw_joint_structs_[i].current_command_;
-        hw_joint_structs_[i].acceleration_state_ = hw_joint_structs_[i].current_command_ / 2; //dummy
-        hw_joint_structs_[i].velocity_state_ += (hw_joint_structs_[i].acceleration_state_ * period.seconds()) / cfg_.hw_slowdown_;
-        hw_joint_structs_[i].position_state_ += (hw_joint_structs_[i].velocity_state_ * period.seconds()) / cfg_.hw_slowdown_;
+        hw_joint_structs_[i].current_state_.current  = hw_joint_structs_[i].command_state_.current;
+        hw_joint_structs_[i].current_state_.acceleration = hw_joint_structs_[i].command_state_.current / 2; //dummy
+        hw_joint_structs_[i].current_state_.velocity += (hw_joint_structs_[i].current_state_.acceleration * period.seconds()) / cfg_.hw_slowdown_;
+        hw_joint_structs_[i].current_state_.position += (hw_joint_structs_[i].current_state_.velocity * period.seconds()) / cfg_.hw_slowdown_;
         break;
       }
       // BEGIN: This part here is for exemplary purposes - Please do not copy to your production code

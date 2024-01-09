@@ -28,7 +28,7 @@
         <!-- limit constraints -->
         <param name="max_effort">200</param>
         <param name="has_position_limits">1</param>
-        <param name="min_position">0</param>
+        <param name="min_position">0.01</param>
         <param name="max_position">0.0137</param>
         <param name="max_velocity">3.0</param>
         <param name="soft_k_position">100</param>
@@ -57,18 +57,18 @@
 
       <joint name="${prefix}_axis_b">
         <param name="device_id">0x02</param>
-        <param name="home">5.73423624e+00</param>
+        <param name="home">5.690</param>
 
         <!-- limit constraints -->
         <param name="max_effort">200</param>
         <param name="has_position_limits">1</param>
-        <param name="min_position">0</param>
-        <param name="max_position">5.690</param>
-        <param name="max_velocity">1</param>
+        <param name="min_position">0.005</param>
+        <param name="max_position">5.70</param>
+        <param name="max_velocity">3.0</param>
         <param name="soft_k_position">100</param>
-        <param name="soft_k_velocity">10</param>
+        <param name="soft_k_velocity">15</param>
         <param name="soft_min_position">0.1</param>
-        <param name="soft_max_position">5.690</param>
+        <param name="soft_max_position">5.70</param>
         <!-- limit constraints -->
 
         <command_interface name="position">
@@ -96,9 +96,9 @@
         <!-- limit constraints -->
         <param name="max_effort">200</param>
         <param name="has_position_limits">1</param>
-        <param name="min_position">0</param>
+        <param name="min_position">0.01</param>
         <param name="max_position">3.400</param>
-        <param name="max_velocity">0.5</param>
+        <param name="max_velocity">3.0</param>
         <param name="soft_k_position">100</param>
         <param name="soft_k_velocity">10</param>
         <param name="soft_min_position">0.1</param>
@@ -130,9 +130,9 @@
         <!-- limit constraints -->
         <param name="max_effort">200</param>
         <param name="has_position_limits">1</param>
-        <param name="min_position">0</param>
+        <param name="min_position">0.01</param>
         <param name="max_position">3.400</param>
-        <param name="max_velocity">0.5</param>
+        <param name="max_velocity">3.0</param>
         <param name="soft_k_position">100</param>
         <param name="soft_k_velocity">10</param>
         <param name="soft_min_position">0.1</param>
@@ -164,9 +164,9 @@
         <!-- limit constraints -->
         <param name="max_effort">200</param>
         <param name="has_position_limits">1</param>
-        <param name="min_position">0</param>
+        <param name="min_position">0.01</param>
         <param name="max_position">6.00</param>
-        <param name="max_velocity">0.5</param>
+        <param name="max_velocity">3.0</param>
         <param name="soft_k_position">100</param>
         <param name="soft_k_velocity">10</param>
         <param name="soft_min_position">0.1</param>

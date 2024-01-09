@@ -7,60 +7,76 @@
 class Joint
 {
 
+private:
+    double soft_min_velocity = 0;
+    double soft_max_velocity = 0;
+
 public:
     std::string name;  // Name of the device or component
     uint8_t device_id; // Unique identifier for the device
 
-    // Internal state variables
-    double default_position_ = 0;     // Default position of the device
-    double position_command_ = 0;     // Commanded position for the device
-    double velocity_command_ = 0;     // Commanded velocity for the device
-    double current_command_ = 0;      // Commanded current for the device
-    double position_state_ = 0;       // Current position state of the device
-    double velocity_state_ = 0;       // Current velocity state of the device
-    double async_position_state_ = 0; // Asynchronous position state of the device
-    double async_velocity_state_ = 0; // Asynchronous velocity state of the device
-    double async_current_state_ = 0;  // Asynchronous current state of the device
-    double current_state_ = 0;        // Current state of the electrical current in the device
-    double acceleration_state_ = 0;   // Current acceleration state of the device
+    struct State
+    {
+        double position = 0;
+        double velocity = 0;
+        double current = 0;
+        double acceleration = 0;
+    };
+
+    State default_state_{}, command_state_{}, current_state_{}, async_state_{};
 
     // Device capabilities and constraints
-    double max_effort = 0;               // Maximum effort or force the device can exert
-    bool has_position_limits = false;      // Flag to indicate if the device has position limits (0 or 1)
-    double min_position = 0;             // Minimum allowed position for the device
-    double max_position = 0;             // Maximum allowed position for the device
-    double max_velocity = 0;             // Maximum velocity the device can achieve
-    double soft_k_position = 0;   // Position factor for soft limits calculation
-    double soft_k_velocity = 0;   // Velocity factor for soft limits calculation
-    double soft_min_position = 0; // Minimum position for soft limits
-    double soft_max_position = 0; // Maximum position for soft limits
-    double soft_min_velocity = 0;             // Minimum soft limit for velocity
-    double soft_max_velocity = 0;             // Maximum soft limit for velocity
+    struct Limits
+    {
+        double position_min = 0;
+        double position_max = 0;
+        double velocity_max = 0;
+        double effort_max = 0;
+    };
+
+    Limits limits_{};
+    bool has_position_limits = false;
+
+    struct SoftLimits
+    {
+        double position_k = 0;
+        double velocity_k = 0;
+        double position_min = 0;
+        double position_max = 0;
+    };
+
+    SoftLimits soft_limits_{};
 
     Joint() = default;
-
-    // constructor with member initializer list and move semantics for string
-    Joint(std::string joint_name, int joint_id, double joint_default)
+    // Constructor with member initializer list
+    Joint(std::string joint_name, uint8_t joint_id, State default_state)
         : name(std::move(joint_name)),
-         device_id(joint_id),
-         default_position_(joint_default) {}
+          device_id(joint_id),
+          default_state_(default_state){}
+
+    // Constructor with member initializer list
+    Joint(std::string joint_name, uint8_t joint_id, State default_state, Limits limits, bool position_limits, SoftLimits soft_limits)
+        : name(std::move(joint_name)),
+          device_id(joint_id),
+          default_state_(default_state),
+          limits_(limits),
+          has_position_limits(position_limits),
+          soft_limits_(soft_limits) {}
 
     void calcAcceleration(const double &prev_velocity_, const double &period_seconds);
 
     /**
      * @brief Enforce position, velocity, and effort limits for a joint that is not subject to soft limits.
      *
-     * @param serial_port The serial port that the manipulator is available at.
-     * @param heartbeat_timeout The maximum time (s) between heartbeat messages before the connection
+     * @param current_effort The serial port that the manipulator is available at.
      * is considered timed out. This must be greater than 1 second; defaults to 3 seconds.
      */
-    double enforce_hard_limits();
+    double enforce_hard_limits(const double &current_effort);
 
     /**
      * @brief Enforce position, velocity and effort limits for a joint subject to soft limits.
      * @note If the joint has no position limits (eg. a continuous joint), only velocity and effort limits
      * will be enforced.
-     *
      */
     double enforce_soft_limits();
 };

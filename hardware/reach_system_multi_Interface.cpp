@@ -15,10 +15,6 @@
 #include "hardware_interface/types/hardware_interface_type_values.hpp"
 #include "rclcpp/rclcpp.hpp"
 
-// #include <joint_limits_interface/joint_limits.h>
-// #include <joint_limits_interface/joint_limits_urdf.h>
-// #include <joint_limits_interface/joint_limits_rosparam.h>
-
 namespace ros2_control_reach_5
 {
   hardware_interface::CallbackReturn ReachSystemMultiInterfaceHardware::on_init(
@@ -36,19 +32,32 @@ namespace ros2_control_reach_5
 
     hw_joint_structs_.reserve(info_.joints.size());
     control_modes_.resize(info_.joints.size(), mode_level_t::MODE_DISABLE);
-      RCLCPP_INFO(
-          rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "Hardware update rate is %u Hz", static_cast<int>(cfg_.state_update_freq_ ));
+    RCLCPP_INFO(
+        rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "Hardware update rate is %u Hz", static_cast<int>(cfg_.state_update_freq_));
     for (const hardware_interface::ComponentInfo &joint : info_.joints)
     {
       std::string device_id_value = joint.parameters.at("device_id");
       double default_position = stod(joint.parameters.at("home"));
       uint8_t device_id = static_cast<uint8_t>(std::stoul(device_id_value, nullptr, 16));
-
       RCLCPP_INFO(
           rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "Device with id %u found", static_cast<unsigned int>(device_id));
 
-      hw_joint_structs_.emplace_back(joint.name, device_id, default_position);
-      // RRBotSystemMultiInterface has exactly 3 state interfaces
+      double max_effort = stod(joint.parameters.at("max_effort"));
+      bool positionLimitsFlag = stoi(joint.parameters.at("has_position_limits"));
+      double min_position = stod(joint.parameters.at("min_position"));
+      double max_position = stod(joint.parameters.at("max_position"));
+      double max_velocity = stod(joint.parameters.at("max_velocity"));
+      double soft_k_position = stod(joint.parameters.at("soft_k_position"));
+      double soft_k_velocity = stod(joint.parameters.at("soft_k_velocity"));
+      double soft_min_position = stod(joint.parameters.at("soft_min_position"));
+      double soft_max_position = stod(joint.parameters.at("soft_max_position"));
+
+      Joint::State initialState{default_position, 0.0, 0.0};
+      Joint::Limits jointLimits{.position_min = min_position, .position_max = max_position, .velocity_max = max_velocity, .effort_max = max_effort};
+      Joint::SoftLimits jointSoftLimits{.position_k = soft_k_position, .velocity_k = soft_k_velocity, .position_min = soft_min_position, .position_max = soft_max_position};
+
+      hw_joint_structs_.emplace_back(joint.name, device_id, initialState, jointLimits, positionLimitsFlag, jointSoftLimits);
+      // ReachSystemMultiInterface has exactly 3 state interfaces
       // and 3 command interfaces on each joint
       if (joint.command_interfaces.size() != 3)
       {
@@ -197,8 +206,8 @@ namespace ros2_control_reach_5
       {
         if (key.find(info_.joints[i].name) != std::string::npos)
         {
-          hw_joint_structs_[i].velocity_command_ = 0;
-          hw_joint_structs_[i].current_command_ = 0;
+          hw_joint_structs_[i].command_state_.velocity = 0;
+          hw_joint_structs_[i].command_state_.current = 0;
           control_modes_[i] = mode_level_t::MODE_DISABLE; // Revert to undefined
         }
       }
@@ -223,13 +232,13 @@ namespace ros2_control_reach_5
     for (std::size_t i = 0; i < info_.joints.size(); i++)
     {
       state_interfaces.emplace_back(hardware_interface::StateInterface(
-          info_.joints[i].name, hardware_interface::HW_IF_POSITION, &hw_joint_structs_[i].position_state_));
+          info_.joints[i].name, hardware_interface::HW_IF_POSITION, &hw_joint_structs_[i].current_state_.position));
       state_interfaces.emplace_back(hardware_interface::StateInterface(
-          info_.joints[i].name, hardware_interface::HW_IF_VELOCITY, &hw_joint_structs_[i].velocity_state_));
+          info_.joints[i].name, hardware_interface::HW_IF_VELOCITY, &hw_joint_structs_[i].current_state_.velocity));
       state_interfaces.emplace_back(hardware_interface::StateInterface(
-          info_.joints[i].name, hardware_interface::HW_IF_ACCELERATION, &hw_joint_structs_[i].acceleration_state_));
+          info_.joints[i].name, hardware_interface::HW_IF_ACCELERATION, &hw_joint_structs_[i].current_state_.acceleration));
       state_interfaces.emplace_back(hardware_interface::StateInterface(
-          info_.joints[i].name, custom_hardware_interface::HW_IF_CURRENT, &hw_joint_structs_[i].current_state_));
+          info_.joints[i].name, custom_hardware_interface::HW_IF_CURRENT, &hw_joint_structs_[i].current_state_.current));
     }
 
     return state_interfaces;
@@ -242,11 +251,11 @@ namespace ros2_control_reach_5
     for (std::size_t i = 0; i < info_.joints.size(); i++)
     {
       command_interfaces.emplace_back(hardware_interface::CommandInterface(
-          info_.joints[i].name, hardware_interface::HW_IF_POSITION, &hw_joint_structs_[i].position_command_));
+          info_.joints[i].name, hardware_interface::HW_IF_POSITION, &hw_joint_structs_[i].command_state_.position));
       command_interfaces.emplace_back(hardware_interface::CommandInterface(
-          info_.joints[i].name, hardware_interface::HW_IF_VELOCITY, &hw_joint_structs_[i].velocity_command_));
+          info_.joints[i].name, hardware_interface::HW_IF_VELOCITY, &hw_joint_structs_[i].command_state_.velocity));
       command_interfaces.emplace_back(hardware_interface::CommandInterface(
-          info_.joints[i].name, custom_hardware_interface::HW_IF_CURRENT, &hw_joint_structs_[i].current_command_));
+          info_.joints[i].name, custom_hardware_interface::HW_IF_CURRENT, &hw_joint_structs_[i].command_state_.current));
     }
 
     return command_interfaces;
@@ -300,10 +309,10 @@ namespace ros2_control_reach_5
     for (std::size_t i = 0; i < info_.joints.size(); i++)
     {
       double delta_seconds = period.seconds();
-      double prev_velocity_ = hw_joint_structs_[i].velocity_state_;
-      hw_joint_structs_[i].position_state_ = hw_joint_structs_[i].async_position_state_;
-      hw_joint_structs_[i].velocity_state_ = hw_joint_structs_[i].async_velocity_state_;
-      hw_joint_structs_[i].current_state_ = hw_joint_structs_[i].async_current_state_;
+      double prev_velocity_ = hw_joint_structs_[i].current_state_.velocity;
+      hw_joint_structs_[i].current_state_.position = hw_joint_structs_[i].async_state_.position;
+      hw_joint_structs_[i].current_state_.velocity = hw_joint_structs_[i].async_state_.velocity;
+      hw_joint_structs_[i].current_state_.current = hw_joint_structs_[i].async_state_.current;
       hw_joint_structs_[i].calcAcceleration(prev_velocity_, delta_seconds);
       //  RCLCPP_INFO(rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), " %d acceleration %f",hw_joint_structs_[i].device_id,
       //   hw_joint_structs_[i].acceleration_state_);
@@ -320,7 +329,7 @@ namespace ros2_control_reach_5
       switch (control_modes_[i])
       {
       case mode_level_t::MODE_POSITION:
-        if (!std::isnan(hw_joint_structs_[i].position_command_))
+        if (!std::isnan(hw_joint_structs_[i].command_state_.position))
         {
           // Get the target device
           const auto target_device = static_cast<alpha::driver::DeviceId>(hw_joint_structs_[i].device_id);
@@ -328,13 +337,13 @@ namespace ros2_control_reach_5
           // Get the target position; if the command is for the jaws, then convert from m to mm
           const double target_position =
               static_cast<alpha::driver::DeviceId>(hw_joint_structs_[i].device_id) == alpha::driver::DeviceId::kLinearJaws
-                  ? hw_joint_structs_[i].position_command_ * 1000
-                  : hw_joint_structs_[i].position_command_;
+                  ? hw_joint_structs_[i].command_state_.position * 1000
+                  : hw_joint_structs_[i].command_state_.position;
           driver_.setPosition(target_position, target_device);
         }
         break;
       case mode_level_t::MODE_VELOCITY:
-        if (!std::isnan(hw_joint_structs_[i].velocity_command_))
+        if (!std::isnan(hw_joint_structs_[i].command_state_.velocity))
         {
           // Get the target device
           const auto target_device = static_cast<alpha::driver::DeviceId>(hw_joint_structs_[i].device_id);
@@ -342,22 +351,30 @@ namespace ros2_control_reach_5
           // Get the target velocity; if the command is for the jaws, then convert from m/s to mm/s
           const double target_velocity =
               static_cast<alpha::driver::DeviceId>(hw_joint_structs_[i].device_id) == alpha::driver::DeviceId::kLinearJaws
-                  ? hw_joint_structs_[i].velocity_command_ * 1000
-                  : hw_joint_structs_[i].velocity_command_;
+                  ? hw_joint_structs_[i].command_state_.velocity * 1000
+                  : hw_joint_structs_[i].command_state_.velocity;
 
           driver_.setVelocity(target_velocity, target_device);
         }
         break;
       case mode_level_t::MODE_CURRENT:
-        if (!std::isnan(hw_joint_structs_[i].current_command_))
+        if (!std::isnan(hw_joint_structs_[i].command_state_.current))
         {
           // Get the target device
           const auto target_device = static_cast<alpha::driver::DeviceId>(hw_joint_structs_[i].device_id);
 
-          // Get the target current;
-          const double target_current = hw_joint_structs_[i].current_command_;
+          // enforce soft limit;
+          // const double target_current = hw_joint_structs_[i].enforce_soft_limits();
 
-          driver_.setCurrent(target_current, target_device);
+          // enforce hard limit;
+          const double enforced_target_current = hw_joint_structs_[i].enforce_hard_limits(hw_joint_structs_[i].command_state_.current);
+
+          // if (static_cast<int>(target_device) == 2)
+          // {
+          //   RCLCPP_INFO(rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "%f, %f, %f ",target_current, enforced_target_current, hw_joint_structs_[i].command_state_.current);
+          // }
+
+          driver_.setCurrent(enforced_target_current, target_device);
         }
         break;
       default:
@@ -393,7 +410,7 @@ namespace ros2_control_reach_5
 
     if (it != hw_joint_structs_ref.end())
     {
-      it->async_position_state_ = position;
+      it->async_state_.position = position;
     }
   }
 
@@ -422,7 +439,7 @@ namespace ros2_control_reach_5
 
     if (it != hw_joint_structs_ref.end())
     {
-      it->async_velocity_state_ = velocity;
+      it->async_state_.velocity = velocity;
     }
   }
 
@@ -451,7 +468,7 @@ namespace ros2_control_reach_5
 
     if (it != hw_joint_structs_ref.end())
     {
-      it->async_current_state_ = current;
+      it->async_state_.current = current;
     }
   }
 
