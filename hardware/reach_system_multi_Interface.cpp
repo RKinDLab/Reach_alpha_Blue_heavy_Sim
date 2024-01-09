@@ -13,8 +13,11 @@
 #include "ros2_control_reach_5/packet_id.hpp"
 
 #include "hardware_interface/types/hardware_interface_type_values.hpp"
-#include "joint_limits/joint_limits_rosparam.hpp"
 #include "rclcpp/rclcpp.hpp"
+
+// #include <joint_limits_interface/joint_limits.h>
+// #include <joint_limits_interface/joint_limits_urdf.h>
+// #include <joint_limits_interface/joint_limits_rosparam.h>
 
 namespace ros2_control_reach_5
 {
@@ -289,7 +292,7 @@ namespace ros2_control_reach_5
   }
 
   hardware_interface::return_type ReachSystemMultiInterfaceHardware::read(
-      const rclcpp::Time & /*time*/, const rclcpp::Duration & period)
+      const rclcpp::Time & /*time*/, const rclcpp::Duration &period)
   {
     // Get access to the real-time states
     const std::lock_guard<std::mutex> lock(access_async_states_);
@@ -310,6 +313,57 @@ namespace ros2_control_reach_5
   hardware_interface::return_type ReachSystemMultiInterfaceHardware::write(
       const rclcpp::Time & /*time*/, const rclcpp::Duration & /*period*/)
   {
+    // Send the commands for each joint
+    for (std::size_t i = 0; i < control_modes_.size(); i++)
+    {
+      switch (control_modes_[i])
+      {
+      case mode_level_t::MODE_POSITION:
+        if (!std::isnan(hw_joint_structs_[i].position_command_))
+        {
+          // Get the target device
+          const auto target_device = static_cast<alpha::driver::DeviceId>(hw_joint_structs_[i].device_id);
+
+          // Get the target position; if the command is for the jaws, then convert from m to mm
+          const double target_position =
+              static_cast<alpha::driver::DeviceId>(hw_joint_structs_[i].device_id) == alpha::driver::DeviceId::kLinearJaws
+                  ? hw_joint_structs_[i].position_command_ * 1000
+                  : hw_joint_structs_[i].position_command_;
+          driver_.setPosition(target_position, target_device);
+        }
+        break;
+      case mode_level_t::MODE_VELOCITY:
+        if (!std::isnan(hw_joint_structs_[i].velocity_command_))
+        {
+          // Get the target device
+          const auto target_device = static_cast<alpha::driver::DeviceId>(hw_joint_structs_[i].device_id);
+
+          // Get the target velocity; if the command is for the jaws, then convert from m/s to mm/s
+          const double target_velocity =
+              static_cast<alpha::driver::DeviceId>(hw_joint_structs_[i].device_id) == alpha::driver::DeviceId::kLinearJaws
+                  ? hw_joint_structs_[i].velocity_command_ * 1000
+                  : hw_joint_structs_[i].velocity_command_;
+
+          driver_.setVelocity(target_velocity, target_device);
+        }
+        break;
+      case mode_level_t::MODE_CURRENT:
+        if (!std::isnan(hw_joint_structs_[i].current_command_))
+        {
+          // Get the target device
+          const auto target_device = static_cast<alpha::driver::DeviceId>(hw_joint_structs_[i].device_id);
+
+          // Get the target current;
+          const double target_current = hw_joint_structs_[i].current_command_;
+
+          driver_.setCurrent(target_current, target_device);
+        }
+        break;
+      default:
+        break;
+      }
+    }
+
     return hardware_interface::return_type::OK;
   }
 
@@ -371,7 +425,7 @@ namespace ros2_control_reach_5
     }
   }
 
- void ReachSystemMultiInterfaceHardware::updateCurrentCb(const alpha::driver::Packet &packet, std::vector<Joint> &hw_joint_structs_ref)
+  void ReachSystemMultiInterfaceHardware::updateCurrentCb(const alpha::driver::Packet &packet, std::vector<Joint> &hw_joint_structs_ref)
   {
     if (packet.getData().size() != 4)
     {
@@ -421,7 +475,6 @@ namespace ros2_control_reach_5
       driver_.request(alpha::driver::PacketId::PacketID_CURRENT, alpha::driver::DeviceId::kBendElbow);
       driver_.request(alpha::driver::PacketId::PacketID_CURRENT, alpha::driver::DeviceId::kBendShoulder);
       driver_.request(alpha::driver::PacketId::PacketID_CURRENT, alpha::driver::DeviceId::kRotateBase);
-
 
       std::this_thread::sleep_for(std::chrono::seconds(1 / freq));
     }
