@@ -8,37 +8,42 @@ class Joint
 {
 
 public:
-    std::string name;
-    uint8_t device_id;
-    double default_position_ = 0;
-    double position_command_ = 0;
-    double velocity_command_ = 0;
-    double current_command_ = 0;
-    double position_state_ = 0;
-    double velocity_state_ = 0;
-    double async_position_state_ = 0;
-    double async_velocity_state_ = 0;
-    double async_current_state_ = 0;
-    double current_state_ = 0;
-    double acceleration_state_ = 0;
+    std::string name;  // Name of the device or component
+    uint8_t device_id; // Unique identifier for the device
 
-    double max_effort = 0;
-    double has_position_limits = 0;
-    double min_position = 0;
-    double max_position = 0;
-    double max_velocity = 0;
-    double soft_limits_k_position = 0;
-    double soft_limits_k_velocity = 0;
-    double soft_limits_min_position = 0;
-    double soft_limits_max_position = 0;
-    double soft_min_vel = 0;
-    double soft_max_vel = 0;
+    // Internal state variables
+    double default_position_ = 0;     // Default position of the device
+    double position_command_ = 0;     // Commanded position for the device
+    double velocity_command_ = 0;     // Commanded velocity for the device
+    double current_command_ = 0;      // Commanded current for the device
+    double position_state_ = 0;       // Current position state of the device
+    double velocity_state_ = 0;       // Current velocity state of the device
+    double async_position_state_ = 0; // Asynchronous position state of the device
+    double async_velocity_state_ = 0; // Asynchronous velocity state of the device
+    double async_current_state_ = 0;  // Asynchronous current state of the device
+    double current_state_ = 0;        // Current state of the electrical current in the device
+    double acceleration_state_ = 0;   // Current acceleration state of the device
+
+    // Device capabilities and constraints
+    double max_effort = 0;               // Maximum effort or force the device can exert
+    bool has_position_limits = false;      // Flag to indicate if the device has position limits (0 or 1)
+    double min_position = 0;             // Minimum allowed position for the device
+    double max_position = 0;             // Maximum allowed position for the device
+    double max_velocity = 0;             // Maximum velocity the device can achieve
+    double soft_limits_k_position = 0;   // Position factor for soft limits calculation
+    double soft_limits_k_velocity = 0;   // Velocity factor for soft limits calculation
+    double soft_limits_min_position = 0; // Minimum position for soft limits
+    double soft_limits_max_position = 0; // Maximum position for soft limits
+    double soft_min_vel = 0;             // Minimum soft limit for velocity
+    double soft_max_vel = 0;             // Maximum soft limit for velocity
 
     Joint() = default;
 
     // constructor with member initializer list and move semantics for string
     Joint(std::string joint_name, int joint_id, double joint_default)
-        : name(std::move(joint_name)), device_id(joint_id), default_position_(joint_default) {}
+        : name(std::move(joint_name)),
+         device_id(joint_id),
+         default_position_(joint_default) {}
 
     void calcAcceleration(const double &prev_velocity_, const double &period_seconds);
 
@@ -59,6 +64,5 @@ public:
      */
     double enforce_soft_limits();
 };
-
 
 #endif // ROS2_CONTROL_REACH_5__JOINT_HPP_
