@@ -36,7 +36,8 @@ namespace ros2_control_reach_5
 
     hw_joint_structs_.reserve(info_.joints.size());
     control_modes_.resize(info_.joints.size(), mode_level_t::MODE_DISABLE);
-
+      RCLCPP_INFO(
+          rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "Hardware update rate is %u Hz", static_cast<int>(cfg_.state_update_freq_ ));
     for (const hardware_interface::ComponentInfo &joint : info_.joints)
     {
       std::string device_id_value = joint.parameters.at("device_id");

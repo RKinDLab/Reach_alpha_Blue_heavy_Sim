@@ -30,12 +30,12 @@ public:
     double min_position = 0;             // Minimum allowed position for the device
     double max_position = 0;             // Maximum allowed position for the device
     double max_velocity = 0;             // Maximum velocity the device can achieve
-    double soft_limits_k_position = 0;   // Position factor for soft limits calculation
-    double soft_limits_k_velocity = 0;   // Velocity factor for soft limits calculation
-    double soft_limits_min_position = 0; // Minimum position for soft limits
-    double soft_limits_max_position = 0; // Maximum position for soft limits
-    double soft_min_vel = 0;             // Minimum soft limit for velocity
-    double soft_max_vel = 0;             // Maximum soft limit for velocity
+    double soft_k_position = 0;   // Position factor for soft limits calculation
+    double soft_k_velocity = 0;   // Velocity factor for soft limits calculation
+    double soft_min_position = 0; // Minimum position for soft limits
+    double soft_max_position = 0; // Maximum position for soft limits
+    double soft_min_velocity = 0;             // Minimum soft limit for velocity
+    double soft_max_velocity = 0;             // Maximum soft limit for velocity
 
     Joint() = default;
 
