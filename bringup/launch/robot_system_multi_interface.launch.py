@@ -94,7 +94,7 @@ def generate_launch_description():
             PathJoinSubstitution(
                 [
                     FindPackageShare("ros2_control_reach_5"),
-                    "urdf",
+                    "xacro",
                     "robot_system_multi_interface.urdf.xacro",
                 ]
             ),

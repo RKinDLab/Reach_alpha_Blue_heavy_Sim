@@ -55,7 +55,7 @@ install(
   DESTINATION include/ros2_control_reach_5
 )
 install(
-  DIRECTORY description/launch description/ros2_control description/xacro description/rviz description/alpha
+  DIRECTORY description/launch description/ros2_control description/xacro description/rviz description/alpha description/blue
   DESTINATION share/ros2_control_reach_5
 )
 install(
