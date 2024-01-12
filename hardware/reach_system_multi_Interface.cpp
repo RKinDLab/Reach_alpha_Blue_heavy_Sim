@@ -368,6 +368,9 @@ namespace ros2_control_reach_5
 
           // enforce hard limit;
           const double enforced_target_current = hw_joint_structs_[i].enforce_hard_limits(hw_joint_structs_[i].command_state_.current);
+          if (enforced_target_current == 0) {
+
+          };
 
           // if (static_cast<int>(target_device) == 2)
           // {
