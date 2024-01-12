@@ -13,18 +13,23 @@ https://github.com/ros-simulation/gazebo_ros_demos/blob/kinetic-devel/rrbot_desc
   <xacro:arg name="serial_port" default="/dev/ttyUSB0"/>
   <xacro:arg name="state_update_frequency" default="250"/>
 
-  <!-- Import RRBot macro -->
-  <xacro:include filename="$(find ros2_control_reach_5)/alpha/urdf/alpha_5.urdf.xacro"/>
-
-  <!-- Import RRBot ros2_control description -->
-  <xacro:include filename="$(find ros2_control_reach_5)/ros2_control/robot_system_multi_interface.ros2_control.xacro" />
-
+    <!-- Properties -->
+  <xacro:property name="description_package" value="ros2_control_reach_5" />
+  <xacro:property name="prefix" value="$(arg prefix)" />
   <!-- Used for fixing robot -->
-  <link name="base_link"/>
+  <!-- <link name="base_link"/>
 
   <xacro:alpha_5 parent="base_link" name="$(arg prefix)">
     <origin xyz="0 0 0" rpy="0 0 0" />
-  </xacro:alpha_5>
+  </xacro:alpha_5> -->
+
+  <!-- Imports -->
+ <xacro:include filename="$(find ${description_package})/xacro/urdf.xacro"/>
+  <!-- Import RRBot ros2_control description -->
+  <xacro:include filename="$(find ${description_package})/ros2_control/robot_system_multi_interface.ros2_control.xacro" />
+
+  <xacro:bluerov2_heavy_alpha_urdf
+    prefix="${prefix}" />
 
   <xacro:robot_system_multi_interface
     name="ReachSystemMultiInterface"
