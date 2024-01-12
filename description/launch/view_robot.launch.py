@@ -69,7 +69,7 @@ def generate_launch_description():
             PathJoinSubstitution([FindExecutable(name="xacro")]),
             " ",
             PathJoinSubstitution(
-                [FindPackageShare("ros2_control_reach_5"), "urdf", description_file]
+                [FindPackageShare("ros2_control_reach_5"), "xacro", description_file]
             ),
             " ",
             "prefix:=",
