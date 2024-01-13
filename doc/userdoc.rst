@@ -133,3 +133,4 @@ Tutorial steps
         .. code-block:: shell
 
           ros2 topic pub /forward_current_controller/commands std_msgs/msg/Float64MultiArray "{data: [100,80,50,-70,0.0]}" --once
+.. image:: uvms.png
