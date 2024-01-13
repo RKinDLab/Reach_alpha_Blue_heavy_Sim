@@ -2,8 +2,8 @@
 <robot xmlns:xacro="http://ros.org/wiki/xacro">
 
   <xacro:macro name="bluerov2_heavy_alpha_urdf" params="prefix">
-    <link name="base_link"/>
-    <!-- <link name="${prefix}manipulator_mount_link">
+    <!-- <link name="${prefix}base_link"/> -->
+    <link name="${prefix}manipulator_mount_link">
       <visual>
         <origin rpy="0 0 0" xyz="0 0 0" />
         <geometry>
@@ -34,28 +34,28 @@
           iyz="0"
           izz="0.0001"
         />
-      </inertial> -->
+      </inertial>
       <!-- Split the collision into four boxes so that
       we can adjust each one to balance things out -->
 
       <!-- Front left -->
-      <!-- <collision>
+      <collision>
         <geometry>
           <box size="0.2285 0.2875 0.015" />
         </geometry>
         <origin rpy="0 0 0" xyz="0.11425 0.14375 0.08" />
-      </collision> -->
+      </collision>
 
       <!-- Front right -->
-      <!-- <collision>
+      <collision>
         <geometry>
           <box size="0.2285 0.2875 0.035" />
         </geometry>
         <origin rpy="0 0 0" xyz="0.11425 -0.14375 0.08" />
-      </collision> -->
+      </collision>
 
       <!-- Back right -->
-      <!-- <collision>
+      <collision>
         <geometry>
           <box size="0.2285 0.2875 0.005" />
         </geometry>
@@ -73,28 +73,20 @@
       <origin rpy="0 0 0" xyz="0 0 0" />
       <parent link="${prefix}base_link" />
       <child link="${prefix}ballast_link" />
-    </joint> -->
+    </joint>
 
     <!-- Imports -->
     <xacro:include filename="$(find ros2_control_reach_5)/alpha/urdf/alpha_5.urdf.xacro" />
-    <!-- <xacro:include filename="$(find ros2_control_reach_5)/blue/xacro/bluerov2_heavy_reach/urdf.xacro" /> -->
+    <xacro:include filename="$(find ros2_control_reach_5)/blue/xacro/bluerov2_heavy_reach/urdf.xacro" />
 
 
-
-    <xacro:alpha_5 parent="base_link" name="$(arg prefix)">
+    <!-- Instantiate the Alpha -->
+    <xacro:alpha_5 parent="${prefix}manipulator_mount_link" name="$(arg prefix)">
     <origin xyz="0 0 0" rpy="0 0 0" />
     </xacro:alpha_5> 
 
-    <!-- Instantiate the Alpha -->
-    <!-- <xacro:alpha_urdf
-      parent="${prefix}manipulator_mount_link"
-      prefix="${prefix}alpha_"
-      description_package="ros2_control_reach_5">
-      <origin xyz="0 0 0" rpy="0 0 0" />
-    </xacro:alpha_urdf> -->
-
     <!-- Instantiate the BlueROV2 -->
-    <!-- <xacro:bluerov2_heavy_reach_urdf prefix="$(arg prefix)" /> -->
+    <xacro:bluerov2_heavy_reach_urdf prefix="$(arg prefix)" />
 
   </xacro:macro>
 
