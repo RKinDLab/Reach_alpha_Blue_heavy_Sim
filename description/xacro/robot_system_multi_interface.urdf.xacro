@@ -1,9 +1,4 @@
 <?xml version="1.0"?>
-<!-- Revolute-Revolute Manipulator -->
-<!--
-Copied and modified from ROS1 example -
-https://github.com/ros-simulation/gazebo_ros_demos/blob/kinetic-devel/rrbot_description/urdf/rrbot.xacro
--->
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="alpha_5_example">
 
   <!-- Enable setting arguments from the launch file -->
@@ -16,12 +11,6 @@ https://github.com/ros-simulation/gazebo_ros_demos/blob/kinetic-devel/rrbot_desc
     <!-- Properties -->
   <xacro:property name="description_package" value="ros2_control_reach_5" />
   <xacro:property name="prefix" value="$(arg prefix)" />
-  <!-- Used for fixing robot -->
-  <!-- <link name="base_link"/>
-
-  <xacro:alpha_5 parent="base_link" name="$(arg prefix)">
-    <origin xyz="0 0 0" rpy="0 0 0" />
-  </xacro:alpha_5> -->
 
   <!-- Imports -->
  <xacro:include filename="$(find ${description_package})/xacro/urdf.xacro"/>
