@@ -1,6 +1,7 @@
 # Reach-Alpha-ROS2-Control
 
 ## Overview
+![alt text](./doc/uvms.png?raw=true "Reach Alpha Blue")
 
 Welcome to the Reach-Alpha-ROS2-Control project. This initiative is dedicated to providing a robust and versatile interface for ROS2 control, tailored specifically for the *reach-alpha-5* platform. Our goal is to enable seamless integration and enhanced functionality across a range of applications.
 
