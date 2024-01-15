@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ROS2_CONTROL_REACH_5__CUSTOM_HARDWARE_INTERFACE_TYPE_VALUES_HPP_
-#define ROS2_CONTROL_REACH_5__CUSTOM_HARDWARE_INTERFACE_TYPE_VALUES_HPP_
+#ifndef ROS2_CONTROL_BLUE_REACH_5__CUSTOM_HARDWARE_INTERFACE_TYPE_VALUES_HPP_
+#define ROS2_CONTROL_BLUE_REACH_5__CUSTOM_HARDWARE_INTERFACE_TYPE_VALUES_HPP_
 
 namespace custom_hardware_interface
 {
@@ -25,4 +25,4 @@ constexpr char HW_IF_DISABLE[] = "disable";
 constexpr char HW_IF_STANDBY[] = "standby";
 }  // namespace hardware_interface
 
-#endif  // ROS2_CONTROL_REACH_5__CUSTOM_HARDWARE_INTERFACE_TYPE_VALUES_HPP_
+#endif  // ROS2_CONTROL_BLUE_REACH_5__CUSTOM_HARDWARE_INTERFACE_TYPE_VALUES_HPP_

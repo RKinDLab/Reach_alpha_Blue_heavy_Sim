@@ -18,7 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#include "ros2_control_reach_5/serial_client.hpp"
+#include "ros2_control_blue_reach_5/serial_client.hpp"
 
 #include <fcntl.h>
 #include <termios.h>
@@ -31,7 +31,7 @@
 #include <stdexcept>
 #include <vector>
 
-#include "ros2_control_reach_5/packet.hpp"
+#include "ros2_control_blue_reach_5/packet.hpp"
 #include "rclcpp/rclcpp.hpp"
 
 using namespace std::chrono_literals;

@@ -19,8 +19,8 @@
 // THE SOFTWARE.
 
 #pragma once
-#ifndef ROS2_CONTROL_REACH_5__CRC_HPP_
-#define ROS2_CONTROL_REACH_5__CRC_HPP_
+#ifndef ROS2_CONTROL_BLUE_REACH_5__CRC_HPP_
+#define ROS2_CONTROL_BLUE_REACH_5__CRC_HPP_
 
 #include <array>
 #include <cstdint>
@@ -127,5 +127,5 @@ unsigned char calculateCrc8(
  */
 unsigned char calculateReachCrc8(const std::vector<unsigned char> & data);
 
-} // namespace ros2_control_reach_5
-#endif // ROS2_CONTROL_REACH_5__CRC_HPP_
+} // namespace ros2_control_blue_reach_5
+#endif // ROS2_CONTROL_BLUE_REACH_5__CRC_HPP_

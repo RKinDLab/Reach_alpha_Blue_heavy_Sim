@@ -19,8 +19,8 @@
 // THE SOFTWARE.
 
 #pragma once
-#ifndef ROS2_CONTROL_REACH_5__DRIVER_HPP_
-#define ROS2_CONTROL_REACH_5__DRIVER_HPP_
+#ifndef ROS2_CONTROL_BLUE_REACH_5__DRIVER_HPP_
+#define ROS2_CONTROL_BLUE_REACH_5__DRIVER_HPP_
 
 #include <atomic>
 #include <chrono>
@@ -29,10 +29,10 @@
 #include <thread>
 #include <vector>
 
-#include "ros2_control_reach_5/mode.hpp"
-#include "ros2_control_reach_5/packet.hpp"
-#include "ros2_control_reach_5/packet_id.hpp"
-#include "ros2_control_reach_5/serial_client.hpp"
+#include "ros2_control_blue_reach_5/mode.hpp"
+#include "ros2_control_blue_reach_5/packet.hpp"
+#include "ros2_control_blue_reach_5/packet_id.hpp"
+#include "ros2_control_blue_reach_5/serial_client.hpp"
 
 namespace alpha::driver
 {
@@ -210,5 +210,5 @@ private:
   std::chrono::time_point<std::chrono::steady_clock> last_heartbeat_;
 };
 
-} // namespace ros2_control_reach_5
-#endif // ROS2_CONTROL_REACH_5__DRIVER_HPP_
+} // namespace ros2_control_blue_reach_5
+#endif // ROS2_CONTROL_BLUE_REACH_5__DRIVER_HPP_

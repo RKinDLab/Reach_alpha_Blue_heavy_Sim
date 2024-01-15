@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ROS2_CONTROL_REACH_5__RRBOT_SYSTEM_MULTI_INTERFACE_HPP_
-#define ROS2_CONTROL_REACH_5__RRBOT_SYSTEM_MULTI_INTERFACE_HPP_
+#ifndef ROS2_CONTROL_BLUE_REACH_5__VEHICLE_SYSTEM_MULTI_INTERFACE_HPP_
+#define ROS2_CONTROL_BLUE_REACH_5__VEHICLE_SYSTEM_MULTI_INTERFACE_HPP_
 
 #include <chrono>
 #include <cstdint>
@@ -31,14 +31,14 @@
 #include "rclcpp/time.hpp"
 #include "rclcpp_lifecycle/node_interfaces/lifecycle_node_interface.hpp"
 #include "rclcpp_lifecycle/state.hpp"
-#include "ros2_control_reach_5/visibility_control.h"
+#include "ros2_control_blue_reach_5/visibility_control.h"
 
-#include "ros2_control_reach_5/joint.hpp"
-#include "ros2_control_reach_5/custom_hardware_interface_type_values.hpp"
+#include "ros2_control_blue_reach_5/thruster.hpp"
+#include "ros2_control_blue_reach_5/custom_hardware_interface_type_values.hpp"
 
-namespace ros2_control_reach_5
+namespace ros2_control_blue_reach_5
 {
-  class RRBotSystemMultiInterfaceHardware : public hardware_interface::SystemInterface
+  class VehicleSystemMultiInterfaceHardware : public hardware_interface::SystemInterface
   {
 
     struct Config
@@ -50,49 +50,49 @@ namespace ros2_control_reach_5
     };
 
   public:
-    RCLCPP_SHARED_PTR_DEFINITIONS(RRBotSystemMultiInterfaceHardware);
+    RCLCPP_SHARED_PTR_DEFINITIONS(VehicleSystemMultiInterfaceHardware);
 
-    ROS2_CONTROL_REACH_5_PUBLIC
+    ROS2_CONTROL_BLUE_REACH_5_PUBLIC
     hardware_interface::CallbackReturn on_init(
         const hardware_interface::HardwareInfo &info) override;
 
-    // ROS2_CONTROL_REACH_5_PUBLIC
+    // ROS2_CONTROL_BLUE_REACH_5_PUBLIC
     // hardware_interface::CallbackReturn on_configure(
     //     const rclcpp_lifecycle::State &previous_state) override;
 
-    // ROS2_CONTROL_REACH_5_PUBLIC
+    // ROS2_CONTROL_BLUE_REACH_5_PUBLIC
     // hardware_interface::CallbackReturn on_cleanup(
     //     const rclcpp_lifecycle::State &previous_state) override;
 
-    ROS2_CONTROL_REACH_5_PUBLIC
+    ROS2_CONTROL_BLUE_REACH_5_PUBLIC
     hardware_interface::return_type prepare_command_mode_switch(
         const std::vector<std::string> &start_interfaces,
         const std::vector<std::string> &stop_interfaces) override;
 
-    // ROS2_CONTROL_REACH_5_PUBLIC
+    // ROS2_CONTROL_BLUE_REACH_5_PUBLIC
     // hardware_interface::return_type perform_command_mode_switch(
     //     const std::vector<std::string> &start_interfaces,
     //     const std::vector<std::string> &stop_interfaces) override;
 
-    ROS2_CONTROL_REACH_5_PUBLIC
+    ROS2_CONTROL_BLUE_REACH_5_PUBLIC
     std::vector<hardware_interface::StateInterface> export_state_interfaces() override;
 
-    ROS2_CONTROL_REACH_5_PUBLIC
+    ROS2_CONTROL_BLUE_REACH_5_PUBLIC
     std::vector<hardware_interface::CommandInterface> export_command_interfaces() override;
 
-    ROS2_CONTROL_REACH_5_PUBLIC
+    ROS2_CONTROL_BLUE_REACH_5_PUBLIC
     hardware_interface::CallbackReturn on_activate(
         const rclcpp_lifecycle::State &previous_state) override;
 
-    ROS2_CONTROL_REACH_5_PUBLIC
+    ROS2_CONTROL_BLUE_REACH_5_PUBLIC
     hardware_interface::CallbackReturn on_deactivate(
         const rclcpp_lifecycle::State &previous_state) override;
 
-    ROS2_CONTROL_REACH_5_PUBLIC
+    ROS2_CONTROL_BLUE_REACH_5_PUBLIC
     hardware_interface::return_type read(
         const rclcpp::Time &time, const rclcpp::Duration &period) override;
         
-    ROS2_CONTROL_REACH_5_PUBLIC
+    ROS2_CONTROL_BLUE_REACH_5_PUBLIC
     hardware_interface::return_type write(
         const rclcpp::Time &time, const rclcpp::Duration &period) override;
 
@@ -100,7 +100,7 @@ namespace ros2_control_reach_5
     Config cfg_;
 
     // Enum defining at which control level we are
-    // maintaining the command_interface type per joint.
+    // maintaining the command_interface type per thruster.
     enum mode_level_t : std::uint8_t
     {
       MODE_STANDBY = 0x00,
@@ -110,12 +110,12 @@ namespace ros2_control_reach_5
       MODE_CURRENT = 0x04
     };
 
-    // Active control mode for each actuator
+    // Active control mode for each thruster
     std::vector<mode_level_t> control_level_;
 
-    // Store the state & commands for the robot joints
-    std::vector<Joint> hw_joint_structs_;
+    // Store the state & commands for the uv thruster
+    std::vector<Thruster> hw_thrust_structs_;
   };
 
-} // namespace ros2_control_reach_5
-#endif // ROS2_CONTROL_REACH_5__RRBOT_SYSTEM_MULTI_INTERFACE_HPP_
+} // namespace ros2_control_blue
+#endif // ROS2_CONTROL_BLUE_REACH_5__VEHICLE_SYSTEM_MULTI_INTERFACE_HPP_

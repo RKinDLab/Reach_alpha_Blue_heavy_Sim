@@ -21,7 +21,7 @@ Tutorial steps
 
    .. code-block:: shell
 
-    ros2 launch ros2_control_reach_5 view_robot.launch.py
+    ros2 launch ros2_control_blue_reach_5 view_robot.launch.py
 
    .. note::
     Getting the following output in terminal is OK: ``Warning: Invalid frame ID "odom" passed to canTransform argument target_frame - frame does not exist``.
@@ -33,7 +33,7 @@ Tutorial steps
 
    .. code-block:: shell
 
-    ros2 launch ros2_control_reach_5 robot_system_multi_interface.launch.py use_mock_hardware:=true
+    ros2 launch ros2_control_blue_reach_5 robot_system_multi_interface.launch.py use_mock_hardware:=true
 
    Useful launch-file options:
 

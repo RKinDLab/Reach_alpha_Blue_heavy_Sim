@@ -19,8 +19,8 @@
 // THE SOFTWARE.
 
 #pragma once
-#ifndef ROS2_CONTROL_REACH_5__SERIAL_CLIENT_HPP_
-#define ROS2_CONTROL_REACH_5__SERIAL_CLIENT_HPP_
+#ifndef ROS2_CONTROL_BLUE_REACH_5__SERIAL_CLIENT_HPP_
+#define ROS2_CONTROL_BLUE_REACH_5__SERIAL_CLIENT_HPP_
 
 #include <atomic>
 #include <functional>
@@ -29,8 +29,8 @@
 #include <unordered_map>
 #include <vector>
 
-#include "ros2_control_reach_5/packet.hpp"
-#include "ros2_control_reach_5/packet_id.hpp"
+#include "ros2_control_blue_reach_5/packet.hpp"
+#include "ros2_control_blue_reach_5/packet_id.hpp"
 
 namespace alpha::driver
 {
@@ -114,5 +114,5 @@ private:
   std::thread rx_worker_;
 };
 
-} // namespace ros2_control_reach_5
-#endif // ROS2_CONTROL_REACH_5__SERIAL_CLIENT_HPP_
+} // namespace ros2_control_blue_reach_5
+#endif // ROS2_CONTROL_BLUE_REACH_5__SERIAL_CLIENT_HPP_

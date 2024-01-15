@@ -20,7 +20,7 @@
       <visual>
         <geometry>
           <mesh
-            filename="package://ros2_control_reach_5/blue/meshes/bluerov2_heavy/bluerov2_heavy.dae"
+            filename="package://ros2_control_blue_reach_5/blue/meshes/bluerov2_heavy/bluerov2_heavy.dae"
             scale="0.025 0.025 0.025"
           />
         </geometry>
@@ -40,14 +40,14 @@
     </joint>
 
     <!-- Import camera macro -->
-    <xacro:include filename="$(find ros2_control_reach_5)/blue/xacro/camera/urdf.xacro" />
+    <xacro:include filename="$(find ros2_control_blue_reach_5)/blue/xacro/camera/urdf.xacro" />
 
     <xacro:camera_urdf prefix="${prefix}" parent="${prefix}base_link">
       <origin rpy="0 0 0" xyz="0.21 0 0.067" />
     </xacro:camera_urdf>
 
     <!-- Import T200 macro -->
-    <xacro:include filename="$(find ros2_control_reach_5)/blue/xacro/t200/urdf.xacro" />
+    <xacro:include filename="$(find ros2_control_blue_reach_5)/blue/xacro/t200/urdf.xacro" />
 
     <xacro:t200_urdf parent="${prefix}base_link" prefix="${prefix}" ccw="true" id="1">
       <origin rpy="-1.571 1.571 -0.785" xyz="0.14 -0.092 0.0" />

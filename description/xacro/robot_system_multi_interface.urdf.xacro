@@ -9,19 +9,29 @@
   <xacro:arg name="state_update_frequency" default="250"/>
 
     <!-- Properties -->
-  <xacro:property name="description_package" value="ros2_control_reach_5" />
+  <xacro:property name="description_package" value="ros2_control_blue_reach_5" />
   <xacro:property name="prefix" value="$(arg prefix)" />
 
   <!-- Imports -->
  <xacro:include filename="$(find ${description_package})/xacro/urdf.xacro"/>
   <!-- Import RRBot ros2_control description -->
   <xacro:include filename="$(find ${description_package})/ros2_control/robot_system_multi_interface.ros2_control.xacro" />
-
+  <!-- Import RRBot ros2_control description -->
+  <xacro:include filename="$(find ${description_package})/ros2_control/vehicle_system_multi_interface.ros2_control.xacro" />
+  
   <xacro:bluerov2_heavy_alpha_urdf
     prefix="${prefix}" />
 
   <xacro:robot_system_multi_interface
     name="ReachSystemMultiInterface"
+    prefix="$(arg prefix)"
+    serial_port="$(arg serial_port)"
+    state_update_frequency="$(arg state_update_frequency)"
+    use_mock_hardware="$(arg use_mock_hardware)"
+    slowdown="$(arg slowdown)" />
+
+  <xacro:vehicle_system_multi_interface
+    name="BlueSystemMultiInterface"
     prefix="$(arg prefix)"
     serial_port="$(arg serial_port)"
     state_update_frequency="$(arg state_update_frequency)"

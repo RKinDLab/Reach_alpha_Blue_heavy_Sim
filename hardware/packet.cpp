@@ -18,15 +18,15 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#include "ros2_control_reach_5/packet.hpp"
+#include "ros2_control_blue_reach_5/packet.hpp"
 
 #include <cstdint>
 #include <stdexcept>
 #include <utility>
 #include <vector>
 
-#include "ros2_control_reach_5/cobs.hpp"
-#include "ros2_control_reach_5/crc.hpp"
+#include "ros2_control_blue_reach_5/cobs.hpp"
+#include "ros2_control_blue_reach_5/crc.hpp"
 
 namespace alpha::driver
 {

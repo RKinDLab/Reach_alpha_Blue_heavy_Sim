@@ -19,35 +19,23 @@
 // THE SOFTWARE.
 
 #pragma once
-#ifndef ROS2_CONTROL_REACH_5__COBS_HPP_
-#define ROS2_CONTROL_REACH_5__COBS_HPP_
-
-#include <vector>
+#ifndef ROS2_CONTROL_BLUE_REACH_5__MODE_HPP_
+#define ROS2_CONTROL_BLUE_REACH_5__MODE_HPP_
 
 namespace alpha::driver
 {
 
-/**
- * @brief Encode serial data using the COBS algorithm.
- *
- * @remark This implementation has been inspired by the following source:
- * https://github.com/gbmhunter/SerialFiller/blob/d678acbf6d29de7042d48c6be8ecef556bb6d857/src/CobsTranscoder.cpp#L19
- *
- * @param data The serial data to encode.
- * @return The serial data that has been encoded with the COBS algorithm.
- */
-std::vector<unsigned char> cobsEncode(const std::vector<unsigned char> & data);
+  /**
+   * @brief A possible operating mode for a device.
+   */
+  enum class Mode : unsigned char
+  {
+    MODE_STANDBY = 0x00,
+    MODE_DISABLE = 0x01,
+    MODE_POSITION = 0x02,
+    MODE_VELOCITY = 0x03,
+    MODE_CURRENT = 0x04
+  };
 
-/**
- * @brief Decode serial data that has been encoded with the COBS algorithm.
- *
- * @remark This implementation has been inspired by the following source:
- * https://github.com/gbmhunter/SerialFiller/blob/d678acbf6d29de7042d48c6be8ecef556bb6d857/src/CobsTranscoder.cpp#L74
- *
- * @param data The serial data to decode.
- * @return The decoded serial data.
- */
-std::vector<unsigned char> cobsDecode(const std::vector<unsigned char> & data);
-
-} // namespace ros2_control_reach_5
-#endif // ROS2_CONTROL_REACH_5__CRC_HPP_
+} // namespace ros2_control_blue_reach_5
+#endif // ROS2_CONTROL_BLUE_REACH_5__CRC_HPP_

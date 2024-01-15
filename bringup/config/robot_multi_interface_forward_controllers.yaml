@@ -20,6 +20,9 @@ controller_manager:
     joint_state_broadcaster:
       type: joint_state_broadcaster/JointStateBroadcaster
 
+    fts_broadcaster:
+      type: force_torque_sensor_broadcaster/ForceTorqueSensorBroadcaster
+
 forward_position_controller:
   ros__parameters:
     joints:
@@ -48,6 +51,14 @@ forward_current_controller:
       - alpha_axis_c
       - alpha_axis_d
       - alpha_axis_e
+      - alphathruster1_joint
+      - alphathruster2_joint
+      - alphathruster3_joint
+      - alphathruster4_joint
+      - alphathruster5_joint
+      - alphathruster6_joint
+      - alphathruster7_joint
+      - alphathruster8_joint
     interface_name: current
 
 forward_illegal1_controller:
