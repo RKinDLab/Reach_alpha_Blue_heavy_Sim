@@ -19,24 +19,35 @@
 // THE SOFTWARE.
 
 #pragma once
-#ifndef ROS2_CONTROL_REACH_5__DEVICE_ID_HPP_
-#define ROS2_CONTROL_REACH_5__DEVICE_ID_HPP_
+#ifndef ROS2_CONTROL_BLUE_REACH_5__COBS_HPP_
+#define ROS2_CONTROL_BLUE_REACH_5__COBS_HPP_
+
+#include <vector>
 
 namespace alpha::driver
 {
 
 /**
- * @brief A unique identifier used to denote the manipulator's joints.
+ * @brief Encode serial data using the COBS algorithm.
+ *
+ * @remark This implementation has been inspired by the following source:
+ * https://github.com/gbmhunter/SerialFiller/blob/d678acbf6d29de7042d48c6be8ecef556bb6d857/src/CobsTranscoder.cpp#L19
+ *
+ * @param data The serial data to encode.
+ * @return The serial data that has been encoded with the COBS algorithm.
  */
-enum class DeviceId : unsigned char
-{
-  kLinearJaws = 0x01,
-  kRotateEndEffector = 0x02,
-  kBendElbow = 0x03,
-  kBendShoulder = 0x04,
-  kRotateBase = 0x05,
-  kAllJoints = 0xFF,
-};
+std::vector<unsigned char> cobsEncode(const std::vector<unsigned char> & data);
 
-} // namespace ros2_control_reach_5
-#endif // ROS2_CONTROL_REACH_5__CRC_HPP_
+/**
+ * @brief Decode serial data that has been encoded with the COBS algorithm.
+ *
+ * @remark This implementation has been inspired by the following source:
+ * https://github.com/gbmhunter/SerialFiller/blob/d678acbf6d29de7042d48c6be8ecef556bb6d857/src/CobsTranscoder.cpp#L74
+ *
+ * @param data The serial data to decode.
+ * @return The decoded serial data.
+ */
+std::vector<unsigned char> cobsDecode(const std::vector<unsigned char> & data);
+
+} // namespace ros2_control_blue_reach_5
+#endif // ROS2_CONTROL_BLUE_REACH_5__CRC_HPP_

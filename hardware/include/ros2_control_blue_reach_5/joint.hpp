@@ -1,5 +1,5 @@
-#ifndef ROS2_CONTROL_REACH_5__JOINT_HPP_
-#define ROS2_CONTROL_REACH_5__JOINT_HPP_
+#ifndef ROS2_CONTROL_BLUE_REACH_5__JOINT_HPP_
+#define ROS2_CONTROL_BLUE_REACH_5__JOINT_HPP_
 
 #include <string>
 #include <algorithm>
@@ -81,4 +81,4 @@ public:
     double enforce_soft_limits();
 };
 
-#endif // ROS2_CONTROL_REACH_5__JOINT_HPP_
+#endif // ROS2_CONTROL_BLUE_REACH_5__JOINT_HPP_

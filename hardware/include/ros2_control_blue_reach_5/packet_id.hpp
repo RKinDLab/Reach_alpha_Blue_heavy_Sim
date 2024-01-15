@@ -1,5 +1,5 @@
-#ifndef ROS2_CONTROL_REACH_5__PACKET_ID_HPP_
-#define ROS2_CONTROL_REACH_5__PACKET_ID_HPP_
+#ifndef ROS2_CONTROL_BLUE_REACH_5__PACKET_ID_HPP_
+#define ROS2_CONTROL_BLUE_REACH_5__PACKET_ID_HPP_
 
 namespace alpha::driver
 {
@@ -119,5 +119,5 @@ PacketID_MODE = 0x01,
     PacketID_RESET = 0xFD
 };
 
-} // namespace ros2_control_reach_5
-#endif // ROS2_CONTROL_REACH_5__PACKET_ID_HPP_
+} // namespace ros2_control_blue_reach_5
+#endif // ROS2_CONTROL_BLUE_REACH_5__PACKET_ID_HPP_

@@ -19,13 +19,13 @@
 // THE SOFTWARE.
 
 #pragma once
-#ifndef ROS2_CONTROL_REACH_5__PACKET_HPP_
-#define ROS2_CONTROL_REACH_5__PACKET_HPP_
+#ifndef ROS2_CONTROL_BLUE_REACH_5__PACKET_HPP_
+#define ROS2_CONTROL_BLUE_REACH_5__PACKET_HPP_
 
 #include <vector>
 
-#include "ros2_control_reach_5/device_id.hpp"
-#include "ros2_control_reach_5/packet_id.hpp"
+#include "ros2_control_blue_reach_5/device_id.hpp"
+#include "ros2_control_blue_reach_5/packet_id.hpp"
 
 namespace alpha::driver
 {
@@ -87,6 +87,6 @@ private:
   std::vector<unsigned char> data_;
 };
 
-} // namespace ros2_control_reach_5
-#endif // ROS2_CONTROL_REACH_5__PACKET_HPP_
+} // namespace ros2_control_blue_reach_5
+#endif // ROS2_CONTROL_BLUE_REACH_5__PACKET_HPP_
 

@@ -93,7 +93,7 @@ def generate_launch_description():
             " ",
             PathJoinSubstitution(
                 [
-                    FindPackageShare("ros2_control_reach_5"),
+                    FindPackageShare("ros2_control_blue_reach_5"),
                     "xacro",
                     "robot_system_multi_interface.urdf.xacro",
                 ]
@@ -119,13 +119,13 @@ def generate_launch_description():
 
     robot_controllers = PathJoinSubstitution(
         [
-            FindPackageShare("ros2_control_reach_5"),
+            FindPackageShare("ros2_control_blue_reach_5"),
             "config",
             "robot_multi_interface_forward_controllers.yaml",
         ]
     )
     rviz_config_file = PathJoinSubstitution(
-        [FindPackageShare("ros2_control_reach_5"), "rviz", "rviz.rviz"]
+        [FindPackageShare("ros2_control_blue_reach_5"), "rviz", "rviz.rviz"]
     )
 
     control_node = Node(

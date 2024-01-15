@@ -19,23 +19,24 @@
 // THE SOFTWARE.
 
 #pragma once
-#ifndef ROS2_CONTROL_REACH_5__MODE_HPP_
-#define ROS2_CONTROL_REACH_5__MODE_HPP_
+#ifndef ROS2_CONTROL_BLUE_REACH_5__DEVICE_ID_HPP_
+#define ROS2_CONTROL_BLUE_REACH_5__DEVICE_ID_HPP_
 
 namespace alpha::driver
 {
 
-  /**
-   * @brief A possible operating mode for a device.
-   */
-  enum class Mode : unsigned char
-  {
-    MODE_STANDBY = 0x00,
-    MODE_DISABLE = 0x01,
-    MODE_POSITION = 0x02,
-    MODE_VELOCITY = 0x03,
-    MODE_CURRENT = 0x04
-  };
+/**
+ * @brief A unique identifier used to denote the manipulator's joints.
+ */
+enum class DeviceId : unsigned char
+{
+  kLinearJaws = 0x01,
+  kRotateEndEffector = 0x02,
+  kBendElbow = 0x03,
+  kBendShoulder = 0x04,
+  kRotateBase = 0x05,
+  kAllJoints = 0xFF,
+};
 
-} // namespace ros2_control_reach_5
-#endif // ROS2_CONTROL_REACH_5__CRC_HPP_
+} // namespace ros2_control_blue_reach_5
+#endif // ROS2_CONTROL_BLUE_REACH_5__CRC_HPP_

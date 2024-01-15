@@ -18,12 +18,12 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#include "ros2_control_reach_5/driver.hpp"
+#include "ros2_control_blue_reach_5/driver.hpp"
 
 #include <vector>
 
-#include "ros2_control_reach_5/device_id.hpp"
-#include "ros2_control_reach_5/packet_id.hpp"
+#include "ros2_control_blue_reach_5/device_id.hpp"
+#include "ros2_control_blue_reach_5/packet_id.hpp"
 #include "rclcpp/rclcpp.hpp"
 
 using namespace std::chrono_literals;

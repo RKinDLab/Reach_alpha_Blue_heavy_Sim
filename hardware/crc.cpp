@@ -18,7 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#include "ros2_control_reach_5/crc.hpp"
+#include "ros2_control_blue_reach_5/crc.hpp"
 
 namespace alpha::driver
 {

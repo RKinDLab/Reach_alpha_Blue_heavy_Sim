@@ -22,7 +22,7 @@ def generate_launch_description():
 
     position_goals = PathJoinSubstitution(
         [
-            FindPackageShare("ros2_control_reach_5"),
+            FindPackageShare("ros2_control_blue_reach_5"),
             "config",
             "robot_forward_position_publisher.yaml",
         ]

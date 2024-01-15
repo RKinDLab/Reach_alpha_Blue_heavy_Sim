@@ -1,4 +1,4 @@
-#include "ros2_control_reach_5/reach_system_multi_Interface.hpp"
+#include "ros2_control_blue_reach_5/reach_system_multi_Interface.hpp"
 
 #include <algorithm>
 #include <chrono>
@@ -8,14 +8,14 @@
 #include <string>
 #include <vector>
 
-#include "ros2_control_reach_5/device_id.hpp"
-#include "ros2_control_reach_5/mode.hpp"
-#include "ros2_control_reach_5/packet_id.hpp"
+#include "ros2_control_blue_reach_5/device_id.hpp"
+#include "ros2_control_blue_reach_5/mode.hpp"
+#include "ros2_control_blue_reach_5/packet_id.hpp"
 
 #include "hardware_interface/types/hardware_interface_type_values.hpp"
 #include "rclcpp/rclcpp.hpp"
 
-namespace ros2_control_reach_5
+namespace ros2_control_blue_reach_5
 {
   hardware_interface::CallbackReturn ReachSystemMultiInterfaceHardware::on_init(
       const hardware_interface::HardwareInfo &info)
@@ -501,10 +501,10 @@ namespace ros2_control_reach_5
     }
   }
 
-} // namespace ros2_control_reach_5
+} // namespace ros2_control_blue_reach_5
 
 #include "pluginlib/class_list_macros.hpp"
 
 PLUGINLIB_EXPORT_CLASS(
-    ros2_control_reach_5::ReachSystemMultiInterfaceHardware,
+    ros2_control_blue_reach_5::ReachSystemMultiInterfaceHardware,
     hardware_interface::SystemInterface)
