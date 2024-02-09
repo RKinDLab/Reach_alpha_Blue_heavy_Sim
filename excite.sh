@@ -2,7 +2,7 @@
 
 function cleanup { 
     echo "Cleaning up before exit..." 
-    ros2 topic pub /forward_current_controller/commands std_msgs/msg/Float64MultiArray "{data: [0.0, 0.0, 0.0, 0.0, 0.0]}" --once
+    ros2 topic pub /forward_current_controller/commands std_msgs/msg/Float64MultiArray "{data: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 , 0.0, 0.0]}" --once
     exit 1 
 } 
 
@@ -27,12 +27,12 @@ adjust_position() {
 
 trap cleanup SIGINT
 
-ros2 topic pub /forward_current_controller/commands std_msgs/msg/Float64MultiArray "{data: [0.0, 0.0, 0.0, 0.0, 0.0]}" --once
+    ros2 topic pub /forward_current_controller/commands std_msgs/msg/Float64MultiArray "{data: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 , 0.0, 0.0]}" --once
 sleep 5
 
 
 # Define the filename
-filename='excitations.txt'
+# filename='excitations.txt'
 
 
 endtime=$(date -ud "1 hours" +%s)
@@ -59,8 +59,11 @@ do
     echo $position3
     echo $position4
 
-    printf "%s %s %s %s %s\n" "$position0 $position1 $position2 $position3 $position4" >> $filename
-    ros2 topic pub /forward_current_controller/commands std_msgs/msg/Float64MultiArray "{data: [$position0, $position1, $position2, $position3, $position4]}" --once
+    # printf "%s %s %s %s %s\n" "$position0 $position1 $position2 $position3 $position4" >> $filename
+    # ros2 topic pub /forward_current_controller/commands std_msgs/msg/Float64MultiArray "{data: [$position0, $position1, $position2, $position3, $position4, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 , 0.0, 0.0]}" --once
+     ros2 topic pub /forward_current_controller/commands std_msgs/msg/Float64MultiArray "{data: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 , 0.0, 0.0]}" --once
     sleep 4
 
 done
+
+# ros2 topic pub /forward_current_controller/commands std_msgs/msg/Float64MultiArray "{data: [0.0, 0.0, 0.0, 0.0, 0.0, 40000.0, 40000.0 , 40000.0, 40000.0, 40000.0, 40000.0 , 40000.0, 40000.0]}"

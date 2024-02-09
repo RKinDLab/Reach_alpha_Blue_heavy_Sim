@@ -65,7 +65,7 @@ def generate_launch_description():
     declared_arguments.append(
         DeclareLaunchArgument(
             "robot_controller",
-            default_value="forward_velocity_controller",
+            default_value="forward_current_controller",
             description="Robot controller to start.",
         )
     )
@@ -132,6 +132,8 @@ def generate_launch_description():
         package="controller_manager",
         executable="ros2_control_node",
         parameters=[robot_description, robot_controllers],
+        # parameters=[{"robot_description": ""}, robot_controllers],
+        # remappings=[("~/robot_description", "/robot_description")],
         output="both",
     )
     robot_state_pub_node = Node(
