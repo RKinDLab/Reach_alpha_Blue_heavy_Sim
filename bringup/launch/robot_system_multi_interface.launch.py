@@ -44,7 +44,7 @@ def generate_launch_description():
     declared_arguments.append(
             DeclareLaunchArgument(
             "state_update_frequency",
-            default_value="120",
+            default_value="200",
             description="The frequency (Hz) at which the driver updates the state of the robot."
                 " Note that this should not be less than the read frequency defined by"
                 " the controller configuration.",
