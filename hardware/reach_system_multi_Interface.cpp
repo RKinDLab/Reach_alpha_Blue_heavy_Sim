@@ -152,7 +152,7 @@ namespace ros2_control_blue_reach_5
   hardware_interface::CallbackReturn ReachSystemMultiInterfaceHardware::on_cleanup(const rclcpp_lifecycle::State &)
   {
     RCLCPP_INFO( // NOLINT
-        rclcpp::get_logger("AlphaHardware"), "Shutting down the AlphaHardware system interface.");
+        rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "Shutting down the AlphaHardware system interface.");
 
     running_.store(false);
     state_request_worker_.join();
@@ -273,7 +273,7 @@ namespace ros2_control_blue_reach_5
     }
     catch (const std::exception &e)
     {
-      RCLCPP_ERROR(rclcpp::get_logger("AlphaHardware"), e.what()); // NOLINT
+      RCLCPP_ERROR(rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), e.what()); // NOLINT
       return hardware_interface::CallbackReturn::ERROR;
     }
     RCLCPP_INFO(
@@ -292,7 +292,7 @@ namespace ros2_control_blue_reach_5
     }
     catch (const std::exception &e)
     {
-      RCLCPP_ERROR(rclcpp::get_logger("AlphaHardware"), e.what()); // NOLINT
+      RCLCPP_ERROR(rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), e.what()); // NOLINT
       return hardware_interface::CallbackReturn::ERROR;
     }
 
