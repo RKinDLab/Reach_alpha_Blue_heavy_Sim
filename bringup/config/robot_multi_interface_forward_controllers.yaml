@@ -21,6 +21,13 @@ controller_manager:
     fts_broadcaster:
       type: force_torque_sensor_broadcaster/ForceTorqueSensorBroadcaster
 
+joint_state_broadcaster:
+  ros__parameters:
+    map_interface_to_joint_state:
+      effort: current
+      position: position
+      velocity: velocity
+
 forward_position_controller:
   ros__parameters:
     joints:
@@ -75,5 +82,8 @@ udwadia_kalaba_controller:
       - alphathruster6_joint
       - alphathruster7_joint
       - alphathruster8_joint
-    interface_name: current
+    command_interface_name: current
+    state_interface_names: 
+      - position
+      - velocity
 
