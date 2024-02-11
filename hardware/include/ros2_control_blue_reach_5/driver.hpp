@@ -54,7 +54,7 @@ public:
    * @param heartbeat_timeout The maximum time (s) between heartbeat messages before the connection
    * is considered timed out. This must be greater than 1 second; defaults to 3 seconds.
    */
-  void start(const std::string & serial_port, int heartbeat_timeout = 3);
+  void start(const std::string & serial_port, int heartbeat_timeout = 3, bool verbose = true);
 
   /**
    * @brief Stop the driver.
@@ -199,7 +199,7 @@ private:
    * @param heartbeat_timeout_ms maximum allowable time between heartbeat messages before notifying
    * users that a timeout may have occurred
    */
-  void monitorHeartbeat(int heartbeat_timeout_ms) const;
+  void monitorHeartbeat(int heartbeat_timeout_ms, bool verbose) const;
 
   SerialClient client_;
 

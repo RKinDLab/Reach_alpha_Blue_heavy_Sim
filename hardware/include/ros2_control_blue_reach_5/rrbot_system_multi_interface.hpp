@@ -33,6 +33,9 @@
 #include "rclcpp_lifecycle/state.hpp"
 #include "ros2_control_blue_reach_5/visibility_control.h"
 
+#include "ros2_control_blue_reach_5/dynamics.hpp"
+#include "ros2_control_blue_reach_5/driver.hpp"
+#include "ros2_control_blue_reach_5/packet.hpp"
 #include "ros2_control_blue_reach_5/joint.hpp"
 #include "ros2_control_blue_reach_5/custom_hardware_interface_type_values.hpp"
 
@@ -44,6 +47,8 @@ namespace ros2_control_blue_reach_5
     struct Config
     {
       // Parameters for the RRBot simulation
+      std::string serial_port_;
+      int state_update_freq_;
       double hw_start_sec_;
       double hw_stop_sec_;
       double hw_slowdown_;
@@ -56,13 +61,13 @@ namespace ros2_control_blue_reach_5
     hardware_interface::CallbackReturn on_init(
         const hardware_interface::HardwareInfo &info) override;
 
-    // ROS2_CONTROL_BLUE_REACH_5_PUBLIC
-    // hardware_interface::CallbackReturn on_configure(
-    //     const rclcpp_lifecycle::State &previous_state) override;
+    ROS2_CONTROL_BLUE_REACH_5_PUBLIC
+    hardware_interface::CallbackReturn on_configure(
+        const rclcpp_lifecycle::State &previous_state) override;
 
-    // ROS2_CONTROL_BLUE_REACH_5_PUBLIC
-    // hardware_interface::CallbackReturn on_cleanup(
-    //     const rclcpp_lifecycle::State &previous_state) override;
+    ROS2_CONTROL_BLUE_REACH_5_PUBLIC
+    hardware_interface::CallbackReturn on_cleanup(
+        const rclcpp_lifecycle::State &previous_state) override;
 
     ROS2_CONTROL_BLUE_REACH_5_PUBLIC
     hardware_interface::return_type prepare_command_mode_switch(
@@ -91,7 +96,7 @@ namespace ros2_control_blue_reach_5
     ROS2_CONTROL_BLUE_REACH_5_PUBLIC
     hardware_interface::return_type read(
         const rclcpp::Time &time, const rclcpp::Duration &period) override;
-        
+
     ROS2_CONTROL_BLUE_REACH_5_PUBLIC
     hardware_interface::return_type write(
         const rclcpp::Time &time, const rclcpp::Duration &period) override;
@@ -115,6 +120,46 @@ namespace ros2_control_blue_reach_5
 
     // Store the state & commands for the robot joints
     std::vector<Joint> hw_joint_structs_;
+    /**
+     * @brief Write the current position of the robot received from the serial client to the
+     * respective asynchronous vector.
+     *
+     * @param packet The position packet that signaled the callback.
+     */
+    void updatePositionCb(const alpha::driver::Packet &packet, std::vector<Joint> &hw_joint_structs_ref);
+
+    /**
+     * @brief Write the current velocity of the robot received from the serial client to the
+     * respective asynchronous vector.
+     *
+     * @param packet The velocity packet that signaled the callback.
+     */
+    void updateVelocityCb(const alpha::driver::Packet &packet, std::vector<Joint> &hw_joint_structs_ref);
+
+    /**
+     * @brief Asynchronously read the current state of the robot by polling the robot serial
+     * interface.
+     *
+     * @param freq The frequency (Hz) that the interface should poll the current robot state at.
+     */
+
+    void updateCurrentCb(const alpha::driver::Packet &packet, std::vector<Joint> &hw_joint_structs_ref);
+
+    /**
+     * @brief Asynchronously read the current state of the robot by polling the robot serial
+     * interface.
+     *
+     * @param freq The frequency (Hz) that the interface should poll the current robot state at.
+     */
+
+    void pollState(int freq) const;
+
+    // Driver things
+    alpha::driver::Driver driver_;
+    std::thread state_request_worker_;
+    std::atomic<bool> running_{false};
+
+    std::mutex access_async_states_;
   };
 
 } // namespace ros2_control_blue_reach_5
