@@ -12,6 +12,9 @@ controller_manager:
     forward_current_controller:
       type: forward_command_controller/ForwardCommandController
 
+    pid_controller:
+      type: pid_controller/PidController
+
     udwadia_kalaba_controller:
       type: udwadia_kalaba_controller/ForwardCommandController
 
@@ -65,6 +68,7 @@ forward_current_controller:
       - alphathruster7_joint
       - alphathruster8_joint
     interface_name: current
+
 
 udwadia_kalaba_controller:
   ros__parameters:

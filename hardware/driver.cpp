@@ -39,7 +39,7 @@ Driver::Driver()
   });
 }
 
-void Driver::start(const std::string & serial_port, int heartbeat_timeout)
+void Driver::start(const std::string & serial_port, int heartbeat_timeout, bool verbose)
 {
   if (heartbeat_timeout < 1) {
     throw std::invalid_argument("The heartbeat timeout must be greater than 1 second.");
@@ -64,7 +64,7 @@ void Driver::start(const std::string & serial_port, int heartbeat_timeout)
   running_.store(true);
 
   // Start the thread that monitors heartbeats from the manipulator
-  heartbeat_worker_ = std::thread(&Driver::monitorHeartbeat, this, heartbeat_timeout);
+  heartbeat_worker_ = std::thread(&Driver::monitorHeartbeat, this, heartbeat_timeout, verbose);
 }
 
 void Driver::stop()
@@ -189,7 +189,7 @@ void Driver::setHeartbeatFreq(int freq)
   client_.send(packet);
 }
 
-void Driver::monitorHeartbeat(int heartbeat_timeout) const
+void Driver::monitorHeartbeat(int heartbeat_timeout, bool verbose) const
 {
   while (running_.load()) {
     // Make sure that the lock is properly scoped so that we don't accidentally keep the lock
@@ -200,11 +200,14 @@ void Driver::monitorHeartbeat(int heartbeat_timeout) const
       if (
         std::chrono::steady_clock::now() - last_heartbeat_ >
         std::chrono::seconds(heartbeat_timeout)) {
-        RCLCPP_WARN(  // NOLINT
+
+        if (verbose) {
+                  RCLCPP_WARN(  // NOLINT
           rclcpp::get_logger("AlphaDriver"),
           "Timeout occurred; the system has not received a heartbeat message in the last %d "
           "seconds",
           heartbeat_timeout);
+        }
       }
     }
 
