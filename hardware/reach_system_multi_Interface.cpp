@@ -7,13 +7,14 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <casadi/casadi.hpp>
 
 #include "ros2_control_blue_reach_5/device_id.hpp"
 #include "ros2_control_blue_reach_5/mode.hpp"
 #include "ros2_control_blue_reach_5/packet_id.hpp"
-
 #include "hardware_interface/types/hardware_interface_type_values.hpp"
 #include "rclcpp/rclcpp.hpp"
+
 
 namespace ros2_control_blue_reach_5
 {
@@ -26,6 +27,12 @@ namespace ros2_control_blue_reach_5
     {
       return hardware_interface::CallbackReturn::ERROR;
     }
+
+    RCLCPP_INFO(rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "Usage from CasADi C++:");
+
+
+    // Use CasADi's "external" to load the compiled function
+    casadi::Function f = casadi::external("Forward_dy","ros2_control_blue_reach_5/forward_dynamics.so");
 
     cfg_.serial_port_ = info_.hardware_parameters["serial_port"];
     cfg_.state_update_freq_ = std::stoi(info_.hardware_parameters["state_update_frequency"]);
@@ -368,8 +375,8 @@ namespace ros2_control_blue_reach_5
 
           // enforce hard limit;
           const double enforced_target_current = hw_joint_structs_[i].enforce_hard_limits(hw_joint_structs_[i].command_state_.current);
-          if (enforced_target_current == 0) {
-
+          if (enforced_target_current == 0)
+          {
           };
 
           // if (static_cast<int>(target_device) == 2)

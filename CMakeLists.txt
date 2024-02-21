@@ -36,6 +36,7 @@ add_library(
   hardware/serial_client.cpp
   hardware/vehicle_system_multi_interface.cpp
 )
+
 target_compile_features(ros2_control_blue_reach_5 PUBLIC cxx_std_17)
 target_include_directories(ros2_control_blue_reach_5 PUBLIC
 $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/hardware/include>
@@ -54,19 +55,25 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE "ROS2_CONTROL_BLUE_REACH_5_BU
 pluginlib_export_plugin_description_file(hardware_interface ros2_control_blue_reach_5.xml)
 
 # INSTALL
+
+install(FILES 
+  casadi_lib/forward_dynamics.so
+  DESTINATION lib/${PROJECT_NAME}
+)
+
 install(
   DIRECTORY hardware/include/
-  DESTINATION include/ros2_control_blue_reach_5
+  DESTINATION include/${PROJECT_NAME}
 )
 install(
   DIRECTORY description/launch description/ros2_control description/xacro description/rviz description/alpha description/blue
-  DESTINATION share/ros2_control_blue_reach_5
+  DESTINATION share/${PROJECT_NAME}
 )
 install(
   DIRECTORY bringup/launch bringup/config
-  DESTINATION share/ros2_control_blue_reach_5
+  DESTINATION share/${PROJECT_NAME}
 )
-install(TARGETS ros2_control_blue_reach_5
+install(TARGETS ${PROJECT_NAME}
   EXPORT export_ros2_control_blue_reach_5
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
