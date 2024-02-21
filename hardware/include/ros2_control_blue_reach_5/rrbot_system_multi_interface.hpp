@@ -33,7 +33,6 @@
 #include "rclcpp_lifecycle/state.hpp"
 #include "ros2_control_blue_reach_5/visibility_control.h"
 
-#include "ros2_control_blue_reach_5/dynamics.hpp"
 #include "ros2_control_blue_reach_5/driver.hpp"
 #include "ros2_control_blue_reach_5/packet.hpp"
 #include "ros2_control_blue_reach_5/joint.hpp"
