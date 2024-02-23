@@ -213,6 +213,8 @@ namespace ros2_control_blue_reach_5
     // Example criteria: All joints must be given new command mode at the same time
     if (new_modes.size() != info_.joints.size())
     {
+    RCLCPP_ERROR( // NOLINT
+        rclcpp::get_logger("RRBotSystemMultiInterfaceHardware"), "All joints must be given new command mode at the same time");
       return hardware_interface::return_type::ERROR;
     }
     // Example criteria: All joints must have the same command mode
@@ -221,6 +223,8 @@ namespace ros2_control_blue_reach_5
             [&](mode_level_t mode)
             { return mode == new_modes[0]; }))
     {
+    RCLCPP_ERROR( // NOLINT
+        rclcpp::get_logger("RRBotSystemMultiInterfaceHardware"), "All joints must have the same command mode");
       return hardware_interface::return_type::ERROR;
     }
 
@@ -243,10 +247,14 @@ namespace ros2_control_blue_reach_5
       if (control_level_[i] != mode_level_t::MODE_DISABLE)
       {
         // Something else is using the joint! Abort!
+    RCLCPP_ERROR( // NOLINT
+        rclcpp::get_logger("RRBotSystemMultiInterfaceHardware"), "Something else is using the joint! Abort!");
         return hardware_interface::return_type::ERROR;
       }
       control_level_[i] = new_modes[i];
     }
+    RCLCPP_ERROR( // NOLINT
+        rclcpp::get_logger("RRBotSystemMultiInterfaceHardware"), "oKAUIFD!");
     return hardware_interface::return_type::OK;
   }
 
