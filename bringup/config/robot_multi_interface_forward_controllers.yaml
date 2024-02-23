@@ -39,6 +39,14 @@ forward_position_controller:
       - alpha_axis_c
       - alpha_axis_d
       - alpha_axis_e
+      - alphathruster1_joint
+      - alphathruster2_joint
+      - alphathruster3_joint
+      - alphathruster4_joint
+      - alphathruster5_joint
+      - alphathruster6_joint
+      - alphathruster7_joint
+      - alphathruster8_joint
     interface_name: position
 
 forward_velocity_controller:
@@ -49,6 +57,14 @@ forward_velocity_controller:
       - alpha_axis_c
       - alpha_axis_d
       - alpha_axis_e
+      - alphathruster1_joint
+      - alphathruster2_joint
+      - alphathruster3_joint
+      - alphathruster4_joint
+      - alphathruster5_joint
+      - alphathruster6_joint
+      - alphathruster7_joint
+      - alphathruster8_joint
     interface_name: velocity
 
 forward_current_controller:
