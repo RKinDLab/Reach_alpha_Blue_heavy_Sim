@@ -15,7 +15,7 @@
 #include "hardware_interface/types/hardware_interface_type_values.hpp"
 #include "rclcpp/rclcpp.hpp"
 
-
+using namespace casadi;
 namespace ros2_control_blue_reach_5
 {
   hardware_interface::CallbackReturn ReachSystemMultiInterfaceHardware::on_init(
@@ -32,7 +32,28 @@ namespace ros2_control_blue_reach_5
 
 
     // Use CasADi's "external" to load the compiled function
-    casadi::Function f = casadi::external("Forward_dy","ros2_control_blue_reach_5/forward_dynamics.so");
+    // casadi::Function f = casadi::external("Forward_dy","ros2_control_blue_reach_5/forward_dynamics.so");
+
+    std::cout << "---" << std::endl;
+    std::cout << "Usage from CasADi C++:" << std::endl;
+    std::cout << std::endl;
+
+    // // Variables
+    SX x = SX::sym("x", 2, 2);
+    // SX y = SX::sym("y");
+
+    // // Simple function
+    // Function f("f", {x, y}, {sqrt(y) - 1, sin(x) - y});
+
+    // // Use like any other CasADi function
+    // std::vector<double> u = {1, 2, 3, 4};
+    // std::vector<DM> arg = {reshape(DM(u), 2, 2), 5};
+    // std::vector<DM> res = f(arg);
+
+    // std::cout << "result (0): " << res.at(0) << std::endl;
+    // std::cout << "result (1): " << res.at(1) << std::endl;
+
+
 
     cfg_.serial_port_ = info_.hardware_parameters["serial_port"];
     cfg_.state_update_freq_ = std::stoi(info_.hardware_parameters["state_update_frequency"]);
