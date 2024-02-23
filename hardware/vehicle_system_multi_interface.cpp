@@ -128,6 +128,10 @@ namespace ros2_control_blue_reach_5
     {
       for (std::size_t i = 0; i < info_.joints.size(); i++)
       {
+        if (key == info_.joints[i].name + "/" + hardware_interface::HW_IF_POSITION)
+        {
+          new_modes.push_back(mode_level_t::MODE_POSITION);
+        }
         if (key == info_.joints[i].name + "/" + hardware_interface::HW_IF_VELOCITY)
         {
           new_modes.push_back(mode_level_t::MODE_VELOCITY);
