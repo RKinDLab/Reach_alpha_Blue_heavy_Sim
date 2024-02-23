@@ -7,7 +7,6 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include <casadi/casadi.hpp>
 
 #include "ros2_control_blue_reach_5/device_id.hpp"
 #include "ros2_control_blue_reach_5/mode.hpp"
@@ -16,8 +15,10 @@
 #include "rclcpp/rclcpp.hpp"
 
 using namespace casadi;
+
 namespace ros2_control_blue_reach_5
 {
+
   hardware_interface::CallbackReturn ReachSystemMultiInterfaceHardware::on_init(
       const hardware_interface::HardwareInfo &info)
   {
@@ -28,30 +29,15 @@ namespace ros2_control_blue_reach_5
       return hardware_interface::CallbackReturn::ERROR;
     }
 
-    RCLCPP_INFO(rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "Usage from CasADi C++:");
+
 
 
     // Use CasADi's "external" to load the compiled function
     // casadi::Function f = casadi::external("Forward_dy","ros2_control_blue_reach_5/forward_dynamics.so");
 
-    std::cout << "---" << std::endl;
-    std::cout << "Usage from CasADi C++:" << std::endl;
-    std::cout << std::endl;
-
-    // // Variables
-    // SX x = SX::sym("x", 2, 2);
-    // SX y = SX::sym("y");
-
-    // // Simple function
-    // Function f("f", {x, y}, {sqrt(y) - 1, sin(x) - y});
-
-    // // Use like any other CasADi function
-    // std::vector<double> u = {1, 2, 3, 4};
-    // std::vector<DM> arg = {reshape(DM(u), 2, 2), 5};
-    // std::vector<DM> res = f(arg);
-
-    // std::cout << "result (0): " << res.at(0) << std::endl;
-    // std::cout << "result (1): " << res.at(1) << std::endl;
+    std::string casadi_version = casadi::CasadiMeta::version();
+    // Print the CasADi version
+    RCLCPP_INFO(rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "CasADi version: %s" , casadi_version.c_str());
 
 
 
