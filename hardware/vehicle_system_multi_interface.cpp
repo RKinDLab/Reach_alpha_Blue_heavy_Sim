@@ -258,6 +258,12 @@ namespace ros2_control_blue_reach_5
         //   "Nothing is using the hardware interface!");
         return hardware_interface::return_type::OK;
         break;
+      case mode_level_t::MODE_POSITION:
+        hw_thrust_structs_[i].current_state_.current  = 0;
+        hw_thrust_structs_[i].current_state_.acceleration = 0;
+        hw_thrust_structs_[i].current_state_.velocity = 0;
+        hw_thrust_structs_[i].current_state_.position = hw_thrust_structs_[i].command_state_.position;
+        break;
       case mode_level_t::MODE_VELOCITY:
         hw_thrust_structs_[i].current_state_.acceleration = 0;
         hw_thrust_structs_[i].current_state_.current  = 0;

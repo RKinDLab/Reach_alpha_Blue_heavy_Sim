@@ -16,7 +16,6 @@ set(THIS_PACKAGE_INCLUDE_DEPENDS
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
-find_package(casadi REQUIRED)
 
 foreach(Dependency IN ITEMS ${THIS_PACKAGE_INCLUDE_DEPENDS})
   find_package(${Dependency} REQUIRED)
@@ -36,6 +35,8 @@ add_library(
   hardware/serial_client.cpp
   hardware/vehicle_system_multi_interface.cpp
 )
+
+target_link_libraries(ros2_control_blue_reach_5 PUBLIC casadi)
 
 target_compile_features(ros2_control_blue_reach_5 PUBLIC cxx_std_17)
 target_include_directories(ros2_control_blue_reach_5 PUBLIC

@@ -41,6 +41,8 @@
 #include "ros2_control_blue_reach_5/joint.hpp"
 #include "ros2_control_blue_reach_5/custom_hardware_interface_type_values.hpp"
 
+#include <casadi/casadi.hpp>
+
 namespace ros2_control_blue_reach_5
 {
   class ReachSystemMultiInterfaceHardware : public hardware_interface::SystemInterface
