@@ -39,7 +39,7 @@ namespace ros2_control_blue_reach_5
     std::cout << std::endl;
 
     // // Variables
-    SX x = SX::sym("x", 2, 2);
+    // SX x = SX::sym("x", 2, 2);
     // SX y = SX::sym("y");
 
     // // Simple function
