@@ -28,6 +28,7 @@ add_library(
   hardware/rrbot_system_multi_interface.cpp
   hardware/reach_system_multi_Interface.cpp
   hardware/joint.cpp
+  hardware/dynamics.cpp
   hardware/cobs.cpp
   hardware/crc.cpp
   hardware/driver.cpp
@@ -59,7 +60,9 @@ pluginlib_export_plugin_description_file(hardware_interface ros2_control_blue_re
 
 install(FILES 
   casadi_lib/forward_dynamics.so
-  DESTINATION lib/${PROJECT_NAME}
+  casadi_lib/lib_test.so
+  casadi_lib/lib_Xnext.so
+  DESTINATION lib
 )
 
 install(
