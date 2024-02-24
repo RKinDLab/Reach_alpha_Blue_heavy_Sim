@@ -33,4 +33,4 @@
 *.out
 *.app
 
-!forward_dynamics.so
+!casadi_lib/*

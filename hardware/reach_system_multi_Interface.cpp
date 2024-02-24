@@ -19,24 +19,6 @@ using namespace casadi;
 namespace ros2_control_blue_reach_5
 {
 
-  void usage_cplusplus()
-  {
-    std::cout << "---" << std::endl;
-    std::cout << "Usage from CasADi C++:" << std::endl;
-    std::cout << std::endl;
-
-    // Use CasADi's "external" to load the compiled function
-    Function f = external("Xnext", "Xnext4.so");
-
-    // Use like any other CasADi function
-    std::vector<double> x = {1, 2, 3, 4};
-    std::vector<DM> arg = {reshape(DM(x), 2, 2), 5};
-    std::vector<DM> res = f(arg);
-
-    std::cout << "result (0): " << res.at(0) << std::endl;
-    std::cout << "result (1): " << res.at(1) << std::endl;
-  }
-
   hardware_interface::CallbackReturn ReachSystemMultiInterfaceHardware::on_init(
       const hardware_interface::HardwareInfo &info)
   {
@@ -51,9 +33,18 @@ namespace ros2_control_blue_reach_5
     std::string casadi_version = casadi::CasadiMeta::version();
     RCLCPP_INFO(rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "CasADi version: %s", casadi_version.c_str());
 
-    // Use CasADi's "external" to load the compiled function
-    usage_cplusplus();
-    std::cout << "Hello, casadi!" << std::endl;
+    // Use CasADi's "external" to load the compiled dynamics functions
+    dynamics_service.usage_cplusplus_checks("Xnext", "lib_test.so");
+    bool forward_dynamics_is_loaded = dynamics_service.load_forward_dynamics("Xnext", "lib_Xnext.so");
+
+    if (!(forward_dynamics_is_loaded))
+    {
+      RCLCPP_FATAL(
+          rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "Failed initialization of robot dynamics");
+      return hardware_interface::CallbackReturn::ERROR;
+    }
+    RCLCPP_FATAL(
+        rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "Successful initialization of robot dynamics");
 
     cfg_.serial_port_ = info_.hardware_parameters["serial_port"];
     cfg_.state_update_freq_ = std::stoi(info_.hardware_parameters["state_update_frequency"]);
