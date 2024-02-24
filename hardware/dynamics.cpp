@@ -24,3 +24,10 @@ bool casadi_reach_alpha_5::Dynamics::load_forward_dynamics(const std::string &na
     forward_dynamics = external(name, bin_name);
     return true;
 }
+
+bool casadi_reach_alpha_5::Dynamics::load_forward_kinematics(const std::string &name, const std::string &bin_name)
+{
+    // Use CasADi's "external" to load forward_kinematics compiled function
+    forward_kinematics = external(name, bin_name);
+    return true;
+}

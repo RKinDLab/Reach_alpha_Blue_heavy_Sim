@@ -59,9 +59,9 @@ pluginlib_export_plugin_description_file(hardware_interface ros2_control_blue_re
 # INSTALL
 
 install(FILES 
-  casadi_lib/forward_dynamics.so
-  casadi_lib/lib_test.so
-  casadi_lib/lib_Xnext.so
+  casadi_lib/libTfk.so
+  casadi_lib/libtest.so
+  casadi_lib/libXnext.so
   DESTINATION lib
 )
 

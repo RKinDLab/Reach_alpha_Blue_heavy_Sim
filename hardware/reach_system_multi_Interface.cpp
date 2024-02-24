@@ -34,17 +34,18 @@ namespace ros2_control_blue_reach_5
     RCLCPP_INFO(rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "CasADi version: %s", casadi_version.c_str());
 
     // Use CasADi's "external" to load the compiled dynamics functions
-    dynamics_service.usage_cplusplus_checks("Xnext", "lib_test.so");
-    bool forward_dynamics_is_loaded = dynamics_service.load_forward_dynamics("Xnext", "lib_Xnext.so");
+    dynamics_service.usage_cplusplus_checks("Xnext", "libtest.so");
+    bool forward_dynamics_is_loaded = dynamics_service.load_forward_dynamics("Xnext", "libXnext.so");
+    bool forward_kinematics_is_loaded = dynamics_service.load_forward_kinematics("T_fk", "libTfk.so");
 
-    if (!(forward_dynamics_is_loaded))
+    if (!(forward_dynamics_is_loaded || forward_kinematics_is_loaded))
     {
       RCLCPP_FATAL(
-          rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "Failed initialization of robot dynamics");
+          rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "Failed initialization of robot kinematics & dynamics");
       return hardware_interface::CallbackReturn::ERROR;
     }
     RCLCPP_FATAL(
-        rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "Successful initialization of robot dynamics");
+        rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "Successful initialization of robot kinematics & dynamics");
 
     cfg_.serial_port_ = info_.hardware_parameters["serial_port"];
     cfg_.state_update_freq_ = std::stoi(info_.hardware_parameters["state_update_frequency"]);
