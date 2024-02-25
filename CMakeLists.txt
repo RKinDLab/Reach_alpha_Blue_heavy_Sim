@@ -56,14 +56,13 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE "ROS2_CONTROL_BLUE_REACH_5_BU
 # Export hardware plugins
 pluginlib_export_plugin_description_file(hardware_interface ros2_control_blue_reach_5.xml)
 
+# Collect all files within the casadi_lib directory and store them in a variable
+file(GLOB CASADI_LIB_FILES "${CMAKE_CURRENT_SOURCE_DIR}/casadi_lib/*")
+
 # INSTALL
 
-install(FILES 
-  casadi_lib/libTfk.so
-  casadi_lib/libtest.so
-  casadi_lib/libXnext.so
-  DESTINATION lib
-)
+# Install all files from the collected list to the destination directory
+install(FILES ${CASADI_LIB_FILES} DESTINATION lib)
 
 install(
   DIRECTORY hardware/include/

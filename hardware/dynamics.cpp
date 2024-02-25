@@ -18,16 +18,8 @@ void casadi_reach_alpha_5::Dynamics::usage_cplusplus_checks(const std::string &n
     std::cout << "result (1): " << res.at(1) << std::endl;
 }
 
-bool casadi_reach_alpha_5::Dynamics::load_forward_dynamics(const std::string &name, const std::string &bin_name)
+Function casadi_reach_alpha_5::Dynamics::load_casadi_fun(const std::string &name, const std::string &bin_name)
 {
-    // Use CasADi's "external" to load forward_dynamics compiled function
-    forward_dynamics = external(name, bin_name);
-    return true;
-}
-
-bool casadi_reach_alpha_5::Dynamics::load_forward_kinematics(const std::string &name, const std::string &bin_name)
-{
-    // Use CasADi's "external" to load forward_kinematics compiled function
-    forward_kinematics = external(name, bin_name);
-    return true;
+    // Use CasADi's "external" to load compiled function
+    return external(name, bin_name);
 }

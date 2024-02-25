@@ -35,15 +35,11 @@ namespace ros2_control_blue_reach_5
 
     // Use CasADi's "external" to load the compiled dynamics functions
     dynamics_service.usage_cplusplus_checks("test", "libtest.so");
-    bool forward_dynamics_is_loaded = dynamics_service.load_forward_dynamics("Xnext", "libXnext.so");
-    bool forward_kinematics_is_loaded = dynamics_service.load_forward_kinematics("T_fk", "libTfk.so");
+    dynamics_service.forward_dynamics = dynamics_service.load_casadi_fun("Xnext", "libXnext.so");
+    dynamics_service.forward_kinematics = dynamics_service.load_casadi_fun("T_fk", "libTfk.so");
+    dynamics_service.inverse_dynamics = dynamics_service.load_casadi_fun("C", "libId.so");
+    dynamics_service.inertia_matrix = dynamics_service.load_casadi_fun("M", "libM.so");
 
-    if (!(forward_dynamics_is_loaded || forward_kinematics_is_loaded))
-    {
-      RCLCPP_FATAL(
-          rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "Failed initialization of robot kinematics & dynamics");
-      return hardware_interface::CallbackReturn::ERROR;
-    }
     RCLCPP_FATAL(
         rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "Successful initialization of robot kinematics & dynamics");
 
