@@ -30,9 +30,9 @@ namespace ros2_control_blue_reach_5
     }
 
     // Print the CasADi version
-    std::string casadi_version = casadi::CasadiMeta::version();
+    std::string casadi_version = CasadiMeta::version();
     RCLCPP_INFO(rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "CasADi version: %s", casadi_version.c_str());
-
+    RCLCPP_INFO(rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "Testing casadi ready for operations");
     // Use CasADi's "external" to load the compiled dynamics functions
     dynamics_service.usage_cplusplus_checks("test", "libtest.so");
     dynamics_service.forward_dynamics = dynamics_service.load_casadi_fun("Xnext", "libXnext.so");
@@ -40,7 +40,31 @@ namespace ros2_control_blue_reach_5
     dynamics_service.inverse_dynamics = dynamics_service.load_casadi_fun("C", "libId.so");
     dynamics_service.inertia_matrix = dynamics_service.load_casadi_fun("M", "libM.so");
 
-    RCLCPP_FATAL(
+    std::vector<double> x = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    std::vector<double> u = {0.0, 0.0, 0.0, 0.001};
+    std::vector<DM> argfd = {DM(x), DM(u)};
+    std::vector<DM> resfd = dynamics_service.forward_dynamics(argfd);
+
+    std::cout << "forward dynamics example result: " << resfd.at(0) << std::endl;
+
+    std::vector<double> q = {0.0, 0.0, 0.0, 0.001};
+    std::vector<DM> argtk = {DM(q)};
+    std::vector<DM> restk = dynamics_service.forward_kinematics(argtk);
+
+    std::cout << "forward kinematics example result: " << restk.at(0) << std::endl;
+
+    std::vector<double> qdot = {0.0, 0.0, 0.0, 0.1};
+    std::vector<double> qddot = {0.0, 0.0, 0.0, 2.0};
+    std::vector<DM> argid = {DM(q),DM(qdot),DM(qddot)};
+    std::vector<DM> resid = dynamics_service.inverse_dynamics(argid);
+
+    std::cout << "inverse dynamics example result: " << resid.at(0) << std::endl;
+
+    std::vector<DM> resM = dynamics_service.inertia_matrix(argtk);
+
+    std::cout << "inertia matrix example result: " << resM.at(0) << std::endl;
+
+    RCLCPP_INFO(
         rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "Successful initialization of robot kinematics & dynamics");
 
     cfg_.serial_port_ = info_.hardware_parameters["serial_port"];
