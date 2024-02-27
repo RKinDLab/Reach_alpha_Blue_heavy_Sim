@@ -37,8 +37,6 @@ namespace ros2_control_blue_reach_5
     dynamics_service.usage_cplusplus_checks("test", "libtest.so");
     dynamics_service.forward_dynamics = dynamics_service.load_casadi_fun("Xnext", "libXnext.so");
     dynamics_service.forward_kinematics = dynamics_service.load_casadi_fun("T_fk", "libTfk.so");
-    dynamics_service.inverse_dynamics = dynamics_service.load_casadi_fun("C", "libId.so");
-    dynamics_service.inertia_matrix = dynamics_service.load_casadi_fun("M", "libM.so");
 
     std::vector<double> x = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
     std::vector<double> u = {0.0, 0.0, 0.0, 0.001};
@@ -52,17 +50,6 @@ namespace ros2_control_blue_reach_5
     std::vector<DM> restk = dynamics_service.forward_kinematics(argtk);
 
     std::cout << "forward kinematics example result: " << restk.at(0) << std::endl;
-
-    std::vector<double> qdot = {0.0, 0.0, 0.0, 0.1};
-    std::vector<double> qddot = {0.0, 0.0, 0.0, 2.0};
-    std::vector<DM> argid = {DM(q),DM(qdot),DM(qddot)};
-    std::vector<DM> resid = dynamics_service.inverse_dynamics(argid);
-
-    std::cout << "inverse dynamics example result: " << resid.at(0) << std::endl;
-
-    std::vector<DM> resM = dynamics_service.inertia_matrix(argtk);
-
-    std::cout << "inertia matrix example result: " << resM.at(0) << std::endl;
 
     RCLCPP_INFO(
         rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "Successful initialization of robot kinematics & dynamics");
@@ -412,9 +399,10 @@ namespace ros2_control_blue_reach_5
           {
           };
 
-          // if (static_cast<int>(target_device) == 2)
+          // if (static_cast<int>(target_device) == 5)
           // {
-          //   RCLCPP_INFO(rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "%f, %f, %f ",target_current, enforced_target_current, hw_joint_structs_[i].command_state_.current);
+          //   RCLCPP_INFO(rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "currents sent :::%f, %f ",enforced_target_current, hw_joint_structs_[i].command_state_.current);
+          //   RCLCPP_INFO(rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "state position :::%f ",hw_joint_structs_[i].async_state_.position);
           // }
 
           driver_.setCurrent(enforced_target_current, target_device);
