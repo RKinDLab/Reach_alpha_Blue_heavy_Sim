@@ -123,8 +123,11 @@ namespace ros2_control_blue_reach_5
     // Store the state & commands for the robot joints
     std::vector<Joint> hw_joint_structs_;
 
-      // Store the dynamics function for the robot joints
+    // Store the dynamics function for the robot joints
     casadi_reach_alpha_5::Dynamics dynamics_service;
+
+    // stores the dynamic response from the forward dynamics simulator
+    std::vector<double> forward_dynamics_res;
 
     /**
      * @brief Write the current position of the robot received from the serial client to the

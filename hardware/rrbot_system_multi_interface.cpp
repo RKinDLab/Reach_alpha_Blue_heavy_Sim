@@ -347,9 +347,14 @@ namespace ros2_control_blue_reach_5
   hardware_interface::return_type RRBotSystemMultiInterfaceHardware::read(
       const rclcpp::Time & /*time*/, const rclcpp::Duration &period)
   {
+    double delta_seconds = period.seconds();
     for (std::size_t i = 0; i < info_.joints.size(); i++)
     {
-
+      double prev_velocity0_;
+      double prev_velocity1_;
+      double prev_velocity2_;
+      double prev_velocity3_;
+      double prev_velocity4_;
       switch (control_level_[i])
       {
       case mode_level_t::MODE_DISABLE:
@@ -372,11 +377,35 @@ namespace ros2_control_blue_reach_5
         hw_joint_structs_[i].current_state_.position += (hw_joint_structs_[i].current_state_.velocity * period.seconds()) / cfg_.hw_slowdown_;
         break;
       case mode_level_t::MODE_CURRENT:
-        hw_joint_structs_[i].current_state_.current = hw_joint_structs_[i].command_state_.current;
-        hw_joint_structs_[i].current_state_.acceleration = hw_joint_structs_[i].command_state_.current / 2; // dummy
-        hw_joint_structs_[i].current_state_.velocity += (hw_joint_structs_[i].current_state_.acceleration * period.seconds()) / cfg_.hw_slowdown_;
-        hw_joint_structs_[i].current_state_.position += (hw_joint_structs_[i].current_state_.velocity * period.seconds()) / cfg_.hw_slowdown_;
+
+        prev_velocity0_ = 0;
+        hw_joint_structs_[0].current_state_.velocity = 0;
+        hw_joint_structs_[0].current_state_.position += (hw_joint_structs_[i].current_state_.velocity * period.seconds()) / cfg_.hw_slowdown_;
+        hw_joint_structs_[0].calcAcceleration(prev_velocity0_, delta_seconds);
+
+        prev_velocity1_ = hw_joint_structs_[1].current_state_.velocity;
+        hw_joint_structs_[1].current_state_.position = forward_dynamics_res[3];
+        hw_joint_structs_[1].current_state_.velocity = forward_dynamics_res[7];
+        hw_joint_structs_[1].calcAcceleration(prev_velocity1_, delta_seconds);
+
+        prev_velocity2_ = hw_joint_structs_[2].current_state_.velocity;
+        hw_joint_structs_[2].current_state_.position = forward_dynamics_res[2];
+        hw_joint_structs_[2].current_state_.velocity = forward_dynamics_res[6];
+        hw_joint_structs_[2].calcAcceleration(prev_velocity2_, delta_seconds);
+
+        prev_velocity3_ = hw_joint_structs_[3].current_state_.velocity;
+        hw_joint_structs_[3].current_state_.position = forward_dynamics_res[1];
+        hw_joint_structs_[3].current_state_.velocity = forward_dynamics_res[5];
+        hw_joint_structs_[3].calcAcceleration(prev_velocity3_, delta_seconds);
+
+        prev_velocity4_ = hw_joint_structs_[4].current_state_.velocity;
+        hw_joint_structs_[4].current_state_.position = forward_dynamics_res[0];
+        hw_joint_structs_[4].current_state_.velocity = forward_dynamics_res[4];
+        hw_joint_structs_[4].calcAcceleration(prev_velocity4_, delta_seconds);
+        // std::cout << "forward dynamics example result: " << res_vec << std::endl;
+
         break;
+
       case mode_level_t::MODE_STANDBY:
         hw_joint_structs_[i].current_state_.current = hw_joint_structs_[i].command_state_.current;
         hw_joint_structs_[i].current_state_.acceleration = hw_joint_structs_[i].command_state_.current / 2; // dummy
@@ -398,48 +427,26 @@ namespace ros2_control_blue_reach_5
   }
 
   hardware_interface::return_type RRBotSystemMultiInterfaceHardware::write(
-      const rclcpp::Time & /*time*/, const rclcpp::Duration &period)
+      const rclcpp::Time & /*time*/, const rclcpp::Duration & /*period*/)
   {
-    double delta_seconds = period.seconds();
     std::vector<double> x = {
+        hw_joint_structs_[4].current_state_.position,
         hw_joint_structs_[3].current_state_.position,
         hw_joint_structs_[2].current_state_.position,
         hw_joint_structs_[1].current_state_.position,
-        hw_joint_structs_[0].current_state_.position,
+        hw_joint_structs_[4].current_state_.velocity,
         hw_joint_structs_[3].current_state_.velocity,
         hw_joint_structs_[2].current_state_.velocity,
         hw_joint_structs_[1].current_state_.velocity,
-        hw_joint_structs_[0].current_state_.velocity,
     };
-    std::vector<double> u = {hw_joint_structs_[3].command_state_.current,
+    std::vector<double> u = {hw_joint_structs_[4].command_state_.current,
+                             hw_joint_structs_[3].command_state_.current,
                              hw_joint_structs_[2].command_state_.current,
-                             hw_joint_structs_[1].command_state_.current,
-                             hw_joint_structs_[0].command_state_.current};
+                             hw_joint_structs_[1].command_state_.current};
     std::vector<DM> dynamic_arg = {DM(x), DM(u)};
+
     std::vector<DM> dynamic_response = dynamics_service.forward_dynamics(dynamic_arg);
-    std::vector<double> res_vec = std::vector<double>(dynamic_response.at(0));
-
-    double prev_velocity0_ = hw_joint_structs_[0].current_state_.velocity;
-    hw_joint_structs_[0].current_state_.position = res_vec[3];
-    hw_joint_structs_[0].current_state_.velocity = res_vec[7];
-    hw_joint_structs_[0].calcAcceleration(prev_velocity0_, delta_seconds);
-
-    double prev_velocity1_ = hw_joint_structs_[1].current_state_.velocity;
-    hw_joint_structs_[1].current_state_.position = res_vec[2];
-    hw_joint_structs_[1].current_state_.velocity = res_vec[6];
-    hw_joint_structs_[1].calcAcceleration(prev_velocity1_, delta_seconds);
-
-    double prev_velocity2_ = hw_joint_structs_[2].current_state_.velocity;
-    hw_joint_structs_[2].current_state_.position = res_vec[1];
-    hw_joint_structs_[2].current_state_.velocity = res_vec[5];
-    hw_joint_structs_[2].calcAcceleration(prev_velocity2_, delta_seconds);
-
-    double prev_velocity3_ = hw_joint_structs_[3].current_state_.velocity;
-    hw_joint_structs_[3].current_state_.position = res_vec[0];
-    hw_joint_structs_[3].current_state_.velocity = res_vec[4];
-    hw_joint_structs_[3].calcAcceleration(prev_velocity3_, delta_seconds);
-    std::cout << "forward dynamics example result: " << res_vec << std::endl;
-
+    forward_dynamics_res = std::vector<double>(dynamic_response.at(0));
     return hardware_interface::return_type::OK;
   }
 
