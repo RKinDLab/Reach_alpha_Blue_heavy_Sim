@@ -11,6 +11,7 @@
 #include "ros2_control_blue_reach_5/device_id.hpp"
 #include "ros2_control_blue_reach_5/mode.hpp"
 #include "ros2_control_blue_reach_5/packet_id.hpp"
+#include "ros2_control_blue_reach_5/motor_control.hpp"
 #include "hardware_interface/types/hardware_interface_type_values.hpp"
 #include "rclcpp/rclcpp.hpp"
 
