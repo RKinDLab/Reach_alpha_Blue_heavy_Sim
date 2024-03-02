@@ -219,8 +219,7 @@ namespace ros2_control_blue_reach_5
     }
 
     RCLCPP_INFO(
-        rclcpp::get_logger("VehicleSystemMultiInterfaceHardware"), "System successfully activated! %u",
-        control_level_[0]);
+        rclcpp::get_logger("VehicleSystemMultiInterfaceHardware"), "System successfully activated!");
     return hardware_interface::CallbackReturn::SUCCESS;
   }
 

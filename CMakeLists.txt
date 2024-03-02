@@ -35,6 +35,7 @@ add_library(
   hardware/packet.cpp
   hardware/serial_client.cpp
   hardware/vehicle_system_multi_interface.cpp
+  hardware/motor_control.cpp
 )
 
 target_link_libraries(ros2_control_blue_reach_5 PUBLIC casadi)
