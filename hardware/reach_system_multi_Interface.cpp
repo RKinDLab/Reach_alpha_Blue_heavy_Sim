@@ -62,6 +62,8 @@ namespace ros2_control_blue_reach_5
     control_modes_.resize(info_.joints.size(), mode_level_t::MODE_DISABLE);
     RCLCPP_INFO(
         rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "Hardware update rate is %u Hz", static_cast<int>(cfg_.state_update_freq_));
+
+    excite = true;
     for (const hardware_interface::ComponentInfo &joint : info_.joints)
     {
       std::string device_id_value = joint.parameters.at("device_id");
@@ -193,6 +195,8 @@ namespace ros2_control_blue_reach_5
       const std::vector<std::string> &start_interfaces,
       const std::vector<std::string> &stop_interfaces)
   {
+    RCLCPP_INFO( // NOLINT
+        rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "preparing command mode switch");
     // Prepare for new command modes
     std::vector<mode_level_t> new_modes = {};
     for (std::string key : start_interfaces)
@@ -210,6 +214,10 @@ namespace ros2_control_blue_reach_5
         if (key == info_.joints[i].name + "/" + custom_hardware_interface::HW_IF_CURRENT)
         {
           new_modes.push_back(mode_level_t::MODE_CURRENT);
+        }
+        if (key == info_.joints[i].name + "/" + custom_hardware_interface::HW_IF_FREE_EXCITE)
+        {
+          new_modes.push_back(mode_level_t::MODE_FREE_EXCITE);
         }
       }
     }
@@ -267,6 +275,8 @@ namespace ros2_control_blue_reach_5
           info_.joints[i].name, hardware_interface::HW_IF_ACCELERATION, &hw_joint_structs_[i].current_state_.acceleration));
       state_interfaces.emplace_back(hardware_interface::StateInterface(
           info_.joints[i].name, custom_hardware_interface::HW_IF_CURRENT, &hw_joint_structs_[i].current_state_.current));
+      state_interfaces.emplace_back(hardware_interface::StateInterface(
+          info_.joints[i].name, hardware_interface::HW_IF_EFFORT, &hw_joint_structs_[i].current_state_.effort));
     }
 
     return state_interfaces;
@@ -341,7 +351,9 @@ namespace ros2_control_blue_reach_5
       hw_joint_structs_[i].current_state_.position = hw_joint_structs_[i].async_state_.position;
       hw_joint_structs_[i].current_state_.velocity = hw_joint_structs_[i].async_state_.velocity;
       hw_joint_structs_[i].current_state_.current = hw_joint_structs_[i].async_state_.current;
+      hw_joint_structs_[i].current_state_.effort = motor_control.currentToTorque(i, hw_joint_structs_[i].current_state_.current);//hw_joint_structs_[i].async_state_.current;
       hw_joint_structs_[i].calcAcceleration(prev_velocity_, delta_seconds);
+
       //  RCLCPP_INFO(rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), " %d acceleration %f",hw_joint_structs_[i].device_id,
       //   hw_joint_structs_[i].acceleration_state_);
     }
@@ -351,8 +363,9 @@ namespace ros2_control_blue_reach_5
   hardware_interface::return_type ReachSystemMultiInterfaceHardware::write(
       const rclcpp::Time & /*time*/, const rclcpp::Duration & /*period*/)
   {
+
     // Send the commands for each joint
-    for (std::size_t i = 0; i < control_modes_.size(); i++)
+    for (std::size_t i = 0; i < info_.joints.size(); i++)
     {
       switch (control_modes_[i])
       {
@@ -409,11 +422,35 @@ namespace ros2_control_blue_reach_5
           driver_.setCurrent(enforced_target_current, target_device);
         }
         break;
+      case mode_level_t::MODE_FREE_EXCITE:
+      {
+        const auto target_device = static_cast<alpha::driver::DeviceId>(hw_joint_structs_[i].device_id);
+        // Set the command interface value for this joint excitation
+        const double tau_in_electric = hw_joint_structs_[i].calculateExcitationEffortForJoint();
+        hw_joint_structs_[i].limits_.phase += 0.001;
+        const double enforced_target_current = hw_joint_structs_[i].enforce_hard_limits(tau_in_electric);
+        if (enforced_target_current == 0)
+        {
+        };
+        // RCLCPP_INFO(rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "currents to be sent to %li:::%f -->  %f ", i, tau_in_electric, enforced_target_current);
+        if (!i == 0)
+        {
+          driver_.setCurrent(enforced_target_current, target_device);
+        }
+
+        break;
+      }
+      case mode_level_t::MODE_STANDBY:
+        // Handle standby mode if needed, or just break
+        break;
+      case mode_level_t::MODE_DISABLE:
+        // Handle disable mode if needed, or just break
+        break;
       default:
+        // Existing code for default case...
         break;
       }
     }
-
     return hardware_interface::return_type::OK;
   }
 
