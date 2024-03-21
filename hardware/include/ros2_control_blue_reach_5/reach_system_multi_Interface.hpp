@@ -117,6 +117,7 @@ namespace ros2_control_blue_reach_5
       MODE_POSITION,
       MODE_VELOCITY,
       MODE_CURRENT,
+      MODE_FREE_EXCITE
     };
     
     MotorControl motor_control;
@@ -170,6 +171,8 @@ namespace ros2_control_blue_reach_5
     std::atomic<bool> running_{false};
 
     std::mutex access_async_states_;
+
+    bool excite = false;
   };
 
 } // namespace ros2_control_blue_reach_5

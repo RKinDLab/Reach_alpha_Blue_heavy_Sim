@@ -107,7 +107,8 @@ namespace ros2_control_blue_reach_5
       MODE_DISABLE = 0x01,
       MODE_POSITION = 0x02,
       MODE_VELOCITY = 0x03,
-      MODE_CURRENT = 0x04
+      MODE_CURRENT = 0x04,
+      MODE_FREE_EXCITE = 0x05,
     };
 
     // Active control mode for each thruster

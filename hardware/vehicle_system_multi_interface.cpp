@@ -98,6 +98,8 @@ namespace ros2_control_blue_reach_5
           info_.joints[i].name, hardware_interface::HW_IF_ACCELERATION, &hw_thrust_structs_[i].current_state_.acceleration));
       state_interfaces.emplace_back(hardware_interface::StateInterface(
           info_.joints[i].name, custom_hardware_interface::HW_IF_CURRENT, &hw_thrust_structs_[i].current_state_.current));
+      state_interfaces.emplace_back(hardware_interface::StateInterface(
+          info_.joints[i].name, hardware_interface::HW_IF_EFFORT, &hw_thrust_structs_[i].current_state_.effort));
     }
 
     return state_interfaces;
@@ -139,6 +141,10 @@ namespace ros2_control_blue_reach_5
         if (key == info_.joints[i].name + "/" + custom_hardware_interface::HW_IF_CURRENT)
         {
           new_modes.push_back(mode_level_t::MODE_CURRENT);
+        }
+        if (key == info_.joints[i].name + "/" + custom_hardware_interface::HW_IF_FREE_EXCITE)
+        {
+          new_modes.push_back(mode_level_t::MODE_FREE_EXCITE);
         }
       }
     }
@@ -280,6 +286,10 @@ namespace ros2_control_blue_reach_5
         hw_thrust_structs_[i].current_state_.acceleration = hw_thrust_structs_[i].command_state_.current / 2; //dummy
         hw_thrust_structs_[i].current_state_.velocity = (hw_thrust_structs_[i].current_state_.acceleration * period.seconds());
         hw_thrust_structs_[i].current_state_.position += (hw_thrust_structs_[i].current_state_.velocity * period.seconds()) / cfg_.hw_slowdown_;
+      case mode_level_t::MODE_FREE_EXCITE:
+        break;
+      default:
+        // Existing code for default case...
         break;
       }
       // BEGIN: This part here is for exemplary purposes - Please do not copy to your production code
