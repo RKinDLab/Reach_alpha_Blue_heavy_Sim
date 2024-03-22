@@ -39,7 +39,11 @@
 #include "ros2_control_blue_reach_5/driver.hpp"
 #include "ros2_control_blue_reach_5/packet.hpp"
 #include "ros2_control_blue_reach_5/joint.hpp"
+#include "ros2_control_blue_reach_5/dynamics.hpp"
+#include "ros2_control_blue_reach_5/motor_control.hpp"
 #include "ros2_control_blue_reach_5/custom_hardware_interface_type_values.hpp"
+
+#include <casadi/casadi.hpp>
 
 namespace ros2_control_blue_reach_5
 {
@@ -113,14 +117,19 @@ namespace ros2_control_blue_reach_5
       MODE_POSITION,
       MODE_VELOCITY,
       MODE_CURRENT,
+      MODE_FREE_EXCITE
     };
     
+    MotorControl motor_control;
 
     // Active control mode for each actuator
     std::vector<mode_level_t> control_modes_;
 
     // Store the state & commands for the robot joints
     std::vector<Joint> hw_joint_structs_;
+
+    // Store the dynamics function for the robot joints
+    casadi_reach_alpha_5::Dynamics dynamics_service;
 
     /**
      * @brief Write the current position of the robot received from the serial client to the
@@ -162,6 +171,8 @@ namespace ros2_control_blue_reach_5
     std::atomic<bool> running_{false};
 
     std::mutex access_async_states_;
+
+    bool excite = false;
   };
 
 } // namespace ros2_control_blue_reach_5

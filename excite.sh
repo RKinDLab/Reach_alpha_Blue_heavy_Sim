@@ -67,3 +67,6 @@ do
 done
 
 # ros2 topic pub /udwadia_kalaba_controller/reference std_msgs/msg/Float64MultiArray "{data: [0.0, 0.0, 0.0, 0.0, 0.0, 40000.0, 40000.0 , 40000.0, 40000.0, 40000.0, 40000.0 , 40000.0, 40000.0]}"
+
+
+# ros2 topic pub /udwadia_kalaba_controller/reference std_msgs/msg/Float64MultiArray "{data: [0.0, 0.0, 3.0, 0.0, 0.0, 0.0, 0.0 , 0.0, 0.0, 0.0, 0.0 , 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 , 0.0, 0.0, 0.0, 0.0 , 0.0, 0.0]}"

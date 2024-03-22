@@ -3,6 +3,7 @@
 
 #include <string>
 #include <algorithm>
+#include <cmath> 
 
 class Joint
 {
@@ -21,6 +22,7 @@ public:
         double velocity = 0;
         double current = 0;
         double acceleration = 0;
+        double effort = 0;
     };
 
     State default_state_{}, command_state_{}, current_state_{}, async_state_{};
@@ -32,6 +34,7 @@ public:
         double position_max = 0;
         double velocity_max = 0;
         double effort_max = 0;
+        double phase = 0;
     };
 
     Limits limits_{};
@@ -79,6 +82,8 @@ public:
      * will be enforced.
      */
     double enforce_soft_limits();
+
+    double calculateExcitationEffortForJoint();
 };
 
 #endif // ROS2_CONTROL_BLUE_REACH_5__JOINT_HPP_

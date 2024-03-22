@@ -16,6 +16,7 @@ public:
         double velocity = 0;
         double current = 0;
         double acceleration = 0;
+        double effort = 0;
     };
 
     State default_state_{}, command_state_{}, current_state_{}, async_state_{};

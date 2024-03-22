@@ -16,7 +16,6 @@ set(THIS_PACKAGE_INCLUDE_DEPENDS
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
-find_package(casadi REQUIRED)
 
 foreach(Dependency IN ITEMS ${THIS_PACKAGE_INCLUDE_DEPENDS})
   find_package(${Dependency} REQUIRED)
@@ -29,13 +28,17 @@ add_library(
   hardware/rrbot_system_multi_interface.cpp
   hardware/reach_system_multi_Interface.cpp
   hardware/joint.cpp
+  hardware/dynamics.cpp
   hardware/cobs.cpp
   hardware/crc.cpp
   hardware/driver.cpp
   hardware/packet.cpp
   hardware/serial_client.cpp
   hardware/vehicle_system_multi_interface.cpp
+  hardware/motor_control.cpp
 )
+
+target_link_libraries(ros2_control_blue_reach_5 PUBLIC casadi)
 
 target_compile_features(ros2_control_blue_reach_5 PUBLIC cxx_std_17)
 target_include_directories(ros2_control_blue_reach_5 PUBLIC
@@ -54,12 +57,13 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE "ROS2_CONTROL_BLUE_REACH_5_BU
 # Export hardware plugins
 pluginlib_export_plugin_description_file(hardware_interface ros2_control_blue_reach_5.xml)
 
+# Collect all files within the casadi_lib directory and store them in a variable
+file(GLOB CASADI_LIB_FILES "${CMAKE_CURRENT_SOURCE_DIR}/casadi_lib/*")
+
 # INSTALL
 
-install(FILES 
-  casadi_lib/forward_dynamics.so
-  DESTINATION lib/${PROJECT_NAME}
-)
+# Install all files from the collected list to the destination directory
+install(FILES ${CASADI_LIB_FILES} DESTINATION lib)
 
 install(
   DIRECTORY hardware/include/

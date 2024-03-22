@@ -7,17 +7,19 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include <casadi/casadi.hpp>
 
 #include "ros2_control_blue_reach_5/device_id.hpp"
 #include "ros2_control_blue_reach_5/mode.hpp"
 #include "ros2_control_blue_reach_5/packet_id.hpp"
+#include "ros2_control_blue_reach_5/motor_control.hpp"
 #include "hardware_interface/types/hardware_interface_type_values.hpp"
 #include "rclcpp/rclcpp.hpp"
 
 using namespace casadi;
+
 namespace ros2_control_blue_reach_5
 {
+
   hardware_interface::CallbackReturn ReachSystemMultiInterfaceHardware::on_init(
       const hardware_interface::HardwareInfo &info)
   {
@@ -28,32 +30,30 @@ namespace ros2_control_blue_reach_5
       return hardware_interface::CallbackReturn::ERROR;
     }
 
-    RCLCPP_INFO(rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "Usage from CasADi C++:");
+    // Print the CasADi version
+    std::string casadi_version = CasadiMeta::version();
+    RCLCPP_INFO(rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "CasADi version: %s", casadi_version.c_str());
+    RCLCPP_INFO(rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "Testing casadi ready for operations");
+    // Use CasADi's "external" to load the compiled dynamics functions
+    dynamics_service.usage_cplusplus_checks("test", "libtest.so");
+    dynamics_service.forward_dynamics = dynamics_service.load_casadi_fun("Xnext", "libXnext.so");
+    dynamics_service.forward_kinematics = dynamics_service.load_casadi_fun("T_fk", "libTfk.so");
 
+    std::vector<double> x = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    std::vector<double> u = {0.0, 0.0, 0.0, 0.001};
+    std::vector<DM> argfd = {DM(x), DM(u)};
+    std::vector<DM> resfd = dynamics_service.forward_dynamics(argfd);
 
-    // Use CasADi's "external" to load the compiled function
-    // casadi::Function f = casadi::external("Forward_dy","ros2_control_blue_reach_5/forward_dynamics.so");
+    std::cout << "forward dynamics example result: " << resfd.at(0) << std::endl;
 
-    std::cout << "---" << std::endl;
-    std::cout << "Usage from CasADi C++:" << std::endl;
-    std::cout << std::endl;
+    std::vector<double> q = {0.0, 0.0, 0.0, 0.001};
+    std::vector<DM> argtk = {DM(q)};
+    std::vector<DM> restk = dynamics_service.forward_kinematics(argtk);
 
-    // // Variables
-    // SX x = SX::sym("x", 2, 2);
-    // SX y = SX::sym("y");
+    std::cout << "forward kinematics example result: " << restk.at(0) << std::endl;
 
-    // // Simple function
-    // Function f("f", {x, y}, {sqrt(y) - 1, sin(x) - y});
-
-    // // Use like any other CasADi function
-    // std::vector<double> u = {1, 2, 3, 4};
-    // std::vector<DM> arg = {reshape(DM(u), 2, 2), 5};
-    // std::vector<DM> res = f(arg);
-
-    // std::cout << "result (0): " << res.at(0) << std::endl;
-    // std::cout << "result (1): " << res.at(1) << std::endl;
-
-
+    RCLCPP_INFO(
+        rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "Successful initialization of robot kinematics & dynamics");
 
     cfg_.serial_port_ = info_.hardware_parameters["serial_port"];
     cfg_.state_update_freq_ = std::stoi(info_.hardware_parameters["state_update_frequency"]);
@@ -62,6 +62,8 @@ namespace ros2_control_blue_reach_5
     control_modes_.resize(info_.joints.size(), mode_level_t::MODE_DISABLE);
     RCLCPP_INFO(
         rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "Hardware update rate is %u Hz", static_cast<int>(cfg_.state_update_freq_));
+
+    excite = true;
     for (const hardware_interface::ComponentInfo &joint : info_.joints)
     {
       std::string device_id_value = joint.parameters.at("device_id");
@@ -193,6 +195,8 @@ namespace ros2_control_blue_reach_5
       const std::vector<std::string> &start_interfaces,
       const std::vector<std::string> &stop_interfaces)
   {
+    RCLCPP_INFO( // NOLINT
+        rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "preparing command mode switch");
     // Prepare for new command modes
     std::vector<mode_level_t> new_modes = {};
     for (std::string key : start_interfaces)
@@ -210,6 +214,10 @@ namespace ros2_control_blue_reach_5
         if (key == info_.joints[i].name + "/" + custom_hardware_interface::HW_IF_CURRENT)
         {
           new_modes.push_back(mode_level_t::MODE_CURRENT);
+        }
+        if (key == info_.joints[i].name + "/" + custom_hardware_interface::HW_IF_FREE_EXCITE)
+        {
+          new_modes.push_back(mode_level_t::MODE_FREE_EXCITE);
         }
       }
     }
@@ -267,6 +275,8 @@ namespace ros2_control_blue_reach_5
           info_.joints[i].name, hardware_interface::HW_IF_ACCELERATION, &hw_joint_structs_[i].current_state_.acceleration));
       state_interfaces.emplace_back(hardware_interface::StateInterface(
           info_.joints[i].name, custom_hardware_interface::HW_IF_CURRENT, &hw_joint_structs_[i].current_state_.current));
+      state_interfaces.emplace_back(hardware_interface::StateInterface(
+          info_.joints[i].name, hardware_interface::HW_IF_EFFORT, &hw_joint_structs_[i].current_state_.effort));
     }
 
     return state_interfaces;
@@ -341,7 +351,9 @@ namespace ros2_control_blue_reach_5
       hw_joint_structs_[i].current_state_.position = hw_joint_structs_[i].async_state_.position;
       hw_joint_structs_[i].current_state_.velocity = hw_joint_structs_[i].async_state_.velocity;
       hw_joint_structs_[i].current_state_.current = hw_joint_structs_[i].async_state_.current;
+      hw_joint_structs_[i].current_state_.effort = motor_control.currentToTorque(i, hw_joint_structs_[i].current_state_.current);//hw_joint_structs_[i].async_state_.current;
       hw_joint_structs_[i].calcAcceleration(prev_velocity_, delta_seconds);
+
       //  RCLCPP_INFO(rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), " %d acceleration %f",hw_joint_structs_[i].device_id,
       //   hw_joint_structs_[i].acceleration_state_);
     }
@@ -351,8 +363,9 @@ namespace ros2_control_blue_reach_5
   hardware_interface::return_type ReachSystemMultiInterfaceHardware::write(
       const rclcpp::Time & /*time*/, const rclcpp::Duration & /*period*/)
   {
+
     // Send the commands for each joint
-    for (std::size_t i = 0; i < control_modes_.size(); i++)
+    for (std::size_t i = 0; i < info_.joints.size(); i++)
     {
       switch (control_modes_[i])
       {
@@ -400,19 +413,44 @@ namespace ros2_control_blue_reach_5
           {
           };
 
-          // if (static_cast<int>(target_device) == 2)
+          // if (static_cast<int>(target_device) == 5)
           // {
-          //   RCLCPP_INFO(rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "%f, %f, %f ",target_current, enforced_target_current, hw_joint_structs_[i].command_state_.current);
+          //   RCLCPP_INFO(rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "currents sent :::%f, %f ",enforced_target_current, hw_joint_structs_[i].command_state_.current);
+          //   RCLCPP_INFO(rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "state position :::%f ",hw_joint_structs_[i].async_state_.position);
           // }
 
           driver_.setCurrent(enforced_target_current, target_device);
         }
         break;
+      case mode_level_t::MODE_FREE_EXCITE:
+      {
+        const auto target_device = static_cast<alpha::driver::DeviceId>(hw_joint_structs_[i].device_id);
+        // Set the command interface value for this joint excitation
+        const double tau_in_electric = hw_joint_structs_[i].calculateExcitationEffortForJoint();
+        hw_joint_structs_[i].limits_.phase += 0.001;
+        const double enforced_target_current = hw_joint_structs_[i].enforce_hard_limits(tau_in_electric);
+        if (enforced_target_current == 0)
+        {
+        };
+        // RCLCPP_INFO(rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "currents to be sent to %li:::%f -->  %f ", i, tau_in_electric, enforced_target_current);
+        if (!i == 0)
+        {
+          driver_.setCurrent(enforced_target_current, target_device);
+        }
+
+        break;
+      }
+      case mode_level_t::MODE_STANDBY:
+        // Handle standby mode if needed, or just break
+        break;
+      case mode_level_t::MODE_DISABLE:
+        // Handle disable mode if needed, or just break
+        break;
       default:
+        // Existing code for default case...
         break;
       }
     }
-
     return hardware_interface::return_type::OK;
   }
 

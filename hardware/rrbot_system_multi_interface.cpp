@@ -10,6 +10,8 @@
 #include "hardware_interface/types/hardware_interface_type_values.hpp"
 #include "rclcpp/rclcpp.hpp"
 
+using namespace casadi;
+
 namespace ros2_control_blue_reach_5
 {
   hardware_interface::CallbackReturn RRBotSystemMultiInterfaceHardware::on_init(
@@ -22,6 +24,23 @@ namespace ros2_control_blue_reach_5
       return hardware_interface::CallbackReturn::ERROR;
     }
 
+    // Print the CasADi version
+    std::string casadi_version = CasadiMeta::version();
+    RCLCPP_INFO(rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "CasADi version: %s", casadi_version.c_str());
+    RCLCPP_INFO(rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "Testing casadi ready for operations");
+    // Use CasADi's "external" to load the compiled dynamics functions
+    dynamics_service.usage_cplusplus_checks("test", "libtest.so");
+    dynamics_service.forward_dynamics = dynamics_service.load_casadi_fun("Xnext", "libXnext.so");
+    dynamics_service.forward_kinematics = dynamics_service.load_casadi_fun("T_fk", "libTfk.so");
+
+    std::vector<double> q = {0.0, 0.0, 0.0, 0.001};
+    std::vector<DM> argtk = {DM(q)};
+    std::vector<DM> restk = dynamics_service.forward_kinematics(argtk);
+
+    std::cout << "forward kinematics example result: " << restk.at(0) << std::endl;
+
+    RCLCPP_INFO(
+        rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "Successful initialization of robot kinematics & dynamics");
     cfg_.serial_port_ = info_.hardware_parameters["serial_port"];
     cfg_.state_update_freq_ = std::stoi(info_.hardware_parameters["state_update_frequency"]);
     // BEGIN: This part here is for exemplary purposes - Please do not copy to your production code
@@ -213,8 +232,8 @@ namespace ros2_control_blue_reach_5
     // Example criteria: All joints must be given new command mode at the same time
     if (new_modes.size() != info_.joints.size())
     {
-    RCLCPP_ERROR( // NOLINT
-        rclcpp::get_logger("RRBotSystemMultiInterfaceHardware"), "All joints must be given new command mode at the same time");
+      RCLCPP_ERROR( // NOLINT
+          rclcpp::get_logger("RRBotSystemMultiInterfaceHardware"), "All joints must be given new command mode at the same time");
       return hardware_interface::return_type::ERROR;
     }
     // Example criteria: All joints must have the same command mode
@@ -223,8 +242,8 @@ namespace ros2_control_blue_reach_5
             [&](mode_level_t mode)
             { return mode == new_modes[0]; }))
     {
-    RCLCPP_ERROR( // NOLINT
-        rclcpp::get_logger("RRBotSystemMultiInterfaceHardware"), "All joints must have the same command mode");
+      RCLCPP_ERROR( // NOLINT
+          rclcpp::get_logger("RRBotSystemMultiInterfaceHardware"), "All joints must have the same command mode");
       return hardware_interface::return_type::ERROR;
     }
 
@@ -247,14 +266,12 @@ namespace ros2_control_blue_reach_5
       if (control_level_[i] != mode_level_t::MODE_DISABLE)
       {
         // Something else is using the joint! Abort!
-    RCLCPP_ERROR( // NOLINT
-        rclcpp::get_logger("RRBotSystemMultiInterfaceHardware"), "Something else is using the joint! Abort!");
+        RCLCPP_ERROR( // NOLINT
+            rclcpp::get_logger("RRBotSystemMultiInterfaceHardware"), "Something else is using the joint! Abort!");
         return hardware_interface::return_type::ERROR;
       }
       control_level_[i] = new_modes[i];
     }
-    RCLCPP_ERROR( // NOLINT
-        rclcpp::get_logger("RRBotSystemMultiInterfaceHardware"), "oKAUIFD!");
     return hardware_interface::return_type::OK;
   }
 
@@ -330,16 +347,14 @@ namespace ros2_control_blue_reach_5
   hardware_interface::return_type RRBotSystemMultiInterfaceHardware::read(
       const rclcpp::Time & /*time*/, const rclcpp::Duration &period)
   {
-    const std::lock_guard<std::mutex> lock(access_async_states_);
-
+    double delta_seconds = period.seconds();
     for (std::size_t i = 0; i < info_.joints.size(); i++)
     {
-      // RCLCPP_INFO(
-      //     rclcpp::get_logger("RRBotSystemMultiInterfaceHardware"),
-      //     "Got pos: %.5f joint %s!",
-      //     hw_joint_structs_[i].async_state_.position,
-      //     info_.joints[i].name.c_str());
-
+      double prev_velocity0_;
+      double prev_velocity1_;
+      double prev_velocity2_;
+      double prev_velocity3_;
+      double prev_velocity4_;
       switch (control_level_[i])
       {
       case mode_level_t::MODE_DISABLE:
@@ -362,11 +377,35 @@ namespace ros2_control_blue_reach_5
         hw_joint_structs_[i].current_state_.position += (hw_joint_structs_[i].current_state_.velocity * period.seconds()) / cfg_.hw_slowdown_;
         break;
       case mode_level_t::MODE_CURRENT:
-        hw_joint_structs_[i].current_state_.current = hw_joint_structs_[i].command_state_.current;
-        hw_joint_structs_[i].current_state_.acceleration = hw_joint_structs_[i].command_state_.current / 2; // dummy
-        hw_joint_structs_[i].current_state_.velocity += (hw_joint_structs_[i].current_state_.acceleration * period.seconds()) / cfg_.hw_slowdown_;
-        hw_joint_structs_[i].current_state_.position += (hw_joint_structs_[i].current_state_.velocity * period.seconds()) / cfg_.hw_slowdown_;
+
+        prev_velocity0_ = 0;
+        hw_joint_structs_[0].current_state_.velocity = 0;
+        hw_joint_structs_[0].current_state_.position += (hw_joint_structs_[i].current_state_.velocity * period.seconds()) / cfg_.hw_slowdown_;
+        hw_joint_structs_[0].calcAcceleration(prev_velocity0_, delta_seconds);
+
+        prev_velocity1_ = hw_joint_structs_[1].current_state_.velocity;
+        hw_joint_structs_[1].current_state_.position = forward_dynamics_res[3];
+        hw_joint_structs_[1].current_state_.velocity = forward_dynamics_res[7];
+        hw_joint_structs_[1].calcAcceleration(prev_velocity1_, delta_seconds);
+
+        prev_velocity2_ = hw_joint_structs_[2].current_state_.velocity;
+        hw_joint_structs_[2].current_state_.position = forward_dynamics_res[2];
+        hw_joint_structs_[2].current_state_.velocity = forward_dynamics_res[6];
+        hw_joint_structs_[2].calcAcceleration(prev_velocity2_, delta_seconds);
+
+        prev_velocity3_ = hw_joint_structs_[3].current_state_.velocity;
+        hw_joint_structs_[3].current_state_.position = forward_dynamics_res[1];
+        hw_joint_structs_[3].current_state_.velocity = forward_dynamics_res[5];
+        hw_joint_structs_[3].calcAcceleration(prev_velocity3_, delta_seconds);
+
+        prev_velocity4_ = hw_joint_structs_[4].current_state_.velocity;
+        hw_joint_structs_[4].current_state_.position = forward_dynamics_res[0];
+        hw_joint_structs_[4].current_state_.velocity = forward_dynamics_res[4];
+        hw_joint_structs_[4].calcAcceleration(prev_velocity4_, delta_seconds);
+        // std::cout << "forward dynamics example result: " << res_vec << std::endl;
+
         break;
+
       case mode_level_t::MODE_STANDBY:
         hw_joint_structs_[i].current_state_.current = hw_joint_structs_[i].command_state_.current;
         hw_joint_structs_[i].current_state_.acceleration = hw_joint_structs_[i].command_state_.current / 2; // dummy
@@ -390,21 +429,24 @@ namespace ros2_control_blue_reach_5
   hardware_interface::return_type RRBotSystemMultiInterfaceHardware::write(
       const rclcpp::Time & /*time*/, const rclcpp::Duration & /*period*/)
   {
-    // BEGIN: This part here is for exemplary purposes - Please do not copy to your production code
-    // for (std::size_t i = 0; i < info_.joints.size(); i++)
-    // {
-    //   // Simulate sending commands to the hardware
-    //   RCLCPP_INFO(
-    //     rclcpp::get_logger("RRBotSystemMultiInterfaceHardware"),
-    //     "Got the commands pos: %.5f, vel: %.5f, cur: %.5f for joint %s, control_lvl:%u",
-    //     hw_joint_structs_[i].position_command_,
-    //     hw_joint_structs_[i].velocity_command_,
-    //     hw_joint_structs_[i].current_command_,
-    //     info_.joints[i].name.c_str(),
-    //     control_level_[i]);
-    // }
-    // END: This part here is for exemplary purposes - Please do not copy to your production code
+    std::vector<double> x = {
+        hw_joint_structs_[4].current_state_.position,
+        hw_joint_structs_[3].current_state_.position,
+        hw_joint_structs_[2].current_state_.position,
+        hw_joint_structs_[1].current_state_.position,
+        hw_joint_structs_[4].current_state_.velocity,
+        hw_joint_structs_[3].current_state_.velocity,
+        hw_joint_structs_[2].current_state_.velocity,
+        hw_joint_structs_[1].current_state_.velocity,
+    };
+    std::vector<double> u = {hw_joint_structs_[4].command_state_.current,
+                             hw_joint_structs_[3].command_state_.current,
+                             hw_joint_structs_[2].command_state_.current,
+                             hw_joint_structs_[1].command_state_.current};
+    std::vector<DM> dynamic_arg = {DM(x), DM(u)};
 
+    std::vector<DM> dynamic_response = dynamics_service.forward_dynamics(dynamic_arg);
+    forward_dynamics_res = std::vector<double>(dynamic_response.at(0));
     return hardware_interface::return_type::OK;
   }
 
