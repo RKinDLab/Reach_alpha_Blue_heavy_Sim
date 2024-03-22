@@ -117,38 +117,38 @@ namespace ros2_control_blue_reach_5
   hardware_interface::CallbackReturn RRBotSystemMultiInterfaceHardware::on_configure(const rclcpp_lifecycle::State &)
   {
     // Start the driver
-    try
-    {
-      driver_.start(cfg_.serial_port_, 5, false);
-    }
-    catch (const std::exception &e)
-    {
-      RCLCPP_FATAL( // NOLINT
-          rclcpp::get_logger("RRBotSystemMultiInterfaceHardware"),
-          "Failed to configure the serial driver for the AlphaHardware system interface.");
+    // try
+    // {
+    //   driver_.start(cfg_.serial_port_, 5, false);
+    // }
+    // catch (const std::exception &e)
+    // {
+    //   RCLCPP_FATAL( // NOLINT
+    //       rclcpp::get_logger("RRBotSystemMultiInterfaceHardware"),
+    //       "Failed to configure the serial driver for the AlphaHardware system interface.");
 
-      return hardware_interface::CallbackReturn::ERROR;
-    }
+    //   return hardware_interface::CallbackReturn::ERROR;
+    // }
 
-    // Register callbacks for joint states
-    driver_.subscribe(
-        alpha::driver::PacketId::PacketID_POSITION,
-        [this](const alpha::driver::Packet &packet) -> void
-        { updatePositionCb(packet, hw_joint_structs_); });
+    // // Register callbacks for joint states
+    // driver_.subscribe(
+    //     alpha::driver::PacketId::PacketID_POSITION,
+    //     [this](const alpha::driver::Packet &packet) -> void
+    //     { updatePositionCb(packet, hw_joint_structs_); });
 
-    driver_.subscribe(
-        alpha::driver::PacketId::PacketID_VELOCITY,
-        [this](const alpha::driver::Packet &packet) -> void
-        { updateVelocityCb(packet, hw_joint_structs_); });
+    // driver_.subscribe(
+    //     alpha::driver::PacketId::PacketID_VELOCITY,
+    //     [this](const alpha::driver::Packet &packet) -> void
+    //     { updateVelocityCb(packet, hw_joint_structs_); });
 
-    driver_.subscribe(
-        alpha::driver::PacketId::PacketID_CURRENT,
-        [this](const alpha::driver::Packet &packet) -> void
-        { updateCurrentCb(packet, hw_joint_structs_); });
+    // driver_.subscribe(
+    //     alpha::driver::PacketId::PacketID_CURRENT,
+    //     [this](const alpha::driver::Packet &packet) -> void
+    //     { updateCurrentCb(packet, hw_joint_structs_); });
 
-    // Start a thread to request state updates
-    running_.store(true);
-    state_request_worker_ = std::thread(&RRBotSystemMultiInterfaceHardware::pollState, this, cfg_.state_update_freq_);
+    // // Start a thread to request state updates
+    // running_.store(true);
+    // state_request_worker_ = std::thread(&RRBotSystemMultiInterfaceHardware::pollState, this, cfg_.state_update_freq_);
 
     RCLCPP_INFO( // NOLINT
         rclcpp::get_logger("RRBotSystemMultiInterfaceHardware"),
