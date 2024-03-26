@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, RegisterEventHandler
+from launch.actions import DeclareLaunchArgument, RegisterEventHandler, ExecuteProcess
 from launch.conditions import IfCondition
 from launch.event_handlers import OnProcessExit
 from launch.substitutions import Command, FindExecutable, LaunchConfiguration, PathJoinSubstitution
@@ -42,13 +42,13 @@ def generate_launch_description():
         )
     )
     declared_arguments.append(
-            DeclareLaunchArgument(
+        DeclareLaunchArgument(
             "state_update_frequency",
             default_value="200",
             description="The frequency (Hz) at which the driver updates the state of the robot."
-                " Note that this should not be less than the read frequency defined by"
-                " the controller configuration.",
-            )
+            " Note that this should not be less than the read frequency defined by"
+            " the controller configuration.",
+        )
     )
     declared_arguments.append(
         DeclareLaunchArgument(
@@ -154,13 +154,22 @@ def generate_launch_description():
     joint_state_broadcaster_spawner = Node(
         package="controller_manager",
         executable="spawner",
-        arguments=["joint_state_broadcaster", "--controller-manager", "/controller_manager"],
+        arguments=["joint_state_broadcaster",
+                   "--controller-manager", "/controller_manager"],
     )
 
     robot_controller_spawner = Node(
         package="controller_manager",
         executable="spawner",
-        arguments=[robot_controller, "--controller-manager", "/controller_manager"],
+        arguments=[robot_controller,
+                   "--controller-manager", "/controller_manager"],
+    )
+
+    spawn_entity = Node(
+        package='gazebo_ros',
+        executable='spawn_entity.py',
+        arguments=['-entity', 'bluerov2_heavy_reach_urdf', '-topic', 'robot_description'],
+        output='screen'
     )
 
     # Delay rviz start after `joint_state_broadcaster`
@@ -180,9 +189,12 @@ def generate_launch_description():
     )
 
     nodes = [
+        ExecuteProcess(cmd=['gazebo', '--verbose', '-s', 'libgazebo_ros_init.so',
+                       '-s', 'libgazebo_ros_factory.so'], output='screen'),
         control_node,
         robot_state_pub_node,
         joint_state_broadcaster_spawner,
+        spawn_entity,
         delay_rviz_after_joint_state_broadcaster_spawner,
         delay_robot_controller_spawner_after_joint_state_broadcaster_spawner,
     ]

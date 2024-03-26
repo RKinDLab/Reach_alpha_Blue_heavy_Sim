@@ -12,6 +12,8 @@ set(THIS_PACKAGE_INCLUDE_DEPENDS
   rclcpp
   rclcpp_lifecycle
   casadi
+  eigen3_cmake_module
+  Eigen3
 )
 
 # find dependencies

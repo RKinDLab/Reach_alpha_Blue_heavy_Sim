@@ -7,15 +7,19 @@
 
   <maintainer email="emorg31@lsu.edu">Edward Morgan</maintainer>
 
+  <author>Edward Morgan</author>
+
   <license>Apache-2.0</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
+  <buildtool_depend>eigen3_cmake_module</buildtool_depend>
 
   <depend>hardware_interface</depend>
   <depend>pluginlib</depend>
   <depend>rclcpp</depend>
   <depend>rclcpp_lifecycle</depend>
   <depend>casadi</depend>
+  <depend>eigen</depend>
 
   <exec_depend>controller_manager</exec_depend>
   <exec_depend>udwadia_kalaba_controller</exec_depend>

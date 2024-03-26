@@ -2,8 +2,6 @@
 <robot xmlns:xacro="http://ros.org/wiki/xacro">
   <xacro:macro name="bluerov2_urdf" params="prefix">
 
-    <link name="${prefix}base_footprint" />
-
     <link name="${prefix}base_link">
       <inertial>
         <origin rpy="0 0 0" xyz="0.0 0.0 0.011" />
@@ -34,9 +32,12 @@
       </collision>
     </link>
 
+      <!-- Robot Footprint -->
+    <link name="${prefix}base_footprint" />
     <joint name="${prefix}base_footprint_joint" type="fixed">
-      <parent link="${prefix}base_footprint" />
-      <child link="${prefix}base_link" />
+      <child link="${prefix}base_footprint" />
+      <parent link="${prefix}base_link" />
+      <origin xyz="0.0 0.0 -10.0" rpy="0 0 0"/>
     </joint>
 
     <!-- Import camera macro -->
