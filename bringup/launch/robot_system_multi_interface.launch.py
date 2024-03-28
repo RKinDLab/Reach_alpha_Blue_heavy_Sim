@@ -168,9 +168,14 @@ def generate_launch_description():
     spawn_entity = Node(
         package='gazebo_ros',
         executable='spawn_entity.py',
-        arguments=['-entity', 'bluerov2_heavy_reach_urdf', '-topic', 'robot_description'],
+        arguments=['-entity', 'bluerov2_heavy_alpha_urdf', '-topic', 'robot_description'],
         output='screen'
     )
+
+    namor_entity = Node(
+            package='namor',
+            executable='namor_node'
+        )
 
     # Delay rviz start after `joint_state_broadcaster`
     delay_rviz_after_joint_state_broadcaster_spawner = RegisterEventHandler(
@@ -189,14 +194,15 @@ def generate_launch_description():
     )
 
     nodes = [
-        ExecuteProcess(cmd=['gazebo', '--verbose', '-s', 'libgazebo_ros_init.so',
-                       '-s', 'libgazebo_ros_factory.so'], output='screen'),
+        # ExecuteProcess(cmd=['gazebo', '--verbose', '-s', 'libgazebo_ros_init.so',
+        #                '-s', 'libgazebo_ros_factory.so'], output='screen'),
         control_node,
         robot_state_pub_node,
         joint_state_broadcaster_spawner,
-        spawn_entity,
+        # spawn_entity,
         delay_rviz_after_joint_state_broadcaster_spawner,
         delay_robot_controller_spawner_after_joint_state_broadcaster_spawner,
+        namor_entity
     ]
 
     return LaunchDescription(declared_arguments + nodes)

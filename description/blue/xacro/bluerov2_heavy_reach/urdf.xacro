@@ -18,7 +18,7 @@
       <visual>
         <geometry>
           <mesh
-            filename="package://ros2_control_blue_reach_5/blue/meshes/bluerov2_heavy_reach/bluerov2_heavy_reach.dae"
+            filename="file://$(find ros2_control_blue_reach_5)/blue/meshes/bluerov2_heavy_reach/bluerov2_heavy_reach.dae"
             scale="0.025 0.025 0.025"
           />
         </geometry>
