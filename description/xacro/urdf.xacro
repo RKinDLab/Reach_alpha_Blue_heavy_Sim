@@ -2,7 +2,8 @@
 <robot xmlns:xacro="http://ros.org/wiki/xacro">
 
   <xacro:macro name="bluerov2_heavy_alpha_urdf" params="prefix">
-    <!-- <link name="${prefix}base_link"/> -->
+    <link name="base_link"/>
+
     <link name="${prefix}manipulator_mount_link">
       <visual>
         <origin rpy="0 0 0" xyz="0 0 0" />
@@ -62,6 +63,13 @@
         <origin rpy="0 0 0" xyz="-0.11425 -0.14375 0.08" />
       </collision>
     </link>
+
+      
+    <joint name="${prefix}base_joint" type="fixed">
+      <child link="${prefix}base_link" />
+      <parent link="base_link" />
+      <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
+    </joint>
 
     <joint name="${prefix}manipulator_mount_joint" type="fixed">
       <origin rpy="0 0 0" xyz="0.14 0.0 -0.12" />

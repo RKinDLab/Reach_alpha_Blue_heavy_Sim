@@ -23,3 +23,4 @@ Function casadi_reach_alpha_5::Dynamics::load_casadi_fun(const std::string &name
     // Use CasADi's "external" to load compiled function
     return external(name, bin_name);
 }
+

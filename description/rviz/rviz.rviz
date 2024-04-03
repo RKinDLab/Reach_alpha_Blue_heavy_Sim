@@ -4,6 +4,7 @@ Panels:
     Name: Displays
     Property Tree Widget:
       Expanded:
+        - /Global Options1
         - /Grid1
         - /TF1/Frames1
         - /aruco_Pose1/Topic1
@@ -181,6 +182,15 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
+        base_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        imu_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
       Mass Properties:
         Inertia: false
         Mass: false
@@ -346,7 +356,7 @@ Visualization Manager:
   Enabled: true
   Global Options:
     Background Color: 52; 101; 164
-    Fixed Frame: alphabase_link
+    Fixed Frame: base_link
     Frame Rate: 30
   Name: root
   Tools:
@@ -404,10 +414,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.1502024382352829
+      Pitch: 0.20020239055156708
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 1.6372003555297852
+      Yaw: 0.4072014093399048
     Saved: ~
 Window Geometry:
   Aruco Detection:

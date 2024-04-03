@@ -55,6 +55,7 @@
         <state_interface name="velocity"/>
         <state_interface name="acceleration"/>
         <state_interface name="current"/>
+        <state_interface name="stateId"/>
       </joint>
 
       <joint name="${prefix}_axis_b">
@@ -89,6 +90,7 @@
         <state_interface name="velocity"/>
         <state_interface name="acceleration"/>
         <state_interface name="current"/>
+        <state_interface name="stateId"/>
       </joint>
 
       <joint name="${prefix}_axis_c">
@@ -123,6 +125,7 @@
         <state_interface name="velocity"/>
         <state_interface name="acceleration"/>
         <state_interface name="current"/>
+        <state_interface name="stateId"/>
       </joint>      
 
       <joint name="${prefix}_axis_d">
@@ -157,6 +160,7 @@
         <state_interface name="velocity"/>
         <state_interface name="acceleration"/>
         <state_interface name="current"/>
+        <state_interface name="stateId"/>
       </joint>      
       
       <joint name="${prefix}_axis_e">
@@ -191,6 +195,7 @@
         <state_interface name="velocity"/>
         <state_interface name="acceleration"/>
         <state_interface name="current"/>
+        <state_interface name="stateId"/>
       </joint>
     </ros2_control>
 

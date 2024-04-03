@@ -32,6 +32,7 @@ joint_state_broadcaster:
       velocity: velocity
       acceleration: acceleration
       current: current
+      stateId: stateId
 
 forward_position_controller:
   ros__parameters:

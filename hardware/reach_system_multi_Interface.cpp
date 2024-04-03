@@ -7,6 +7,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <random>
 
 #include "ros2_control_blue_reach_5/device_id.hpp"
 #include "ros2_control_blue_reach_5/mode.hpp"
@@ -29,6 +30,11 @@ namespace ros2_control_blue_reach_5
     {
       return hardware_interface::CallbackReturn::ERROR;
     }
+    
+    // std::random_device rd; // Obtain a random number from hardware
+    // std::mt19937 gen(rd()); // Seed the generator
+    // std::normal_distribution<> distr(0., 0.001); // Define the mean and stddev
+    // std::vector<double> noise(8);
 
     // Print the CasADi version
     std::string casadi_version = CasadiMeta::version();
@@ -38,6 +44,44 @@ namespace ros2_control_blue_reach_5
     dynamics_service.usage_cplusplus_checks("test", "libtest.so");
     dynamics_service.forward_dynamics = dynamics_service.load_casadi_fun("Xnext", "libXnext.so");
     dynamics_service.forward_kinematics = dynamics_service.load_casadi_fun("T_fk", "libTfk.so");
+    // dynamics_service.mhe = dynamics_service.load_casadi_fun("MHE", "libMHpE.so");
+
+    //   std::vector<std::vector<double>> xnxt = {
+    //       {0.0, 0.02126068},
+    //       {0.0, 0.20170668},
+    //       {0.0, 0.00469083},
+    //       {0.0, 0.23304388},
+    //       {0.0, 0.18975492},
+    //       {0.0, 2.02220656},
+    //       {0.0, 0.09588989},
+    //       {0.0, 2.44951664}
+    //   };
+
+    // std::vector<double> u_ ={0.00604835, 0.150251, -0.0299043, 0.00127495};
+    // std::vector<double> goal_position = {1.2, 10.0, 1.8, 5.0};
+    // std::vector<double> goal_vel = {0.0, 0.0, 0.0, 0.0};
+    // std::vector<double> goal_acceleration = {0.0, 0.0, 0.0, 0.0};
+    // std::vector<double> p_gains = {1.0, 1.0, 0.001 ,1.5};
+    // std::vector<double> d_gains = {1.0, 1.0, 2.0 ,1.1};
+    // std::vector<double> non_ideals_forces = {0.0, 0.0, 0.0, 0.0};
+    // std::vector<double> noise =  {0.0, 0.0,  0.0,  0.0, 0.0, 0.0, 0.0, 0.0};
+
+    // std::vector<DM> mhe_arguments = {DM(xnxt), DM(u_), DM(goal_position), DM(goal_vel), DM(goal_acceleration), DM(p_gains), DM(d_gains), DM(non_ideals_forces), DM(noise)};
+    // std::vector<DM> estimates_dm = dynamics_service.mhe(mhe_arguments);
+
+    // std::vector<double> estimates = std::vector<double>(estimates_dm.at(0));
+
+    // // Convert the vector to a string for logging
+    // // std::stringstream ss;
+    // for (size_t i = 0; i < estimates.size(); ++i) {
+    //       // Now log the string representation of the vector
+    // RCLCPP_INFO(
+    //     rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), 
+    //     "Estimates: [%f]", estimates[i]);
+    // }
+
+
+
 
     std::vector<double> x = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
     std::vector<double> u = {0.0, 0.0, 0.0, 0.001};
@@ -109,19 +153,20 @@ namespace ros2_control_blue_reach_5
             hardware_interface::HW_IF_VELOCITY, custom_hardware_interface::HW_IF_CURRENT, hardware_interface::HW_IF_ACCELERATION);
         return hardware_interface::CallbackReturn::ERROR;
       }
-
-      if (joint.state_interfaces.size() != 4)
+      if (joint.state_interfaces.size() != 5)
       {
         RCLCPP_FATAL(
             rclcpp::get_logger("ReachSystemMultiInterfaceHardware"),
-            "Joint '%s'has %zu state interfaces. 3 expected.", joint.name.c_str(),
+            "Joint '%s'has %zu state interfaces. 5 expected.", joint.name.c_str(),
             joint.command_interfaces.size());
         return hardware_interface::CallbackReturn::ERROR;
       }
 
       if (!(joint.state_interfaces[0].name == hardware_interface::HW_IF_POSITION ||
             joint.state_interfaces[0].name == hardware_interface::HW_IF_VELOCITY ||
+            joint.state_interfaces[0].name == hardware_interface::HW_IF_EFFORT ||
             joint.state_interfaces[0].name == hardware_interface::HW_IF_ACCELERATION ||
+            joint.state_interfaces[0].name == custom_hardware_interface::HW_IF_STATE_ID ||
             joint.state_interfaces[0].name == custom_hardware_interface::HW_IF_CURRENT))
       {
         RCLCPP_FATAL(
@@ -277,6 +322,8 @@ namespace ros2_control_blue_reach_5
           info_.joints[i].name, custom_hardware_interface::HW_IF_CURRENT, &hw_joint_structs_[i].current_state_.current));
       state_interfaces.emplace_back(hardware_interface::StateInterface(
           info_.joints[i].name, hardware_interface::HW_IF_EFFORT, &hw_joint_structs_[i].current_state_.effort));
+      state_interfaces.emplace_back(hardware_interface::StateInterface(
+          info_.joints[i].name, custom_hardware_interface::HW_IF_STATE_ID, &hw_joint_structs_[i].current_state_.state_id));
     }
 
     return state_interfaces;
@@ -342,16 +389,18 @@ namespace ros2_control_blue_reach_5
   hardware_interface::return_type ReachSystemMultiInterfaceHardware::read(
       const rclcpp::Time & /*time*/, const rclcpp::Duration &period)
   {
+
     // Get access to the real-time states
     const std::lock_guard<std::mutex> lock(access_async_states_);
     for (std::size_t i = 0; i < info_.joints.size(); i++)
     {
       double delta_seconds = period.seconds();
+      hw_joint_structs_[i].current_state_.state_id ++;
       double prev_velocity_ = hw_joint_structs_[i].current_state_.velocity;
       hw_joint_structs_[i].current_state_.position = hw_joint_structs_[i].async_state_.position;
       hw_joint_structs_[i].current_state_.velocity = hw_joint_structs_[i].async_state_.velocity;
       hw_joint_structs_[i].current_state_.current = hw_joint_structs_[i].async_state_.current;
-      hw_joint_structs_[i].current_state_.effort = motor_control.currentToTorque(i, hw_joint_structs_[i].current_state_.current);//hw_joint_structs_[i].async_state_.current;
+      hw_joint_structs_[i].current_state_.effort = motor_control.currentToTorque(i, hw_joint_structs_[i].current_state_.current); // hw_joint_structs_[i].async_state_.current;
       hw_joint_structs_[i].calcAcceleration(prev_velocity_, delta_seconds);
 
       //  RCLCPP_INFO(rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), " %d acceleration %f",hw_joint_structs_[i].device_id,

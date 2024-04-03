@@ -88,7 +88,7 @@ namespace ros2_control_blue_reach_5
         return hardware_interface::CallbackReturn::ERROR;
       }
 
-      if (joint.state_interfaces.size() != 4)
+      if (joint.state_interfaces.size() != 5)
       {
         RCLCPP_FATAL(
             rclcpp::get_logger("RRBotSystemMultiInterfaceHardware"),
@@ -99,7 +99,9 @@ namespace ros2_control_blue_reach_5
 
       if (!(joint.state_interfaces[0].name == hardware_interface::HW_IF_POSITION ||
             joint.state_interfaces[0].name == hardware_interface::HW_IF_VELOCITY ||
+            joint.state_interfaces[0].name == hardware_interface::HW_IF_EFFORT ||
             joint.state_interfaces[0].name == hardware_interface::HW_IF_ACCELERATION ||
+            joint.state_interfaces[0].name == custom_hardware_interface::HW_IF_STATE_ID ||
             joint.state_interfaces[0].name == custom_hardware_interface::HW_IF_CURRENT))
       {
         RCLCPP_FATAL(
@@ -175,7 +177,7 @@ namespace ros2_control_blue_reach_5
     std::vector<hardware_interface::StateInterface> state_interfaces;
     for (std::size_t i = 0; i < info_.joints.size(); i++)
     {
-      state_interfaces.emplace_back(hardware_interface::StateInterface(
+    state_interfaces.emplace_back(hardware_interface::StateInterface(
           info_.joints[i].name, hardware_interface::HW_IF_POSITION, &hw_joint_structs_[i].current_state_.position));
       state_interfaces.emplace_back(hardware_interface::StateInterface(
           info_.joints[i].name, hardware_interface::HW_IF_VELOCITY, &hw_joint_structs_[i].current_state_.velocity));
@@ -183,6 +185,10 @@ namespace ros2_control_blue_reach_5
           info_.joints[i].name, hardware_interface::HW_IF_ACCELERATION, &hw_joint_structs_[i].current_state_.acceleration));
       state_interfaces.emplace_back(hardware_interface::StateInterface(
           info_.joints[i].name, custom_hardware_interface::HW_IF_CURRENT, &hw_joint_structs_[i].current_state_.current));
+      state_interfaces.emplace_back(hardware_interface::StateInterface(
+          info_.joints[i].name, hardware_interface::HW_IF_EFFORT, &hw_joint_structs_[i].current_state_.effort));
+      state_interfaces.emplace_back(hardware_interface::StateInterface(
+          info_.joints[i].name, custom_hardware_interface::HW_IF_STATE_ID, &hw_joint_structs_[i].current_state_.state_id));
     }
 
     return state_interfaces;

@@ -18,6 +18,7 @@ namespace casadi_reach_alpha_5
         Function forward_kinematics; // forward kinematics of the robotic arm
         Function inverse_dynamics; // inverse dynamics of the robotic arm
         Function inertia_matrix; // inertia/mass matrix of the robotic arm
+        Function mhe; //moving horizon estimation
 
         Dynamics() = default;
         // Constructor with member initializer list

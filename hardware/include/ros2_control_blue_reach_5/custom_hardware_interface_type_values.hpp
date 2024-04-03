@@ -25,6 +25,8 @@ constexpr char HW_IF_DISABLE[] = "disable";
 constexpr char HW_IF_STANDBY[] = "standby";
 /// Constant defining excite interface
 constexpr char HW_IF_FREE_EXCITE[] = "excite";
+/// Constant defining excite interface
+constexpr char HW_IF_STATE_ID[] = "stateId";
 }  // namespace hardware_interface
 
 #endif  // ROS2_CONTROL_BLUE_REACH_5__CUSTOM_HARDWARE_INTERFACE_TYPE_VALUES_HPP_
