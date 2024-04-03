@@ -33,4 +33,9 @@
 *.out
 *.app
 
-!casadi_lib/*
+
+libMHpE.so
+!libId.so
+!libtest.so
+!libTfk.so
+!libXnext.so
