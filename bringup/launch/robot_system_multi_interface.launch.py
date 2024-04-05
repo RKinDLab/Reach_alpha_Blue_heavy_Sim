@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, RegisterEventHandler
+from launch.actions import DeclareLaunchArgument, RegisterEventHandler,  ExecuteProcess
 from launch.conditions import IfCondition
 from launch.event_handlers import OnProcessExit
 from launch.substitutions import Command, FindExecutable, LaunchConfiguration, PathJoinSubstitution
@@ -179,12 +179,23 @@ def generate_launch_description():
         )
     )
 
+    spawn_entity = Node(
+        package='gazebo_ros',
+        executable='spawn_entity.py',
+        arguments=['-entity', 'bluerov2_heavy_alpha_urdf', '-topic', 'robot_description'],
+        output='screen'
+    )
+    
     nodes = [
+        ExecuteProcess(cmd=['gazebo', '--verbose', '-s', 'libgazebo_ros_init.so',
+                       '-s', 'libgazebo_ros_factory.so'], output='screen'),
         control_node,
         robot_state_pub_node,
         joint_state_broadcaster_spawner,
+        spawn_entity,
         delay_rviz_after_joint_state_broadcaster_spawner,
         delay_robot_controller_spawner_after_joint_state_broadcaster_spawner,
+        # namor_entity
     ]
 
     return LaunchDescription(declared_arguments + nodes)
