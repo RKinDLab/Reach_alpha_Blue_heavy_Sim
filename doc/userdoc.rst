@@ -31,7 +31,7 @@ Tutorial steps
 
 2. To start *reach alpha 5* example open a terminal, source your ROS2-workspace and execute its launch file with
 
-   .. code-block:: shell
+   .. code-block:: python
 
     ros2 launch ros2_control_blue_reach_5 robot_system_multi_interface.launch.py use_mock_hardware:=true
 
