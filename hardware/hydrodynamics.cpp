@@ -202,9 +202,9 @@ namespace blue::dynamics
     Eigen::Vector6d acc = computeAcceleration(velocity, ori);
 
     // Set derivatives of the position
-    dxdt[0] = vel[3]; // Linear velocity
-    dxdt[1] = vel[4]; // Linear velocity
-    dxdt[2] = vel[5]; // Linear velocity
+    dxdt[0] = x[3]; // Linear velocity
+    dxdt[1] = x[4]; // Linear velocity
+    dxdt[2] = x[5]; // Linear velocity
     dxdt[3] = acc[0]; // Linear acceleration
     dxdt[4] = acc[1]; // Linear acceleration
     dxdt[5] = acc[2]; // Linear acceleration
