@@ -34,7 +34,10 @@
 #include "ros2_control_blue_reach_5/visibility_control.h"
 
 #include "ros2_control_blue_reach_5/thruster.hpp"
+#include "ros2_control_blue_reach_5/vehicle_parameters.hpp"
+#include "ros2_control_blue_reach_5/hydrodynamics.hpp"
 #include "ros2_control_blue_reach_5/custom_hardware_interface_type_values.hpp"
+
 
 namespace ros2_control_blue_reach_5
 {
@@ -114,8 +117,14 @@ namespace ros2_control_blue_reach_5
     // Active control mode for each thruster
     std::vector<mode_level_t> control_level_;
 
+    // vehicle dynamics object
+    Vehicle blue_parameters;
+    blue::dynamics::Vehicle hydrodynamics_;
+
     // Store the state & commands for the uv thruster
     std::vector<Thruster> hw_thrust_structs_;
+
+    std::vector<double> hw_sensor_states_;
   };
 
 } // namespace ros2_control_blue

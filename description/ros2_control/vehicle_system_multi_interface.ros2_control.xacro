@@ -140,6 +140,18 @@
         <state_interface name="acceleration"/>
         <state_interface name="current"/>
       </joint>
+      <sensor name="${prefix}imu_sensor">
+        <state_interface name="position.x"/>
+        <state_interface name="position.y"/>
+        <state_interface name="position.z"/>
+        <state_interface name="velocity.x"/>
+        <state_interface name="velocity.y"/>
+        <state_interface name="velocity.z"/>
+        <state_interface name="orientation.x"/>
+        <state_interface name="orientation.y"/>
+        <state_interface name="orientation.z"/>
+        <state_interface name="orientation.w"/>
+      </sensor>
     </ros2_control>
   </xacro:macro>
 

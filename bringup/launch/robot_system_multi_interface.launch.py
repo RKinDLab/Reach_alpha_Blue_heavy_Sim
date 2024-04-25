@@ -202,7 +202,7 @@ def generate_launch_description():
         # spawn_entity,
         delay_rviz_after_joint_state_broadcaster_spawner,
         delay_robot_controller_spawner_after_joint_state_broadcaster_spawner,
-        namor_entity
+        # namor_entity
     ]
 
     return LaunchDescription(declared_arguments + nodes)

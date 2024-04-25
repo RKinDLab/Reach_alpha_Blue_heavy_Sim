@@ -15,6 +15,29 @@ namespace ros2_control_blue_reach_5
   hardware_interface::CallbackReturn VehicleSystemMultiInterfaceHardware::on_init(
       const hardware_interface::HardwareInfo &info)
   {
+
+    blue_parameters.setupParameters();
+
+    // Initialize the hydrodynamic parameters
+    hydrodynamics_ = blue::dynamics::Vehicle(
+        blue::dynamics::Inertia(blue_parameters.params.mass, blue_parameters.params.inertia_tensor_coeff, blue_parameters.params.added_mass_coeff),
+        blue::dynamics::Coriolis(blue_parameters.params.mass, blue_parameters.params.inertia_tensor_coeff, blue_parameters.params.added_mass_coeff),
+        blue::dynamics::Damping(blue_parameters.params.linear_damping_coeff, blue_parameters.params.quadratic_damping_coeff),
+        blue::dynamics::RestoringForces(blue_parameters.params.weight, blue_parameters.params.buoyancy, blue_parameters.params.center_of_buoyancy, blue_parameters.params.center_of_gravity),
+        blue::dynamics::CurrentEffects(blue_parameters.params.ocean_current));
+
+    // Custom IOFormat for pretty printing
+    Eigen::IOFormat CleanFmt(4, 0, ", ", "\n", "[", "]", "[", "]");
+    std::stringstream ss;
+    ss << hydrodynamics_.inertia.getInertia().format(CleanFmt);
+    // Usage in your logging function
+    RCLCPP_INFO(rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "******************Blue vehicle inertia matrix:\n%s", ss.str().c_str());
+
+    std::stringstream ssv;
+    ssv << hydrodynamics_.velocity.format(CleanFmt);
+    // Usage in your logging function
+    RCLCPP_INFO(rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "******************Blue vehicle initial velocity:\n%s", ssv.str().c_str());
+
     if (
         hardware_interface::SystemInterface::on_init(info) !=
         hardware_interface::CallbackReturn::SUCCESS)
@@ -28,6 +51,10 @@ namespace ros2_control_blue_reach_5
     cfg_.hw_slowdown_ = stod(info_.hardware_parameters["example_param_hw_slowdown"]);
 
     hw_thrust_structs_.reserve(info_.joints.size());
+    
+    hw_sensor_states_.resize(
+      info_.sensors[0].state_interfaces.size(), std::numeric_limits<double>::quiet_NaN());
+
     control_level_.resize(info_.joints.size(), mode_level_t::MODE_DISABLE);
 
     for (const hardware_interface::ComponentInfo &joint : info_.joints)
@@ -47,14 +74,13 @@ namespace ros2_control_blue_reach_5
       }
 
       if (!(joint.command_interfaces[0].name == hardware_interface::HW_IF_VELOCITY ||
-            joint.command_interfaces[0].name == custom_hardware_interface::HW_IF_CURRENT
-            ))
+            joint.command_interfaces[0].name == custom_hardware_interface::HW_IF_CURRENT))
       {
         RCLCPP_FATAL(
             rclcpp::get_logger("VehicleSystemMultiInterfaceHardware"),
-            "Thruster '%s' has %s command interface. Expected %s, %s or %s.", joint.name.c_str(), 
+            "Thruster '%s' has %s command interface. Expected %s, %s or %s.", joint.name.c_str(),
             joint.command_interfaces[0].name.c_str(),
-            hardware_interface::HW_IF_VELOCITY, custom_hardware_interface::HW_IF_CURRENT , hardware_interface::HW_IF_ACCELERATION);
+            hardware_interface::HW_IF_VELOCITY, custom_hardware_interface::HW_IF_CURRENT, hardware_interface::HW_IF_ACCELERATION);
         return hardware_interface::CallbackReturn::ERROR;
       }
 
@@ -101,7 +127,27 @@ namespace ros2_control_blue_reach_5
       state_interfaces.emplace_back(hardware_interface::StateInterface(
           info_.joints[i].name, hardware_interface::HW_IF_EFFORT, &hw_thrust_structs_[i].current_state_.effort));
     }
-
+    
+    state_interfaces.emplace_back(hardware_interface::StateInterface(
+          info_.sensors[0].name, info_.sensors[0].state_interfaces[0].name, &hydrodynamics_.state[0]));
+    state_interfaces.emplace_back(hardware_interface::StateInterface(
+          info_.sensors[0].name, info_.sensors[0].state_interfaces[1].name, &hydrodynamics_.state[1]));
+    state_interfaces.emplace_back(hardware_interface::StateInterface(
+          info_.sensors[0].name, info_.sensors[0].state_interfaces[2].name, &hydrodynamics_.state[2]));
+    state_interfaces.emplace_back(hardware_interface::StateInterface(
+          info_.sensors[0].name, info_.sensors[0].state_interfaces[3].name, &hydrodynamics_.state[3]));
+    state_interfaces.emplace_back(hardware_interface::StateInterface(
+          info_.sensors[0].name, info_.sensors[0].state_interfaces[4].name, &hydrodynamics_.state[4]));
+    state_interfaces.emplace_back(hardware_interface::StateInterface(
+          info_.sensors[0].name, info_.sensors[0].state_interfaces[5].name, &hydrodynamics_.state[5]));
+    state_interfaces.emplace_back(hardware_interface::StateInterface(
+          info_.sensors[0].name, info_.sensors[0].state_interfaces[6].name, &hydrodynamics_.state[6]));
+    state_interfaces.emplace_back(hardware_interface::StateInterface(
+          info_.sensors[0].name, info_.sensors[0].state_interfaces[7].name, &hydrodynamics_.state[7]));
+    state_interfaces.emplace_back(hardware_interface::StateInterface(
+          info_.sensors[0].name, info_.sensors[0].state_interfaces[8].name, &hydrodynamics_.state[8]));
+    state_interfaces.emplace_back(hardware_interface::StateInterface(
+          info_.sensors[0].name, info_.sensors[0].state_interfaces[9].name, &hydrodynamics_.state[9]));
     return state_interfaces;
   }
 
@@ -194,7 +240,7 @@ namespace ros2_control_blue_reach_5
     // BEGIN: This part here is for exemplary purposes - Please do not copy to your production code
     RCLCPP_INFO(
         rclcpp::get_logger("VehicleSystemMultiInterfaceHardware"), "Activating... please wait...");
-        
+
     for (std::size_t i = 0; i < info_.joints.size(); i++)
     {
       if (std::isnan(hw_thrust_structs_[i].current_state_.position))
@@ -264,26 +310,26 @@ namespace ros2_control_blue_reach_5
         return hardware_interface::return_type::OK;
         break;
       case mode_level_t::MODE_POSITION:
-        hw_thrust_structs_[i].current_state_.current  = 0;
+        hw_thrust_structs_[i].current_state_.current = 0;
         hw_thrust_structs_[i].current_state_.acceleration = 0;
         hw_thrust_structs_[i].current_state_.velocity = 0;
         hw_thrust_structs_[i].current_state_.position = hw_thrust_structs_[i].command_state_.position;
         break;
       case mode_level_t::MODE_VELOCITY:
         hw_thrust_structs_[i].current_state_.acceleration = 0;
-        hw_thrust_structs_[i].current_state_.current  = 0;
+        hw_thrust_structs_[i].current_state_.current = 0;
         hw_thrust_structs_[i].current_state_.velocity = hw_thrust_structs_[i].command_state_.velocity;
         hw_thrust_structs_[i].current_state_.position += (hw_thrust_structs_[i].current_state_.velocity * period.seconds());
         break;
       case mode_level_t::MODE_CURRENT:
-        hw_thrust_structs_[i].current_state_.current  = hw_thrust_structs_[i].command_state_.current;
-        hw_thrust_structs_[i].current_state_.acceleration = hw_thrust_structs_[i].command_state_.current / 2; //dummy
+        hw_thrust_structs_[i].current_state_.current = hw_thrust_structs_[i].command_state_.current;
+        hw_thrust_structs_[i].current_state_.acceleration = hw_thrust_structs_[i].command_state_.current / 2; // dummy
         hw_thrust_structs_[i].current_state_.velocity = (hw_thrust_structs_[i].current_state_.acceleration * period.seconds());
         hw_thrust_structs_[i].current_state_.position += (hw_thrust_structs_[i].current_state_.velocity * period.seconds()) / cfg_.hw_slowdown_;
         break;
       case mode_level_t::MODE_STANDBY:
-        hw_thrust_structs_[i].current_state_.current  = hw_thrust_structs_[i].command_state_.current;
-        hw_thrust_structs_[i].current_state_.acceleration = hw_thrust_structs_[i].command_state_.current / 2; //dummy
+        hw_thrust_structs_[i].current_state_.current = hw_thrust_structs_[i].command_state_.current;
+        hw_thrust_structs_[i].current_state_.acceleration = hw_thrust_structs_[i].command_state_.current / 2; // dummy
         hw_thrust_structs_[i].current_state_.velocity = (hw_thrust_structs_[i].current_state_.acceleration * period.seconds());
         hw_thrust_structs_[i].current_state_.position += (hw_thrust_structs_[i].current_state_.velocity * period.seconds()) / cfg_.hw_slowdown_;
       case mode_level_t::MODE_FREE_EXCITE:
@@ -295,9 +341,9 @@ namespace ros2_control_blue_reach_5
       // BEGIN: This part here is for exemplary purposes - Please do not copy to your production code
       // RCLCPP_INFO(
       //   rclcpp::get_logger("VehicleSystemMultiInterfaceHardware"),
-      //   "Got pos: %.5f, vel: %.5f, acc: %.5f, cur: %.5f for joint %s!", 
+      //   "Got pos: %.5f, vel: %.5f, acc: %.5f, cur: %.5f for joint %s!",
       //   hw_joint_structs_[i].position_state_,
-      //   hw_joint_structs_[i].velocity_state_, 
+      //   hw_joint_structs_[i].velocity_state_,
       //   hw_joint_structs_[i].acceleration_state_,
       //   hw_joint_structs_[i].current_state_, info_.joints[i].name.c_str());
       // END: This part here is for exemplary purposes - Please do not copy to your production code
@@ -308,6 +354,40 @@ namespace ros2_control_blue_reach_5
   hardware_interface::return_type VehicleSystemMultiInterfaceHardware::write(
       const rclcpp::Time & /*time*/, const rclcpp::Duration & /*period*/)
   {
+
+    Eigen::Vector6d torqu;
+    torqu << 1.0, 2.0, 3.0, 40.0, 50.0, 60.0;  // Using the comma initializer
+
+    // Eigen::VectorXd thruster_forces = Eigen::VectorXd::Map(
+    //     (std::vector<double>{800.0, 600.0, 300.0, 500.0, 500.0, 600.0, 500.0, 600.0}).data(), 8);
+
+    // torqu = blue_parameters.params.tcm_ * thruster_forces;
+
+    double dt = 0.01;         // Time step for integration
+    double total_time = 0.05; // Total time to integrate
+    hydrodynamics_.tau = torqu;
+
+    // Create a stepper; using a simple one for this example
+    runge_kutta4<state_type> stepper;
+    // Output the new state
+    // std::cout << "State before: ";
+    // for (auto val : hydrodynamics_.state)
+    // {
+    //   std::cout << val << " ";
+    // }
+    // std::cout << std::endl;
+
+    // Function to perform integration
+    // We use integrate_const to integrate over a fixed time step
+    // integrate_const(stepper, hydrodynamics_, hydrodynamics_.state, 0.0, total_time, dt);
+    // // Output the new state
+    // // std::cout << "State after 0.05 seconds: ";
+    // for (auto val : hydrodynamics_.state)
+    // {
+    //   std::cout << val << " ";
+    // }
+    // std::cout << std::endl;
+
     // BEGIN: This part here is for exemplary purposes - Please do not copy to your production code
     // for (std::size_t i = 0; i < info_.joints.size(); i++)
     // {

@@ -40,6 +40,7 @@ add_library(
   hardware/motor_control.cpp
   hardware/thruster_dynamics.cpp
   hardware/hydrodynamics.cpp
+  hardware/vehicle_parameters.cpp
 )
 
 target_link_libraries(ros2_control_blue_reach_5 PUBLIC casadi)

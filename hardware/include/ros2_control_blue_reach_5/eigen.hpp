@@ -18,13 +18,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#pragma once
+// #pragma once
 #ifndef ROS2_CONTROL_BLUE_REACH_5__EIGEN_HPP_
 #define ROS2_CONTROL_BLUE_REACH_5__EIGEN_HPP_
 
 #include <Eigen/Dense>
 #include <vector>
-
+#include <iostream>
 /// @cond
 namespace Eigen
 {
