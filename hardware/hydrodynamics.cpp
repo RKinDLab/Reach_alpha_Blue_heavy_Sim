@@ -176,49 +176,56 @@ namespace blue::dynamics
         restoring_forces(std::move(restoring_forces)),
         current_effects(std::move(current_effects))
   {
-    state.resize(10);
+    state.resize(12);
   }
 
   // Function to compute acceleration
-  Eigen::Vector6d Vehicle::computeAcceleration(const Eigen::Vector6d &velocity, const Eigen::Quaterniond &orientation)
+  Eigen::Vector6d Vehicle::computeAcceleration(const Eigen::Vector6d &velocity, const Eigen::Vector3d &rpy)
   {
+    // The magnitude of the orientation vector represents the rotation angle in radians
+    double angle = rpy.norm();
+
+    // The normalized orientation vector represents the rotation axis
+    Eigen::Vector3d axis = rpy.normalized();
+
+    // Create an AngleAxis object from the angle and axis
+    Eigen::AngleAxisd angleAxis(angle, axis);
+
+    // Convert to a rotation matrix
+    Eigen::Matrix3d rotationMatrix = angleAxis.toRotationMatrix();
     // This should be set or passed as needed
     return inertia.getInertia().inverse() *
            (tau -
-            (coriolis.calculateCoriolis(velocity) +
-             damping.calculateDamping(velocity)) *
-                velocity -
-            restoring_forces.calculateRestoringForces(orientation.toRotationMatrix()));
+            (coriolis.calculateCoriolis(velocity) + damping.calculateDamping(velocity)) * velocity 
+            - restoring_forces.calculateRestoringForces(rotationMatrix));
   }
 
   // Operator to interface with Boost Odeint
-  void Vehicle::operator()(const state_type &x, state_type &dxdt, double t)
+  void Vehicle::operator()(const state_type &x, state_type &dxdt, double /*t*/)
   {
     // Map the state vector to Eigen types
-    Eigen::Map<const Eigen::Vector3d> pos(&x[0]);
-    Eigen::Map<const Eigen::Vector3d> vel(&x[3]);
-    Eigen::Quaterniond ori(x[9], x[6], x[7], x[8]); // quaternion w, x, y, z
+    Eigen::Map<const Eigen::Vector3d> rpy(&x[3]);
+    Eigen::Map<const Eigen::Vector6d> vel(&x[6]);
 
-    Eigen::Vector6d acc = computeAcceleration(velocity, ori);
+    Eigen::Vector6d acc = computeAcceleration(vel, rpy);
 
-    // Set derivatives of the position
-    dxdt[0] = x[3]; // Linear velocity
-    dxdt[1] = x[4]; // Linear velocity
-    dxdt[2] = x[5]; // Linear velocity
-    dxdt[3] = acc[0]; // Linear acceleration
-    dxdt[4] = acc[1]; // Linear acceleration
-    dxdt[5] = acc[2]; // Linear acceleration
+    // // Set derivatives of the position
+    dxdt[0] = x[6]; // Linear velocity
+    dxdt[1] = x[7]; // Linear velocity
+    dxdt[2] = x[8]; // Linear velocity
 
-    // Update quaternion based on angular velocity (last 3 of acc for angular part)
-    Eigen::Quaterniond omega(0, acc[3], acc[4], acc[5]);
-    Eigen::Quaterniond qdot = omega * ori; 
-    qdot.coeffs() *= 0.5;
-    
-    dxdt[6] = qdot.x();
-    dxdt[7] = qdot.y();
-    dxdt[8] = qdot.z();
-    dxdt[9] = qdot.w();
+    // set derivatives of the orientation
+    dxdt[3] = x[9];  // angular velocity
+    dxdt[4] = x[10]; // angular velocity
+    dxdt[5] = x[11]; // angular velocity
+
+    dxdt[6] = acc[0]; // Linear acceleration
+    dxdt[7] = acc[1]; // Linear acceleration
+    dxdt[8] = acc[2]; // Linear acceleration
+
+    dxdt[9] = acc[3];  // angular acceleration
+    dxdt[10] = acc[4]; // angular acceleration
+    dxdt[11] = acc[5]; // angular acceleration
   }
-
 
 } // namespace blue::dynamics

@@ -302,8 +302,6 @@ namespace blue::dynamics
   public:
     state_type state; // State vector: x, y, z, vx, vy, vz (position, velocity)
     Eigen::Vector6d tau;
-    Eigen::Vector6d velocity;
-    Eigen::Quaterniond orientation; // Orientation in some suitable vector form
     Inertia inertia;
     Coriolis coriolis;
     Damping damping;
@@ -315,7 +313,7 @@ namespace blue::dynamics
     Vehicle(Inertia inertia, Coriolis coriolis, Damping damping, RestoringForces restoring_forces, CurrentEffects current_effects);
 
     // Function to compute acceleration
-    Eigen::Vector6d computeAcceleration(const Eigen::Vector6d &velocity, const Eigen::Quaterniond &orientation);
+    Eigen::Vector6d computeAcceleration(const Eigen::Vector6d &velocity, const Eigen::Vector3d &rpy);
 
     void operator()(const state_type &x, state_type &dxdt, double t);
 
