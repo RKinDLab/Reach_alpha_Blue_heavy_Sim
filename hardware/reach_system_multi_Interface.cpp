@@ -260,6 +260,10 @@ namespace ros2_control_blue_reach_5
         {
           new_modes.push_back(mode_level_t::MODE_CURRENT);
         }
+        if (key == info_.joints[i].name + "/" + "effort")
+        {
+          new_modes.push_back(mode_level_t::MODE_CURRENT);
+        }
         if (key == info_.joints[i].name + "/" + custom_hardware_interface::HW_IF_FREE_EXCITE)
         {
           new_modes.push_back(mode_level_t::MODE_FREE_EXCITE);

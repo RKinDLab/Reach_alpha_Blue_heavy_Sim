@@ -75,7 +75,7 @@ namespace ros2_control_blue_reach_5
 
       if (!(joint.command_interfaces[0].name == hardware_interface::HW_IF_VELOCITY ||
             joint.command_interfaces[0].name == custom_hardware_interface::HW_IF_CURRENT ||
-            joint.command_interfaces[0].name == "effort" ))
+            joint.command_interfaces[0].name == "effort"))
       {
         RCLCPP_FATAL(
             rclcpp::get_logger("VehicleSystemMultiInterfaceHardware"),
@@ -194,6 +194,10 @@ namespace ros2_control_blue_reach_5
         if (key == info_.joints[i].name + "/" + custom_hardware_interface::HW_IF_FREE_EXCITE)
         {
           new_modes.push_back(mode_level_t::MODE_FREE_EXCITE);
+        }
+        if (key == info_.joints[i].name + "/effort")
+        {
+          new_modes.push_back(mode_level_t::MODE_EFFORT);
         }
       }
     }
@@ -359,6 +363,14 @@ namespace ros2_control_blue_reach_5
   {
     Eigen::Vector6d torqu;
 
+    RCLCPP_INFO(
+        rclcpp::get_logger("VehicleSystemMultiInterfaceHardware"),
+        "Got pos: %.5f, vel: %.5f, acc: %.5f, cur: %.5f for joint %s!",
+        hw_joint_structs_[i].position_state_,
+        hw_joint_structs_[i].velocity_state_,
+        hw_joint_structs_[i].acceleration_state_,
+        hw_joint_structs_[i].current_state_, info_.joints[i].name.c_str());
+
     Eigen::VectorXd thruster_forces = Eigen::VectorXd::Map(
         (std::vector<double>{
              hw_thrust_structs_[0].command_state_.effort,
@@ -374,7 +386,7 @@ namespace ros2_control_blue_reach_5
 
     torqu = blue_parameters.params.tcm_ * thruster_forces;
 
-    double dt = 0.001;                     // Time step for integration
+    double dt = 0.001;                    // Time step for integration
     double total_time = period.seconds(); // Total time to integrate
     hydrodynamics_.tau = torqu;
 

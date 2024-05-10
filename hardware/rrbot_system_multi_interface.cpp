@@ -233,6 +233,10 @@ namespace ros2_control_blue_reach_5
         {
           new_modes.push_back(mode_level_t::MODE_CURRENT);
         }
+        if (key == info_.joints[i].name + "/effort")
+        {
+          new_modes.push_back(mode_level_t::MODE_EFFORT);
+        }
       }
     }
     // Example criteria: All joints must be given new command mode at the same time
