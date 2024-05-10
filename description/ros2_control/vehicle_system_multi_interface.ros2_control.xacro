@@ -173,12 +173,12 @@
         <state_interface name="current"/>
       </joint>
       <sensor name="${prefix}imu_sensor">
-        <state_interface name="x"/>
-        <state_interface name="y"/>
-        <state_interface name="z"/>
-        <state_interface name="r"/>
-        <state_interface name="p"/>
-        <state_interface name="y"/>
+        <state_interface name="position.x"/>
+        <state_interface name="position.y"/>
+        <state_interface name="position.z"/>
+        <state_interface name="rot.r"/>
+        <state_interface name="rot.p"/>
+        <state_interface name="rot.y"/>
         <state_interface name="v.x"/>
         <state_interface name="v.y"/>
         <state_interface name="v.z"/>
