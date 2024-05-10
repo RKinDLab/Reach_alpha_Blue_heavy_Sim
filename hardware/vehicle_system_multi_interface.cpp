@@ -384,10 +384,10 @@ namespace ros2_control_blue_reach_5
     hydrodynamics_.tau = torqu;
 
     // Create a stepper; using a simple one for this example
-    runge_kutta4<state_type> stepper;
+    runge_kutta4<state_type> rk4;
     // Function to perform integration
     // We use integrate_const to integrate over a fixed time step
-    integrate_const(stepper, hydrodynamics_, hydrodynamics_.state, 0.0, total_time, dt);
+    rk4.do_step(hydrodynamics_, hydrodynamics_.state, total_time, dt);
 
     return hardware_interface::return_type::OK;
   }
