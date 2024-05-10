@@ -163,9 +163,8 @@ namespace ros2_control_blue_reach_5
       command_interfaces.emplace_back(hardware_interface::CommandInterface(
           info_.joints[i].name, custom_hardware_interface::HW_IF_CURRENT, &hw_thrust_structs_[i].command_state_.current));
       command_interfaces.emplace_back(hardware_interface::CommandInterface(
-          info_.joints[i].name, "effort", &hw_thrust_structs_[i].command_state_.effort));
+          info_.joints[i].name, hardware_interface::HW_IF_EFFORT, &hw_thrust_structs_[i].command_state_.effort));
     }
-
     return command_interfaces;
   }
 
@@ -195,7 +194,7 @@ namespace ros2_control_blue_reach_5
         {
           new_modes.push_back(mode_level_t::MODE_FREE_EXCITE);
         }
-        if (key == info_.joints[i].name + "/effort")
+        if (key == info_.joints[i].name + "/" + hardware_interface::HW_IF_EFFORT)
         {
           new_modes.push_back(mode_level_t::MODE_EFFORT);
         }
@@ -363,13 +362,17 @@ namespace ros2_control_blue_reach_5
   {
     Eigen::Vector6d torqu;
 
-    RCLCPP_INFO(
-        rclcpp::get_logger("VehicleSystemMultiInterfaceHardware"),
-        "Got pos: %.5f, vel: %.5f, acc: %.5f, cur: %.5f for joint %s!",
-        hw_joint_structs_[i].position_state_,
-        hw_joint_structs_[i].velocity_state_,
-        hw_joint_structs_[i].acceleration_state_,
-        hw_joint_structs_[i].current_state_, info_.joints[i].name.c_str());
+    // RCLCPP_INFO(
+    //     rclcpp::get_logger("VehicleSystemMultiInterfaceHardware"),
+    //     "Got commands: %.5f,  %.5f, %.5f, %.5f, %.5f,  %.5f, %.5f, %.5f ",
+    //          hw_thrust_structs_[0].command_state_.effort,
+    //          hw_thrust_structs_[1].command_state_.effort,
+    //          hw_thrust_structs_[2].command_state_.effort,
+    //          hw_thrust_structs_[3].command_state_.effort,
+    //          hw_thrust_structs_[4].command_state_.effort,
+    //          hw_thrust_structs_[5].command_state_.effort,
+    //          hw_thrust_structs_[6].command_state_.effort,
+    //          hw_thrust_structs_[7].command_state_.effort);
 
     Eigen::VectorXd thruster_forces = Eigen::VectorXd::Map(
         (std::vector<double>{

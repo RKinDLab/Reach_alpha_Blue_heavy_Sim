@@ -206,6 +206,8 @@ namespace ros2_control_blue_reach_5
           info_.joints[i].name, hardware_interface::HW_IF_VELOCITY, &hw_joint_structs_[i].command_state_.velocity));
       command_interfaces.emplace_back(hardware_interface::CommandInterface(
           info_.joints[i].name, custom_hardware_interface::HW_IF_CURRENT, &hw_joint_structs_[i].command_state_.current));
+      command_interfaces.emplace_back(hardware_interface::CommandInterface(
+          info_.joints[i].name, hardware_interface::HW_IF_EFFORT, &hw_joint_structs_[i].command_state_.effort));
     }
 
     return command_interfaces;
@@ -233,7 +235,7 @@ namespace ros2_control_blue_reach_5
         {
           new_modes.push_back(mode_level_t::MODE_CURRENT);
         }
-        if (key == info_.joints[i].name + "/effort")
+        if (key == info_.joints[i].name + "/" + hardware_interface::HW_IF_EFFORT)
         {
           new_modes.push_back(mode_level_t::MODE_EFFORT);
         }
