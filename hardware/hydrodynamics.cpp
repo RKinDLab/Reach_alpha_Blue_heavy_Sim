@@ -113,8 +113,7 @@ namespace blue::dynamics
 
   [[nodiscard]] Eigen::Matrix6d Damping::calculateDamping(const Eigen::Vector6d &velocity) const
   {
-    return linear_damping_;
-    // + calculateNonlinearDamping(velocity);
+    return linear_damping_ + calculateNonlinearDamping(velocity);
   }
 
   [[nodiscard]] Eigen::Matrix6d Damping::calculateNonlinearDamping(
