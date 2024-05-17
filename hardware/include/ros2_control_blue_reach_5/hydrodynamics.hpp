@@ -313,7 +313,11 @@ namespace blue::dynamics
     Vehicle(Inertia inertia, Coriolis coriolis, Damping damping, RestoringForces restoring_forces, CurrentEffects current_effects);
 
     // Function to compute acceleration
-    Eigen::Vector6d computeAcceleration(const Eigen::Vector6d &velocity, const Eigen::Vector3d &rpy);
+    Eigen::Vector6d computeAcceleration(const Eigen::Vector6d &velocity, const Eigen::Matrix3d &rot);
+
+    Eigen::Matrix3d linear_rotation_matrix(double r, double p, double y);
+
+    Eigen::Matrix3d angular_rotation_matrix(double r, double p);
 
     void operator()(const state_type &x, state_type &dxdt, double t);
 

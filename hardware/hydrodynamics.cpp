@@ -19,6 +19,7 @@
 // THE SOFTWARE.
 
 #include "ros2_control_blue_reach_5/hydrodynamics.hpp"
+#include "rclcpp/rclcpp.hpp"
 
 namespace blue::dynamics
 {
@@ -142,9 +143,9 @@ namespace blue::dynamics
 
     Eigen::Vector6d g_rb;
 
-    g_rb.topRows(3) = rotation * (fg + fb);
+    g_rb.topRows(3) = rotation.transpose() * (fg + fb);
     g_rb.bottomRows(3) =
-        center_of_gravity_.cross(rotation * fg) + center_of_buoyancy_.cross(rotation * fb);
+        center_of_gravity_.cross(rotation.transpose() * fg) + center_of_buoyancy_.cross(rotation.transpose() * fb);
 
     g_rb *= -1;
 
@@ -178,45 +179,91 @@ namespace blue::dynamics
     state.resize(12);
   }
 
-  // Function to compute acceleration
-  Eigen::Vector6d Vehicle::computeAcceleration(const Eigen::Vector6d &velocity, const Eigen::Vector3d &rpy)
+  Eigen::Matrix3d Vehicle::linear_rotation_matrix(double r, double p, double y)
   {
-    // The magnitude of the orientation vector represents the rotation angle in radians
-    double angle = rpy.norm();
+    // phi - roll - r
+    // theta - pitch - p
+    // psi - yaw - y
+    Eigen::Matrix3d mat;
+    double cr = cos(r), sr = sin(r);
+    double cp = cos(p), sp = sin(p);
+    double cy = cos(y), sy = sin(y);
+    mat << cp * cy, sr * sp * cy - cr * sy, cr * sp * cy + sr * sy,
+    cp * sy, sr * sp * sy + cr * cy, cr * sp * sy - sr * cy,
+    -sp, sr * cp, cr * cp;
+    return mat;
+  }
 
-    // The normalized orientation vector represents the rotation axis
-    Eigen::Vector3d axis = rpy.normalized();
+    Eigen::Matrix3d Vehicle::angular_rotation_matrix(double r, double p)
+  {
+    Eigen::Matrix3d mat;
+    double cr = cos(r), sr = sin(r);
+    double cp = cos(p), tp = tan(p);
+    mat << 1, sr*tp, cr*tp, 0, cr, -sr, 0, sr/cp, cr/cp;
 
-    // Create an AngleAxis object from the angle and axis
-    Eigen::AngleAxisd angleAxis(angle, axis);
+    return mat;
+  }
 
-    // Convert to a rotation matrix
-    Eigen::Matrix3d rotationMatrix = angleAxis.toRotationMatrix();
-    // This should be set or passed as needed
+  // Function to compute acceleration
+  Eigen::Vector6d Vehicle::computeAcceleration(const Eigen::Vector6d &velocity, const Eigen::Matrix3d &rot)
+  {
+
+    // // Custom IOFormat for pretty printing
+    // Eigen::IOFormat CleanFmt(4, 0, ", ", "\n", "[", "]", "[", "]");
+    // std::stringstream ss;
+    // ss << inertia.getInertia().format(CleanFmt);
+    // // Usage in your logging function
+    // RCLCPP_INFO(rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "***working wow. i am azm*****Blue vehicle inertia matrix:\n%s", ss.str().c_str());
+
     return inertia.getInertia().inverse() *
            (tau -
             (coriolis.calculateCoriolis(velocity) + damping.calculateDamping(velocity)) * velocity 
-            - restoring_forces.calculateRestoringForces(rotationMatrix));
+            - restoring_forces.calculateRestoringForces(rot));
   }
 
   // Operator to interface with Boost Odeint
   void Vehicle::operator()(const state_type &x, state_type &dxdt, double /*t*/)
   {
     // Map the state vector to Eigen types
-    Eigen::Map<const Eigen::Vector3d> rpy(&x[3]);
     Eigen::Map<const Eigen::Vector6d> vel(&x[6]);
 
-    Eigen::Vector6d acc = computeAcceleration(vel, rpy);
+    Eigen::Map<const Eigen::Vector3d> vb_nb(&x[6]);
+    Eigen::Map<const Eigen::Vector3d> wb_nb(&x[9]);
+
+    // std::cout << "vb_nb: " << vb_nb << std::endl;
+
+
+    Eigen::Matrix3d Rot_l = linear_rotation_matrix(x[0],x[1],x[2]);
+    Eigen::Matrix3d T_a = angular_rotation_matrix(x[0],x[1]);
+
+    Eigen::Vector6d acc = computeAcceleration(vel, Rot_l);
+
+    Eigen::Vector3d d_pn_nb  = Rot_l*vb_nb;
+    Eigen::Vector3d d_thet = T_a*wb_nb;
+
+    // std::cout << "d_pn_nb: " << d_pn_nb << std::endl;
+    // std::cout << "d_thet: " << d_thet << std::endl;
+
+  //  Eigen::IOFormat CleanFmt(4, 0, ", ", "\n", "[", "]", "[", "]");
+  //   std::stringstream ss;
+  //   ss << R_l.format(CleanFmt);
+  //   // Usage in your logging function
+  //   RCLCPP_INFO(rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "*******linear rotation matrix:\n%s", ss.str().c_str());
+
+  //   std::stringstream sus;
+  //   sus << T_a.format(CleanFmt);
+  //   // Usage in your logging function
+  //   RCLCPP_INFO(rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "*****angular rotation matrix:\n%s", sus.str().c_str());
 
     // // Set derivatives of the position
-    dxdt[0] = x[6]; // Linear velocity
-    dxdt[1] = x[7]; // Linear velocity
-    dxdt[2] = x[8]; // Linear velocity
+    dxdt[0] = d_pn_nb[0]; // Linear velocity
+    dxdt[1] = d_pn_nb[1]; // Linear velocity
+    dxdt[2] = d_pn_nb[2]; // Linear velocity
 
     // set derivatives of the orientation
-    dxdt[3] = x[9];  // angular velocity
-    dxdt[4] = x[10]; // angular velocity
-    dxdt[5] = x[11]; // angular velocity
+    dxdt[3] = d_thet[0];  // angular velocity
+    dxdt[4] = d_thet[1]; // angular velocity
+    dxdt[5] = d_thet[2]; // angular velocity
 
     dxdt[6] = acc[0]; // Linear acceleration
     dxdt[7] = acc[1]; // Linear acceleration
