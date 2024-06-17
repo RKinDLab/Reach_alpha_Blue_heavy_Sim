@@ -4,6 +4,7 @@
 #include <string>
 #include <algorithm>
 #include <casadi/casadi.hpp>
+#include <Eigen/Geometry>  // Include Eigen library for geometry
 
 using namespace casadi;
 
@@ -19,6 +20,7 @@ namespace casadi_reach_alpha_5
         Function inverse_dynamics; // inverse dynamics of the robotic arm
         Function inertia_matrix; // inertia/mass matrix of the robotic arm
         Function mhe; //moving horizon estimation
+        Function vehicle_dynamics; // forward dynamics of the vehicle
 
         Dynamics() = default;
         // Constructor with member initializer list

@@ -1,16 +1,22 @@
-// Copyright 2021 Department of Engineering Cybernetics, NTNU
+// Copyright 2024, Edward Morgan
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
 
 #ifndef ROS2_CONTROL_BLUE_REACH_5__VEHICLE_SYSTEM_MULTI_INTERFACE_HPP_
 #define ROS2_CONTROL_BLUE_REACH_5__VEHICLE_SYSTEM_MULTI_INTERFACE_HPP_
@@ -34,10 +40,12 @@
 #include "ros2_control_blue_reach_5/visibility_control.h"
 
 #include "ros2_control_blue_reach_5/thruster.hpp"
+#include "ros2_control_blue_reach_5/vehicle.hpp"
 #include "ros2_control_blue_reach_5/vehicle_parameters.hpp"
-#include "ros2_control_blue_reach_5/hydrodynamics.hpp"
 #include "ros2_control_blue_reach_5/custom_hardware_interface_type_values.hpp"
+#include "ros2_control_blue_reach_5/dynamics.hpp"
 
+#include <casadi/casadi.hpp>
 
 namespace ros2_control_blue_reach_5
 {
@@ -117,15 +125,19 @@ namespace ros2_control_blue_reach_5
 
     // Active control mode for each thruster
     std::vector<mode_level_t> control_level_;
-
+    
+    // Store the dynamics function for the robot joints
+    casadi_reach_alpha_5::Dynamics dynamics_service;
+    
     // vehicle dynamics object
     Vehicle blue_parameters;
-    blue::dynamics::Vehicle hydrodynamics_;
-
-    // Store the state & commands for the uv thruster
-    std::vector<Thruster> hw_thrust_structs_;
+    // Store the state & commands for the robot vehicle
+    std::vector<blue::dynamics::Vehicle> hw_vehicle_structs_;
 
     std::vector<double> hw_sensor_states_;
+    
+    // stores the dynamic response from the forward dynamics simulator
+    std::vector<double> forward_dynamics_res;
   };
 
 } // namespace ros2_control_blue

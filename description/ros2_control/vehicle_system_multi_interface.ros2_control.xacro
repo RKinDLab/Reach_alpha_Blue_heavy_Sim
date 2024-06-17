@@ -176,15 +176,16 @@
         <state_interface name="position.x"/>
         <state_interface name="position.y"/>
         <state_interface name="position.z"/>
-        <state_interface name="rot.r"/>
-        <state_interface name="rot.p"/>
-        <state_interface name="rot.y"/>
-        <state_interface name="v.x"/>
-        <state_interface name="v.y"/>
-        <state_interface name="v.z"/>
-        <state_interface name="w.r"/>
-        <state_interface name="w.p"/>
-        <state_interface name="w.y"/>
+        <state_interface name="orientation.w"/>
+        <state_interface name="orientation.x"/>
+        <state_interface name="orientation.y"/>
+        <state_interface name="orientation.z"/>
+        <state_interface name="velocity.u"/>
+        <state_interface name="velocity.v"/>
+        <state_interface name="velocity.w"/>
+        <state_interface name="velocity.p"/>
+        <state_interface name="velocity.q"/>
+        <state_interface name="velocity.r"/>
       </sensor>
     </ros2_control>
   </xacro:macro>
