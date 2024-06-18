@@ -387,14 +387,14 @@ namespace ros2_control_blue_reach_5
 
     Eigen::VectorXd thruster_forces = Eigen::VectorXd::Map(
         (std::vector<double>{
-             hw_vehicle_structs_[0].hw_thrust_structs_[0].command_state_.effort,
-             hw_vehicle_structs_[0].hw_thrust_structs_[1].command_state_.effort,
-             hw_vehicle_structs_[0].hw_thrust_structs_[2].command_state_.effort,
-             hw_vehicle_structs_[0].hw_thrust_structs_[3].command_state_.effort,
              hw_vehicle_structs_[0].hw_thrust_structs_[4].command_state_.effort,
              hw_vehicle_structs_[0].hw_thrust_structs_[5].command_state_.effort,
              hw_vehicle_structs_[0].hw_thrust_structs_[6].command_state_.effort,
-             hw_vehicle_structs_[0].hw_thrust_structs_[7].command_state_.effort})
+             hw_vehicle_structs_[0].hw_thrust_structs_[7].command_state_.effort,
+             hw_vehicle_structs_[0].hw_thrust_structs_[8].command_state_.effort,
+             hw_vehicle_structs_[0].hw_thrust_structs_[9].command_state_.effort,
+             hw_vehicle_structs_[0].hw_thrust_structs_[10].command_state_.effort,
+             hw_vehicle_structs_[0].hw_thrust_structs_[11].command_state_.effort})
             .data(),
         8);
 
