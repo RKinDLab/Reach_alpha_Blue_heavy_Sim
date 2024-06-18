@@ -186,10 +186,7 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-        world_bottom:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
+          Value: true
       Mass Properties:
         Inertia: false
         Mass: false
@@ -348,8 +345,6 @@ Visualization Manager:
           Value: true
         world:
           Value: true
-        world_bottom:
-          Value: true
       Marker Scale: 1
       Name: TF
       Show Arrows: false
@@ -395,8 +390,6 @@ Visualization Manager:
                 {}
               alphathruster8:
                 {}
-          world_bottom:
-            {}
       Update Interval: 0
       Value: true
     - Alpha: 1
@@ -451,7 +444,7 @@ Visualization Manager:
       Cell Size: 1
       Class: rviz_default_plugins/Grid
       Color: 160; 160; 164
-      Enabled: true
+      Enabled: false
       Line Style:
         Line Width: 0.029999999329447746
         Value: Lines
@@ -464,11 +457,11 @@ Visualization Manager:
       Plane: XY
       Plane Cell Count: 20
       Reference Frame: world_bottom
-      Value: true
+      Value: false
   Enabled: true
   Global Options:
     Background Color: 52; 101; 164
-    Fixed Frame: base_link
+    Fixed Frame: world
     Frame Rate: 30
   Name: root
   Tools:
@@ -511,25 +504,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 20.726058959960938
+      Distance: 6.991107940673828
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0.213251993060112
-        Y: -0.265647828578949
-        Z: 0.012065996415913105
+        X: 0
+        Y: 0
+        Z: 0
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.05520232021808624
-      Target Frame: <Fixed Frame>
+      Pitch: 0.2602022588253021
+      Target Frame: base_link
       Value: Orbit (rviz)
-      Yaw: 4.129030704498291
+      Yaw: 4.702689170837402
     Saved: ~
 Window Geometry:
   Aruco Detection:
