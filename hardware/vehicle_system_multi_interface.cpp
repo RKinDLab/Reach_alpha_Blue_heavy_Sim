@@ -380,7 +380,7 @@ namespace ros2_control_blue_reach_5
   }
 
   hardware_interface::return_type VehicleSystemMultiInterfaceHardware::write(
-      const rclcpp::Time & /*time*/, const rclcpp::Duration & /*period*/)
+      const rclcpp::Time & /*time*/, const rclcpp::Duration & period)
   {
     // double delta_seconds = period.seconds();
     Eigen::Vector6d torqu;
@@ -415,18 +415,18 @@ namespace ros2_control_blue_reach_5
         hw_vehicle_structs_[0].current_state_.q,
         hw_vehicle_structs_[0].current_state_.r};
 
-    std::vector<double> u0 = {torqu[0], torqu[1], torqu[2], torqu[3], torqu[4], torqu[5]};
+    std::vector<double> u0 = {0.5, torqu[1], torqu[2], torqu[3], torqu[4], torqu[5]};
     std::vector<DM> dynamic_arg = {DM(x0), DM(u0)};
-    // RCLCPP_INFO(rclcpp::get_logger("VehicleSystemMultiInterfaceHardware"), "Got states: %.5f second interval, %.5f,  %.5f, %.5f, %.5f, %.5f,  %.5f, %.5f, %.5f ",
-    //             delta_seconds,
-    //             hw_vehicle_structs_[0].current_state_.position_x,
-    //             hw_vehicle_structs_[0].current_state_.position_y,
-    //             hw_vehicle_structs_[0].current_state_.position_z,
-    //             hw_vehicle_structs_[0].current_state_.orientation_w,
-    //             hw_vehicle_structs_[0].current_state_.orientation_x,
-    //             hw_vehicle_structs_[0].current_state_.orientation_y,
-    //             hw_vehicle_structs_[0].current_state_.orientation_z,
-    //             hw_vehicle_structs_[0].current_state_.u);
+    RCLCPP_INFO(rclcpp::get_logger("VehicleSystemMultiInterfaceHardware"), "Got states: %.5f second interval, %.5f,  %.5f, %.5f, %.5f, %.5f,  %.5f, %.5f, %.5f ",
+                delta_seconds,
+                hw_vehicle_structs_[0].current_state_.position_x,
+                hw_vehicle_structs_[0].current_state_.position_y,
+                hw_vehicle_structs_[0].current_state_.position_z,
+                hw_vehicle_structs_[0].current_state_.orientation_w,
+                hw_vehicle_structs_[0].current_state_.orientation_x,
+                hw_vehicle_structs_[0].current_state_.orientation_y,
+                hw_vehicle_structs_[0].current_state_.orientation_z,
+                hw_vehicle_structs_[0].current_state_.u);
 
 
     std::vector<DM> dynamic_response = dynamics_service.vehicle_dynamics(dynamic_arg);
