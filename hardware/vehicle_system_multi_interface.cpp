@@ -417,7 +417,7 @@ namespace ros2_control_blue_reach_5
 
     std::vector<double> u0 = {torqu[0], torqu[1], torqu[2], torqu[3], torqu[4], torqu[5]};
     std::vector<DM> dynamic_arg = {DM(x0), DM(u0)};
-    RCLCPP_INFO(rclcpp::get_logger("VehicleSystemMultiInterfaceHardware"), "Got states: %.5f second interval, %.5f,  %.5f, %.5f, %.5f, %.5f,  %.5f, %.5f, %.5f ",
+    RCLCPP_DEBUG(rclcpp::get_logger("VehicleSystemMultiInterfaceHardware"), "Got states: %.5f second interval, %.5f,  %.5f, %.5f, %.5f, %.5f,  %.5f, %.5f, %.5f ",
                 delta_seconds,
                 hw_vehicle_structs_[0].current_state_.position_x,
                 hw_vehicle_structs_[0].current_state_.position_y,
