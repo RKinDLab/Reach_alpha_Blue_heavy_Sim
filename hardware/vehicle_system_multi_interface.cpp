@@ -382,7 +382,7 @@ namespace ros2_control_blue_reach_5
   hardware_interface::return_type VehicleSystemMultiInterfaceHardware::write(
       const rclcpp::Time & /*time*/, const rclcpp::Duration & period)
   {
-    // double delta_seconds = period.seconds();
+    double delta_seconds = period.seconds();
     Eigen::Vector6d torqu;
 
     Eigen::VectorXd thruster_forces = Eigen::VectorXd::Map(
