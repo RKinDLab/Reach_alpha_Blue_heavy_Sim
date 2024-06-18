@@ -32,14 +32,6 @@
       </collision>
     </link>
 
-      <!-- Robot Footprint -->
-    <link name="${prefix}base_footprint" />
-    <joint name="${prefix}base_footprint_joint" type="fixed">
-      <child link="${prefix}base_footprint" />
-      <parent link="${prefix}base_link" />
-      <origin xyz="0.0 0.0 1.0" rpy="0 0 0"/>
-    </joint>
-
     <!-- Import camera macro -->
     <xacro:include filename="$(find ros2_control_blue_reach_5)/blue/xacro/camera/urdf.xacro" />
 

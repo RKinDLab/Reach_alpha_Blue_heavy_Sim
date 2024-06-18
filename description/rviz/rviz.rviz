@@ -6,7 +6,7 @@ Panels:
       Expanded:
         - /Global Options1
         - /Grid1
-        - /TF1/Frames1
+        - /TF1
         - /aruco_Pose1/Topic1
       Splitter Ratio: 0.6844444274902344
     Tree Height: 814
@@ -42,8 +42,8 @@ Visualization Manager:
         Y: 0
         Z: 0
       Plane: XY
-      Plane Cell Count: 10
-      Reference Frame: alphabase_footprint
+      Plane Cell Count: 20
+      Reference Frame: world
       Value: true
     - Alpha: 1
       Class: rviz_default_plugins/RobotModel
@@ -120,10 +120,6 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
-        alphabase_footprint:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
         alphabase_link:
           Alpha: 1
           Show Axes: false
@@ -186,11 +182,14 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-        imu_link:
+        world:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-          Value: true
+        world_bottom:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
       Mass Properties:
         Inertia: false
         Mass: false
@@ -236,6 +235,7 @@ Visualization Manager:
         Aruco Detection: true
         EndEffector Pose: true
         Grid: true
+        Grid_bottom: true
         Path: true
         PointCloud2: true
         RobotModel: true
@@ -292,19 +292,113 @@ Visualization Manager:
       Use rainbow: true
       Value: true
     - Class: rviz_default_plugins/TF
-      Enabled: false
+      Enabled: true
       Frame Timeout: 15
       Frames:
         All Enabled: false
+        alpha_base_link:
+          Value: false
+        alpha_jaws_base_link:
+          Value: false
+        alpha_m1_link:
+          Value: false
+        alpha_m2_1_1_link:
+          Value: false
+        alpha_m2_1_2_link:
+          Value: false
+        alpha_m2_joint_link:
+          Value: false
+        alpha_m3_inline_link:
+          Value: false
+        alpha_push_rod:
+          Value: false
+        alpha_standard_jaws_base_link:
+          Value: false
+        alpha_standard_jaws_rs1_130_link:
+          Value: false
+        alpha_standard_jaws_rs1_139_link:
+          Value: false
+        alphaballast_link:
+          Value: false
+        alphabase_link:
+          Value: false
+        alphacamera_link:
+          Value: false
+        alphacamera_mount_link:
+          Value: false
+        alphamanipulator_mount_link:
+          Value: false
+        alphathruster1:
+          Value: false
+        alphathruster2:
+          Value: false
+        alphathruster3:
+          Value: false
+        alphathruster4:
+          Value: false
+        alphathruster5:
+          Value: false
+        alphathruster6:
+          Value: false
+        alphathruster7:
+          Value: false
+        alphathruster8:
+          Value: false
+        base_link:
+          Value: true
+        world:
+          Value: true
+        world_bottom:
+          Value: true
       Marker Scale: 1
       Name: TF
-      Show Arrows: true
+      Show Arrows: false
       Show Axes: true
       Show Names: false
       Tree:
-        {}
+        world:
+          base_link:
+            alphabase_link:
+              alphaballast_link:
+                {}
+              alphacamera_mount_link:
+                alphacamera_link:
+                  {}
+              alphamanipulator_mount_link:
+                alpha_base_link:
+                  alpha_m3_inline_link:
+                    alpha_m2_1_1_link:
+                      alpha_m2_joint_link:
+                        alpha_m2_1_2_link:
+                          alpha_m1_link:
+                            alpha_jaws_base_link:
+                              alpha_push_rod:
+                                {}
+                              alpha_standard_jaws_base_link:
+                                alpha_standard_jaws_rs1_130_link:
+                                  {}
+                                alpha_standard_jaws_rs1_139_link:
+                                  {}
+              alphathruster1:
+                {}
+              alphathruster2:
+                {}
+              alphathruster3:
+                {}
+              alphathruster4:
+                {}
+              alphathruster5:
+                {}
+              alphathruster6:
+                {}
+              alphathruster7:
+                {}
+              alphathruster8:
+                {}
+          world_bottom:
+            {}
       Update Interval: 0
-      Value: false
+      Value: true
     - Alpha: 1
       Axes Length: 0.05000000074505806
       Axes Radius: 0.004999999888241291
@@ -353,6 +447,24 @@ Visualization Manager:
         Reliability Policy: Reliable
         Value: /Path
       Value: true
+    - Alpha: 0.5
+      Cell Size: 1
+      Class: rviz_default_plugins/Grid
+      Color: 160; 160; 164
+      Enabled: true
+      Line Style:
+        Line Width: 0.029999999329447746
+        Value: Lines
+      Name: Grid_bottom
+      Normal Cell Count: 0
+      Offset:
+        X: 0
+        Y: 0
+        Z: 0
+      Plane: XY
+      Plane Cell Count: 20
+      Reference Frame: world_bottom
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 52; 101; 164
@@ -399,7 +511,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 5.271739482879639
+      Distance: 20.726058959960938
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -414,10 +526,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.20020239055156708
+      Pitch: 0.05520232021808624
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 0.4072014093399048
+      Yaw: 4.129030704498291
     Saved: ~
 Window Geometry:
   Aruco Detection:
@@ -438,4 +550,4 @@ Window Geometry:
     collapsed: false
   Width: 1920
   X: 3000
-  Y: 840
+  Y: 504
