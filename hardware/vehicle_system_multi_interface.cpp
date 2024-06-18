@@ -359,17 +359,17 @@ namespace ros2_control_blue_reach_5
         hw_vehicle_structs_[0].hw_thrust_structs_[i].current_state_.position += (hw_vehicle_structs_[0].hw_thrust_structs_[i].current_state_.velocity * period.seconds()) / cfg_.hw_slowdown_;
         break;
       case mode_level_t::MODE_EFFORT:
-        // RCLCPP_INFO(
-        //     rclcpp::get_logger("VehicleSystemMultiInterfaceHardware"),
-        //     "Got commands: %.5f,  %.5f, %.5f, %.5f, %.5f,  %.5f, %.5f, %.5f ",
-        //     hw_vehicle_structs_[0].hw_thrust_structs_[0].command_state_.effort,
-        //     hw_vehicle_structs_[0].hw_thrust_structs_[1].command_state_.effort,
-        //     hw_vehicle_structs_[0].hw_thrust_structs_[2].command_state_.effort,
-        //     hw_vehicle_structs_[0].hw_thrust_structs_[3].command_state_.effort,
-        //     hw_vehicle_structs_[0].hw_thrust_structs_[4].command_state_.effort,
-        //     hw_vehicle_structs_[0].hw_thrust_structs_[5].command_state_.effort,
-        //     hw_vehicle_structs_[0].hw_thrust_structs_[6].command_state_.effort,
-        //     hw_vehicle_structs_[0].hw_thrust_structs_[7].command_state_.effort);
+        RCLCPP_INFO(
+            rclcpp::get_logger("VehicleSystemMultiInterfaceHardware"),
+            "Got commands: %.5f,  %.5f, %.5f, %.5f, %.5f,  %.5f, %.5f, %.5f ",
+            hw_vehicle_structs_[0].hw_thrust_structs_[0].command_state_.effort,
+            hw_vehicle_structs_[0].hw_thrust_structs_[1].command_state_.effort,
+            hw_vehicle_structs_[0].hw_thrust_structs_[2].command_state_.effort,
+            hw_vehicle_structs_[0].hw_thrust_structs_[3].command_state_.effort,
+            hw_vehicle_structs_[0].hw_thrust_structs_[4].command_state_.effort,
+            hw_vehicle_structs_[0].hw_thrust_structs_[5].command_state_.effort,
+            hw_vehicle_structs_[0].hw_thrust_structs_[6].command_state_.effort,
+            hw_vehicle_structs_[0].hw_thrust_structs_[7].command_state_.effort);
         break;
       default:
         // Existing code for default case...
@@ -385,16 +385,17 @@ namespace ros2_control_blue_reach_5
     double delta_seconds = period.seconds();
     Eigen::Vector6d torqu;
 
+
     Eigen::VectorXd thruster_forces = Eigen::VectorXd::Map(
         (std::vector<double>{
+             hw_vehicle_structs_[0].hw_thrust_structs_[0].command_state_.effort,
+             hw_vehicle_structs_[0].hw_thrust_structs_[1].command_state_.effort,
+             hw_vehicle_structs_[0].hw_thrust_structs_[2].command_state_.effort,
+             hw_vehicle_structs_[0].hw_thrust_structs_[3].command_state_.effort,
              hw_vehicle_structs_[0].hw_thrust_structs_[4].command_state_.effort,
              hw_vehicle_structs_[0].hw_thrust_structs_[5].command_state_.effort,
              hw_vehicle_structs_[0].hw_thrust_structs_[6].command_state_.effort,
-             hw_vehicle_structs_[0].hw_thrust_structs_[7].command_state_.effort,
-             hw_vehicle_structs_[0].hw_thrust_structs_[8].command_state_.effort,
-             hw_vehicle_structs_[0].hw_thrust_structs_[9].command_state_.effort,
-             hw_vehicle_structs_[0].hw_thrust_structs_[10].command_state_.effort,
-             hw_vehicle_structs_[0].hw_thrust_structs_[11].command_state_.effort})
+             hw_vehicle_structs_[0].hw_thrust_structs_[7].command_state_.effort})
             .data(),
         8);
 

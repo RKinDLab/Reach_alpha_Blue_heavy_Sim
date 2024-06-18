@@ -70,3 +70,7 @@ done
 
 
 # ros2 topic pub /udwadia_kalaba_controller/reference std_msgs/msg/Float64MultiArray "{data: [0.0, 0.0, 3.0, 0.0, 0.0, 0.0, 0.0 , 0.0, 0.0, 0.0, 0.0 , 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 , 0.0, 0.0, 0.0, 0.0 , 0.0, 0.0]}"
+
+
+
+ros2 topic pub /forward_effort_controller/commands std_msgs/msg/Float64MultiArray "{data: [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5 , 0.5]}" --once
