@@ -64,7 +64,7 @@ namespace ros2_control_blue_reach_5
     hw_vehicle_structs_.emplace_back("blue ROV heavy 0", initialState);
 
     hw_vehicle_structs_[0].thrustSizeAllocation(info_.joints.size());
-    blue_parameters.setupParameters();
+    // blue_parameters.setupParameters();
 
     hw_sensor_states_.resize(
         info_.sensors[0].state_interfaces.size(), std::numeric_limits<double>::quiet_NaN());
@@ -359,17 +359,17 @@ namespace ros2_control_blue_reach_5
         hw_vehicle_structs_[0].hw_thrust_structs_[i].current_state_.position += (hw_vehicle_structs_[0].hw_thrust_structs_[i].current_state_.velocity * period.seconds()) / cfg_.hw_slowdown_;
         break;
       case mode_level_t::MODE_EFFORT:
-        RCLCPP_INFO(
-            rclcpp::get_logger("VehicleSystemMultiInterfaceHardware"),
-            "Got commands: %.5f,  %.5f, %.5f, %.5f, %.5f,  %.5f, %.5f, %.5f ",
-            hw_vehicle_structs_[0].hw_thrust_structs_[0].command_state_.effort,
-            hw_vehicle_structs_[0].hw_thrust_structs_[1].command_state_.effort,
-            hw_vehicle_structs_[0].hw_thrust_structs_[2].command_state_.effort,
-            hw_vehicle_structs_[0].hw_thrust_structs_[3].command_state_.effort,
-            hw_vehicle_structs_[0].hw_thrust_structs_[4].command_state_.effort,
-            hw_vehicle_structs_[0].hw_thrust_structs_[5].command_state_.effort,
-            hw_vehicle_structs_[0].hw_thrust_structs_[6].command_state_.effort,
-            hw_vehicle_structs_[0].hw_thrust_structs_[7].command_state_.effort);
+        // RCLCPP_INFO(
+        //     rclcpp::get_logger("VehicleSystemMultiInterfaceHardware"),
+        //     "Got commands: %.5f,  %.5f, %.5f, %.5f, %.5f,  %.5f, %.5f, %.5f ",
+        //     hw_vehicle_structs_[0].hw_thrust_structs_[0].command_state_.effort,
+        //     hw_vehicle_structs_[0].hw_thrust_structs_[1].command_state_.effort,
+        //     hw_vehicle_structs_[0].hw_thrust_structs_[2].command_state_.effort,
+        //     hw_vehicle_structs_[0].hw_thrust_structs_[3].command_state_.effort,
+        //     hw_vehicle_structs_[0].hw_thrust_structs_[4].command_state_.effort,
+        //     hw_vehicle_structs_[0].hw_thrust_structs_[5].command_state_.effort,
+        //     hw_vehicle_structs_[0].hw_thrust_structs_[6].command_state_.effort,
+        //     hw_vehicle_structs_[0].hw_thrust_structs_[7].command_state_.effort);
         break;
       default:
         // Existing code for default case...
@@ -380,26 +380,46 @@ namespace ros2_control_blue_reach_5
   }
 
   hardware_interface::return_type VehicleSystemMultiInterfaceHardware::write(
-      const rclcpp::Time & /*time*/, const rclcpp::Duration & period)
+      const rclcpp::Time & /*time*/, const rclcpp::Duration &period)
   {
     double delta_seconds = period.seconds();
-    Eigen::Vector6d torqu;
+    // Eigen::Vector6d torqu;
 
+    // Eigen::VectorXd thruster_forces = Eigen::VectorXd::Map(
+    //     (std::vector<double>{
+    //          hw_vehicle_structs_[0].hw_thrust_structs_[0].command_state_.effort,
+    //          hw_vehicle_structs_[0].hw_thrust_structs_[1].command_state_.effort,
+    //          hw_vehicle_structs_[0].hw_thrust_structs_[2].command_state_.effort,
+    //          hw_vehicle_structs_[0].hw_thrust_structs_[3].command_state_.effort,
+    //          hw_vehicle_structs_[0].hw_thrust_structs_[4].command_state_.effort,
+    //          hw_vehicle_structs_[0].hw_thrust_structs_[5].command_state_.effort,
+    //          hw_vehicle_structs_[0].hw_thrust_structs_[6].command_state_.effort,
+    //          hw_vehicle_structs_[0].hw_thrust_structs_[7].command_state_.effort})
+    //         .data(),
+    //     8);
 
-    Eigen::VectorXd thruster_forces = Eigen::VectorXd::Map(
-        (std::vector<double>{
-             hw_vehicle_structs_[0].hw_thrust_structs_[0].command_state_.effort,
-             hw_vehicle_structs_[0].hw_thrust_structs_[1].command_state_.effort,
-             hw_vehicle_structs_[0].hw_thrust_structs_[2].command_state_.effort,
-             hw_vehicle_structs_[0].hw_thrust_structs_[3].command_state_.effort,
-             hw_vehicle_structs_[0].hw_thrust_structs_[4].command_state_.effort,
-             hw_vehicle_structs_[0].hw_thrust_structs_[5].command_state_.effort,
-             hw_vehicle_structs_[0].hw_thrust_structs_[6].command_state_.effort,
-             hw_vehicle_structs_[0].hw_thrust_structs_[7].command_state_.effort})
-            .data(),
-        8);
+    // RCLCPP_INFO(rclcpp::get_logger("VehicleSystemMultiInterfaceHardware"), "Got states: %.5f second interval, thruster recieved ::: %.5f,  %.5f, %.5f, %.5f, %.5f,  %.5f, %.5f,  %.5f ",
+    //             delta_seconds,
+    //             thruster_forces[0],
+    //             thruster_forces[1],
+    //             thruster_forces[2],
+    //             thruster_forces[3],
+    //             thruster_forces[4],
+    //             thruster_forces[5],
+    //             thruster_forces[6],
+    //             thruster_forces[7]);
 
-    torqu = blue_parameters.params.tcm_ * thruster_forces;
+    // possible bug
+    // torqu = blue_parameters.params.tcm_ * thruster_forces;
+
+    // RCLCPP_INFO(rclcpp::get_logger("VehicleSystemMultiInterfaceHardware"), "Got states: %.5f second interval, TORQUES CALCULATED ::: %.5f,  %.5f, %.5f, %.5f, %.5f,  %.5f ",
+    //             delta_seconds,
+    //             torqu[0],
+    //             torqu[1],
+    //             torqu[2],
+    //             torqu[3],
+    //             torqu[4],
+    //             torqu[5]);
 
     std::vector<double> x0 = {
         hw_vehicle_structs_[0].current_state_.position_x,
@@ -416,19 +436,25 @@ namespace ros2_control_blue_reach_5
         hw_vehicle_structs_[0].current_state_.q,
         hw_vehicle_structs_[0].current_state_.r};
 
-    std::vector<double> u0 = {torqu[0], torqu[1], torqu[2], torqu[3], torqu[4], torqu[5]};
+    std::vector<double> u0 = {hw_vehicle_structs_[0].hw_thrust_structs_[0].command_state_.effort,
+                              hw_vehicle_structs_[0].hw_thrust_structs_[1].command_state_.effort,
+                              hw_vehicle_structs_[0].hw_thrust_structs_[2].command_state_.effort,
+                              hw_vehicle_structs_[0].hw_thrust_structs_[3].command_state_.effort,
+                              hw_vehicle_structs_[0].hw_thrust_structs_[4].command_state_.effort,
+                              hw_vehicle_structs_[0].hw_thrust_structs_[5].command_state_.effort,
+                              hw_vehicle_structs_[0].hw_thrust_structs_[6].command_state_.effort,
+                              hw_vehicle_structs_[0].hw_thrust_structs_[7].command_state_.effort};
     std::vector<DM> dynamic_arg = {DM(x0), DM(u0)};
     RCLCPP_DEBUG(rclcpp::get_logger("VehicleSystemMultiInterfaceHardware"), "Got states: %.5f second interval, %.5f,  %.5f, %.5f, %.5f, %.5f,  %.5f, %.5f, %.5f ",
-                delta_seconds,
-                hw_vehicle_structs_[0].current_state_.position_x,
-                hw_vehicle_structs_[0].current_state_.position_y,
-                hw_vehicle_structs_[0].current_state_.position_z,
-                hw_vehicle_structs_[0].current_state_.orientation_w,
-                hw_vehicle_structs_[0].current_state_.orientation_x,
-                hw_vehicle_structs_[0].current_state_.orientation_y,
-                hw_vehicle_structs_[0].current_state_.orientation_z,
-                hw_vehicle_structs_[0].current_state_.u);
-
+                 delta_seconds,
+                 hw_vehicle_structs_[0].current_state_.position_x,
+                 hw_vehicle_structs_[0].current_state_.position_y,
+                 hw_vehicle_structs_[0].current_state_.position_z,
+                 hw_vehicle_structs_[0].current_state_.orientation_w,
+                 hw_vehicle_structs_[0].current_state_.orientation_x,
+                 hw_vehicle_structs_[0].current_state_.orientation_y,
+                 hw_vehicle_structs_[0].current_state_.orientation_z,
+                 hw_vehicle_structs_[0].current_state_.u);
 
     std::vector<DM> dynamic_response = dynamics_service.vehicle_dynamics(dynamic_arg);
     forward_dynamics_res = std::vector<double>(dynamic_response.at(0));
