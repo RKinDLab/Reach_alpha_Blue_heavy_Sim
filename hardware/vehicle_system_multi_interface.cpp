@@ -60,7 +60,7 @@ namespace ros2_control_blue_reach_5
     double no_vehicles = 1;
     hw_vehicle_structs_.reserve(no_vehicles);
 
-    blue::dynamics::Vehicle::State initialState{0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    blue::dynamics::Vehicle::State initialState{0.0, 0.0, 3.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
     hw_vehicle_structs_.emplace_back("blue ROV heavy 0", initialState);
 
     hw_vehicle_structs_[0].thrustSizeAllocation(info_.joints.size());
