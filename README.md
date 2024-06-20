@@ -1,9 +1,9 @@
-# Reach-Alpha-ROS2-Control
+# Reach_alpha_Blue_heavy_Simulator
 
 ## Overview
 ![alt text](./doc/uvms.png?raw=true "Reach Alpha Blue")
 
-Welcome to the Reach-Alpha-ROS2-Control project. This initiative is dedicated to providing a robust and versatile interface for ROS2 control, tailored specifically for the *reach-alpha-5* platform. Our goal is to enable seamless integration and enhanced functionality across a range of applications.
+Welcome to the Reach alpha Blue heavy_Sim project. This initiative is dedicated to providing a robust and versatile interface for ROS2 control, tailored specifically for the *reach-alpha-5* platform. Our goal is to enable seamless integration and enhanced functionality across a range of applications.
 
 ## Documentation
 
