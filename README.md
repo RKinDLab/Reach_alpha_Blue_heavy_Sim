@@ -1,4 +1,4 @@
-# Reach_alpha_Blue_heavy_Simulator
+# Reach Alpha Blue Heavy Simulator
 
 ## Overview
 ![alt text](./doc/uvms.png?raw=true "Reach Alpha Blue")
