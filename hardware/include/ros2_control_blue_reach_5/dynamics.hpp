@@ -19,6 +19,7 @@ namespace casadi_reach_alpha_5
         Function forward_kinematics; // forward kinematics of the robotic arm
         Function inverse_dynamics; // inverse dynamics of the robotic arm
         Function inertia_matrix; // inertia/mass matrix of the robotic arm
+        Function kalman_filter; // kalman filter for robotic arm sensor
         Function mhe; //moving horizon estimation
         Function vehicle_dynamics; // forward dynamics of the vehicle
 

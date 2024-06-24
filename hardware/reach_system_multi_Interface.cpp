@@ -44,6 +44,7 @@ namespace ros2_control_blue_reach_5
     dynamics_service.usage_cplusplus_checks("test", "libtest.so");
     dynamics_service.forward_dynamics = dynamics_service.load_casadi_fun("Xnext", "libXnext.so");
     dynamics_service.forward_kinematics = dynamics_service.load_casadi_fun("T_fk", "libTfk.so");
+    dynamics_service.kalman_filter = dynamics_service.load_casadi_fun("KF_PREDICT", "libKFnext.so");
     // dynamics_service.mhe = dynamics_service.load_casadi_fun("MHE", "libMHpE.so");
 
     //   std::vector<std::vector<double>> xnxt = {
