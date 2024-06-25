@@ -30,7 +30,7 @@ namespace ros2_control_blue_reach_5
     {
       return hardware_interface::CallbackReturn::ERROR;
     }
-    
+
     // std::random_device rd; // Obtain a random number from hardware
     // std::mt19937 gen(rd()); // Seed the generator
     // std::normal_distribution<> distr(0., 0.001); // Define the mean and stddev
@@ -45,44 +45,22 @@ namespace ros2_control_blue_reach_5
     dynamics_service.forward_dynamics = dynamics_service.load_casadi_fun("Xnext", "libXnext.so");
     dynamics_service.forward_kinematics = dynamics_service.load_casadi_fun("T_fk", "libTfk.so");
     dynamics_service.kalman_filter = dynamics_service.load_casadi_fun("KF_PREDICT", "libKFnext.so");
-    // dynamics_service.mhe = dynamics_service.load_casadi_fun("MHE", "libMHpE.so");
 
-    //   std::vector<std::vector<double>> xnxt = {
-    //       {0.0, 0.02126068},
-    //       {0.0, 0.20170668},
-    //       {0.0, 0.00469083},
-    //       {0.0, 0.23304388},
-    //       {0.0, 0.18975492},
-    //       {0.0, 2.02220656},
-    //       {0.0, 0.09588989},
-    //       {0.0, 2.44951664}
-    //   };
+    std::vector<double> x_est = {0.0, 0.0, 0.0};                                                         // Initial estimate of state
+    double dt = 0.1;                                                                                     // time step
+    double sigma_a = 0.5;                                                                                // acceleration process noise
+    std::vector<double> sigma_m = {0.5, 0.5};                                                            // position measurement noise
+    std::vector<double> p_0d = {5, 0, 0, 0, 5, 0, 0, 0, 10};                                             // initial covariance matrix
+    std::vector<double> z = {1, 0.5};                                                                    // example measurment (position and velocity)
+    std::vector<DM> arg = {DM(x_est), DM(z), reshape(DM(p_0d), 3, 3), DM(sigma_m), DM(sigma_a), DM(dt)}; // KF argument bundled
+    std::vector<DM> estimates_dm = dynamics_service.kalman_filter(arg);                                  // execute KF
 
-    // std::vector<double> u_ ={0.00604835, 0.150251, -0.0299043, 0.00127495};
-    // std::vector<double> goal_position = {1.2, 10.0, 1.8, 5.0};
-    // std::vector<double> goal_vel = {0.0, 0.0, 0.0, 0.0};
-    // std::vector<double> goal_acceleration = {0.0, 0.0, 0.0, 0.0};
-    // std::vector<double> p_gains = {1.0, 1.0, 0.001 ,1.5};
-    // std::vector<double> d_gains = {1.0, 1.0, 2.0 ,1.1};
-    // std::vector<double> non_ideals_forces = {0.0, 0.0, 0.0, 0.0};
-    // std::vector<double> noise =  {0.0, 0.0,  0.0,  0.0, 0.0, 0.0, 0.0, 0.0};
-
-    // std::vector<DM> mhe_arguments = {DM(xnxt), DM(u_), DM(goal_position), DM(goal_vel), DM(goal_acceleration), DM(p_gains), DM(d_gains), DM(non_ideals_forces), DM(noise)};
-    // std::vector<DM> estimates_dm = dynamics_service.mhe(mhe_arguments);
-
-    // std::vector<double> estimates = std::vector<double>(estimates_dm.at(0));
-
-    // // Convert the vector to a string for logging
-    // // std::stringstream ss;
-    // for (size_t i = 0; i < estimates.size(); ++i) {
-    //       // Now log the string representation of the vector
-    // RCLCPP_INFO(
-    //     rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), 
-    //     "Estimates: [%f]", estimates[i]);
-    // }
-
-
-
+    std::cout << "*********************************************************" << std::endl;
+    std::cout << "Kalman filter example exercise" << std::endl;
+    std::cout << "Kalman filter estimate result: " << estimates_dm.at(0) << std::endl;
+    std::cout << "Kalman filter error result: " << estimates_dm.at(1) << std::endl;
+    std::cout << "Kalman filter Pk result: " << estimates_dm.at(2) << std::endl;
+    std::cout << "*********************************************************" << std::endl;
 
     std::vector<double> x = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
     std::vector<double> u = {0.0, 0.0, 0.0, 0.001};
@@ -90,13 +68,13 @@ namespace ros2_control_blue_reach_5
     std::vector<DM> resfd = dynamics_service.forward_dynamics(argfd);
 
     std::cout << "forward dynamics example result: " << resfd.at(0) << std::endl;
-
+    std::cout << "*********************************************************" << std::endl;
     std::vector<double> q = {0.0, 0.0, 0.0, 0.001};
     std::vector<DM> argtk = {DM(q)};
     std::vector<DM> restk = dynamics_service.forward_kinematics(argtk);
 
     std::cout << "forward kinematics example result: " << restk.at(0) << std::endl;
-
+    std::cout << "*********************************************************" << std::endl;
     RCLCPP_INFO(
         rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "Successful initialization of robot kinematics & dynamics");
 
@@ -154,27 +132,40 @@ namespace ros2_control_blue_reach_5
             hardware_interface::HW_IF_VELOCITY, custom_hardware_interface::HW_IF_CURRENT, hardware_interface::HW_IF_ACCELERATION);
         return hardware_interface::CallbackReturn::ERROR;
       }
-      if (joint.state_interfaces.size() != 5)
+      if (joint.state_interfaces.size() != 9)
       {
         RCLCPP_FATAL(
             rclcpp::get_logger("ReachSystemMultiInterfaceHardware"),
-            "Joint '%s'has %zu state interfaces. 5 expected.", joint.name.c_str(),
-            joint.command_interfaces.size());
+            "Joint '%s'has %zu state interfaces. 9 expected.",
+            joint.name.c_str(),
+            joint.state_interfaces.size());
         return hardware_interface::CallbackReturn::ERROR;
       }
 
       if (!(joint.state_interfaces[0].name == hardware_interface::HW_IF_POSITION ||
-            joint.state_interfaces[0].name == hardware_interface::HW_IF_VELOCITY ||
-            joint.state_interfaces[0].name == hardware_interface::HW_IF_EFFORT ||
-            joint.state_interfaces[0].name == hardware_interface::HW_IF_ACCELERATION ||
-            joint.state_interfaces[0].name == custom_hardware_interface::HW_IF_STATE_ID ||
-            joint.state_interfaces[0].name == custom_hardware_interface::HW_IF_CURRENT))
+            joint.state_interfaces[1].name == custom_hardware_interface::HW_IF_FILTERED_POSITION ||
+            joint.state_interfaces[2].name == hardware_interface::HW_IF_VELOCITY ||
+            joint.state_interfaces[3].name == custom_hardware_interface::HW_IF_FILTERED_VELOCITY ||
+            joint.state_interfaces[4].name == hardware_interface::HW_IF_ACCELERATION ||
+            joint.state_interfaces[5].name == custom_hardware_interface::HW_IF_ESTIMATED_ACCELERATION ||
+            joint.state_interfaces[6].name == custom_hardware_interface::HW_IF_CURRENT ||
+            joint.state_interfaces[7].name == hardware_interface::HW_IF_EFFORT ||
+            joint.state_interfaces[8].name == custom_hardware_interface::HW_IF_STATE_ID))
       {
         RCLCPP_FATAL(
             rclcpp::get_logger("ReachSystemMultiInterfaceHardware"),
-            "Joint '%s' has %s state interface. Expected %s, %s, or %s.", joint.name.c_str(),
-            joint.state_interfaces[0].name.c_str(), hardware_interface::HW_IF_POSITION,
-            hardware_interface::HW_IF_VELOCITY, custom_hardware_interface::HW_IF_CURRENT);
+            "Joint '%s' has %ld state interfaces. Expected %s, %s, %s, %s, %s, %s, %s , %s or %s.",
+            joint.name.c_str(),
+            joint.state_interfaces.size(),
+            hardware_interface::HW_IF_POSITION,
+            custom_hardware_interface::HW_IF_FILTERED_POSITION,
+            hardware_interface::HW_IF_VELOCITY,
+            custom_hardware_interface::HW_IF_FILTERED_VELOCITY,
+            hardware_interface::HW_IF_ACCELERATION,
+            custom_hardware_interface::HW_IF_ESTIMATED_ACCELERATION,
+            custom_hardware_interface::HW_IF_CURRENT,
+            hardware_interface::HW_IF_EFFORT,
+            custom_hardware_interface::HW_IF_STATE_ID);
         return hardware_interface::CallbackReturn::ERROR;
       }
     }
@@ -261,7 +252,7 @@ namespace ros2_control_blue_reach_5
         {
           new_modes.push_back(mode_level_t::MODE_CURRENT);
         }
-        if (key == info_.joints[i].name + "/" + "effort")
+        if (key == info_.joints[i].name + "/" + hardware_interface::HW_IF_EFFORT)
         {
           new_modes.push_back(mode_level_t::MODE_CURRENT);
         }
@@ -320,13 +311,24 @@ namespace ros2_control_blue_reach_5
       state_interfaces.emplace_back(hardware_interface::StateInterface(
           info_.joints[i].name, hardware_interface::HW_IF_POSITION, &hw_joint_structs_[i].current_state_.position));
       state_interfaces.emplace_back(hardware_interface::StateInterface(
+          info_.joints[i].name, custom_hardware_interface::HW_IF_FILTERED_POSITION, &hw_joint_structs_[i].current_state_.filtered_position));
+
+      state_interfaces.emplace_back(hardware_interface::StateInterface(
           info_.joints[i].name, hardware_interface::HW_IF_VELOCITY, &hw_joint_structs_[i].current_state_.velocity));
+      state_interfaces.emplace_back(hardware_interface::StateInterface(
+          info_.joints[i].name, custom_hardware_interface::HW_IF_FILTERED_VELOCITY, &hw_joint_structs_[i].current_state_.filtered_velocity));
+
       state_interfaces.emplace_back(hardware_interface::StateInterface(
           info_.joints[i].name, hardware_interface::HW_IF_ACCELERATION, &hw_joint_structs_[i].current_state_.acceleration));
       state_interfaces.emplace_back(hardware_interface::StateInterface(
+          info_.joints[i].name, custom_hardware_interface::HW_IF_ESTIMATED_ACCELERATION, &hw_joint_structs_[i].current_state_.estimated_acceleration));
+
+      state_interfaces.emplace_back(hardware_interface::StateInterface(
           info_.joints[i].name, custom_hardware_interface::HW_IF_CURRENT, &hw_joint_structs_[i].current_state_.current));
+
       state_interfaces.emplace_back(hardware_interface::StateInterface(
           info_.joints[i].name, hardware_interface::HW_IF_EFFORT, &hw_joint_structs_[i].current_state_.effort));
+
       state_interfaces.emplace_back(hardware_interface::StateInterface(
           info_.joints[i].name, custom_hardware_interface::HW_IF_STATE_ID, &hw_joint_structs_[i].current_state_.state_id));
     }
@@ -400,14 +402,32 @@ namespace ros2_control_blue_reach_5
     for (std::size_t i = 0; i < info_.joints.size(); i++)
     {
       double delta_seconds = period.seconds();
-      hw_joint_structs_[i].current_state_.state_id ++;
-      double prev_velocity_ = hw_joint_structs_[i].current_state_.velocity;
-      hw_joint_structs_[i].current_state_.position = hw_joint_structs_[i].async_state_.position;
+      hw_joint_structs_[i].current_state_.state_id++;
+      double prev_velocity_ = hw_joint_structs_[i].current_state_.filtered_velocity;
+      hw_joint_structs_[i].current_state_.position = hw_joint_structs_[i].async_state_.position;                   
+
       hw_joint_structs_[i].current_state_.velocity = hw_joint_structs_[i].async_state_.velocity;
       hw_joint_structs_[i].current_state_.current = hw_joint_structs_[i].async_state_.current;
-      hw_joint_structs_[i].current_state_.effort = motor_control.currentToTorque(i, hw_joint_structs_[i].current_state_.current); // hw_joint_structs_[i].async_state_.current;
-      hw_joint_structs_[i].calcAcceleration(prev_velocity_, delta_seconds);
+      hw_joint_structs_[i].current_state_.effort = motor_control.currentToTorque(i, hw_joint_structs_[i].current_state_.current);
 
+      std::vector<double> x_est = {hw_joint_structs_[i].current_state_.filtered_position,
+                                   hw_joint_structs_[i].current_state_.filtered_velocity,
+                                   hw_joint_structs_[i].current_state_.estimated_acceleration};  
+      double dt = delta_seconds; 
+      double sigma_a = hw_joint_structs_[i].current_state_.sigma_a;        
+      std::vector<double> sigma_m = hw_joint_structs_[i].current_state_.sigma_m;   
+      std::vector<double> p_k = hw_joint_structs_[i].current_state_.covariance;          
+      std::vector<double> yk = {hw_joint_structs_[i].current_state_.position, hw_joint_structs_[i].current_state_.velocity};
+      std::vector<DM> arg = {DM(x_est), DM(yk), reshape(DM(p_k), 3, 3), DM(sigma_m), DM(sigma_a), DM(dt)};
+      
+      std::vector<DM> estimates_dm = dynamics_service.kalman_filter(arg);
+
+      hw_joint_structs_[i].current_state_.filtered_position = estimates_dm.at(0).nonzeros()[0];
+      hw_joint_structs_[i].current_state_.filtered_velocity = estimates_dm.at(0).nonzeros()[1];
+      hw_joint_structs_[i].current_state_.estimated_acceleration = estimates_dm.at(0).nonzeros()[2];
+      hw_joint_structs_[i].current_state_.KF_error = estimates_dm.at(1).nonzeros();
+      hw_joint_structs_[i].current_state_.covariance = estimates_dm.at(2).nonzeros(); 
+      hw_joint_structs_[i].calcAcceleration(hw_joint_structs_[i].current_state_.filtered_velocity, prev_velocity_, delta_seconds);
       //  RCLCPP_INFO(rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), " %d acceleration %f",hw_joint_structs_[i].device_id,
       //   hw_joint_structs_[i].acceleration_state_);
     }

@@ -76,9 +76,9 @@ double Joint::enforce_hard_limits(const double &current_effort)
 };
 
 
-void Joint::calcAcceleration(const double &prev_velocity_, const double &period_seconds)
+void Joint::calcAcceleration(const double &cur_velocity, const double &prev_velocity_, const double &period_seconds)
 {
-    current_state_.acceleration = (current_state_.velocity - prev_velocity_) / period_seconds;
+    current_state_.acceleration = (cur_velocity - prev_velocity_) / period_seconds;
 }
 
 

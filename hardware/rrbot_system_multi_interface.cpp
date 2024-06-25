@@ -88,27 +88,38 @@ namespace ros2_control_blue_reach_5
         return hardware_interface::CallbackReturn::ERROR;
       }
 
-      if (joint.state_interfaces.size() != 5)
+      if (joint.state_interfaces.size() != 9)
       {
         RCLCPP_FATAL(
             rclcpp::get_logger("RRBotSystemMultiInterfaceHardware"),
-            "Joint '%s'has %zu state interfaces. 3 expected.", joint.name.c_str(),
-            joint.command_interfaces.size());
+            "Joint '%s'has %zu state interfaces. 9 expected.", joint.name.c_str(),
+            joint.state_interfaces.size());
         return hardware_interface::CallbackReturn::ERROR;
       }
-
       if (!(joint.state_interfaces[0].name == hardware_interface::HW_IF_POSITION ||
-            joint.state_interfaces[0].name == hardware_interface::HW_IF_VELOCITY ||
-            joint.state_interfaces[0].name == hardware_interface::HW_IF_EFFORT ||
-            joint.state_interfaces[0].name == hardware_interface::HW_IF_ACCELERATION ||
-            joint.state_interfaces[0].name == custom_hardware_interface::HW_IF_STATE_ID ||
-            joint.state_interfaces[0].name == custom_hardware_interface::HW_IF_CURRENT))
+            joint.state_interfaces[1].name == custom_hardware_interface::HW_IF_FILTERED_POSITION ||
+            joint.state_interfaces[2].name == hardware_interface::HW_IF_VELOCITY ||
+            joint.state_interfaces[3].name == custom_hardware_interface::HW_IF_FILTERED_VELOCITY ||
+            joint.state_interfaces[4].name == hardware_interface::HW_IF_ACCELERATION ||
+            joint.state_interfaces[5].name == custom_hardware_interface::HW_IF_ESTIMATED_ACCELERATION ||
+            joint.state_interfaces[6].name == custom_hardware_interface::HW_IF_CURRENT ||
+            joint.state_interfaces[7].name == hardware_interface::HW_IF_EFFORT ||
+            joint.state_interfaces[8].name == custom_hardware_interface::HW_IF_STATE_ID))
       {
         RCLCPP_FATAL(
-            rclcpp::get_logger("RRBotSystemMultiInterfaceHardware"),
-            "Joint '%s' has %s state interface. Expected %s, %s, or %s.", joint.name.c_str(),
-            joint.state_interfaces[0].name.c_str(), hardware_interface::HW_IF_POSITION,
-            hardware_interface::HW_IF_VELOCITY, custom_hardware_interface::HW_IF_CURRENT);
+            rclcpp::get_logger("ReachSystemMultiInterfaceHardware"),
+            "Joint '%s' has %ld state interfaces. Expected %s, %s, %s, %s, %s, %s, %s , %s or %s.",
+            joint.name.c_str(),
+            joint.state_interfaces.size(),
+            hardware_interface::HW_IF_POSITION,
+            custom_hardware_interface::HW_IF_FILTERED_POSITION,
+            hardware_interface::HW_IF_VELOCITY,
+            custom_hardware_interface::HW_IF_FILTERED_VELOCITY,
+            hardware_interface::HW_IF_ACCELERATION,
+            custom_hardware_interface::HW_IF_ESTIMATED_ACCELERATION,
+            custom_hardware_interface::HW_IF_CURRENT,
+            hardware_interface::HW_IF_EFFORT,
+            custom_hardware_interface::HW_IF_STATE_ID);
         return hardware_interface::CallbackReturn::ERROR;
       }
     }
@@ -177,20 +188,30 @@ namespace ros2_control_blue_reach_5
     std::vector<hardware_interface::StateInterface> state_interfaces;
     for (std::size_t i = 0; i < info_.joints.size(); i++)
     {
-    state_interfaces.emplace_back(hardware_interface::StateInterface(
+      state_interfaces.emplace_back(hardware_interface::StateInterface(
           info_.joints[i].name, hardware_interface::HW_IF_POSITION, &hw_joint_structs_[i].current_state_.position));
+      state_interfaces.emplace_back(hardware_interface::StateInterface(
+          info_.joints[i].name, custom_hardware_interface::HW_IF_FILTERED_POSITION, &hw_joint_structs_[i].current_state_.filtered_position));
+
       state_interfaces.emplace_back(hardware_interface::StateInterface(
           info_.joints[i].name, hardware_interface::HW_IF_VELOCITY, &hw_joint_structs_[i].current_state_.velocity));
       state_interfaces.emplace_back(hardware_interface::StateInterface(
+          info_.joints[i].name, custom_hardware_interface::HW_IF_FILTERED_VELOCITY, &hw_joint_structs_[i].current_state_.filtered_velocity));
+
+      state_interfaces.emplace_back(hardware_interface::StateInterface(
           info_.joints[i].name, hardware_interface::HW_IF_ACCELERATION, &hw_joint_structs_[i].current_state_.acceleration));
       state_interfaces.emplace_back(hardware_interface::StateInterface(
+          info_.joints[i].name, custom_hardware_interface::HW_IF_ESTIMATED_ACCELERATION, &hw_joint_structs_[i].current_state_.estimated_acceleration));
+
+      state_interfaces.emplace_back(hardware_interface::StateInterface(
           info_.joints[i].name, custom_hardware_interface::HW_IF_CURRENT, &hw_joint_structs_[i].current_state_.current));
+
       state_interfaces.emplace_back(hardware_interface::StateInterface(
           info_.joints[i].name, hardware_interface::HW_IF_EFFORT, &hw_joint_structs_[i].current_state_.effort));
+          
       state_interfaces.emplace_back(hardware_interface::StateInterface(
           info_.joints[i].name, custom_hardware_interface::HW_IF_STATE_ID, &hw_joint_structs_[i].current_state_.state_id));
     }
-
     return state_interfaces;
   }
 
@@ -393,27 +414,27 @@ namespace ros2_control_blue_reach_5
         prev_velocity0_ = 0;
         hw_joint_structs_[0].current_state_.velocity = 0;
         hw_joint_structs_[0].current_state_.position += (hw_joint_structs_[i].current_state_.velocity * period.seconds()) / cfg_.hw_slowdown_;
-        hw_joint_structs_[0].calcAcceleration(prev_velocity0_, delta_seconds);
+        // hw_joint_structs_[0].calcAcceleration(prev_velocity0_, delta_seconds);
 
         prev_velocity1_ = hw_joint_structs_[1].current_state_.velocity;
         hw_joint_structs_[1].current_state_.position = forward_dynamics_res[3];
         hw_joint_structs_[1].current_state_.velocity = forward_dynamics_res[7];
-        hw_joint_structs_[1].calcAcceleration(prev_velocity1_, delta_seconds);
+        // hw_joint_structs_[1].calcAcceleration(prev_velocity1_, delta_seconds);
 
         prev_velocity2_ = hw_joint_structs_[2].current_state_.velocity;
         hw_joint_structs_[2].current_state_.position = forward_dynamics_res[2];
         hw_joint_structs_[2].current_state_.velocity = forward_dynamics_res[6];
-        hw_joint_structs_[2].calcAcceleration(prev_velocity2_, delta_seconds);
+        // hw_joint_structs_[2].calcAcceleration(prev_velocity2_, delta_seconds);
 
         prev_velocity3_ = hw_joint_structs_[3].current_state_.velocity;
         hw_joint_structs_[3].current_state_.position = forward_dynamics_res[1];
         hw_joint_structs_[3].current_state_.velocity = forward_dynamics_res[5];
-        hw_joint_structs_[3].calcAcceleration(prev_velocity3_, delta_seconds);
+        // hw_joint_structs_[3].calcAcceleration(prev_velocity3_, delta_seconds);
 
         prev_velocity4_ = hw_joint_structs_[4].current_state_.velocity;
         hw_joint_structs_[4].current_state_.position = forward_dynamics_res[0];
         hw_joint_structs_[4].current_state_.velocity = forward_dynamics_res[4];
-        hw_joint_structs_[4].calcAcceleration(prev_velocity4_, delta_seconds);
+        // hw_joint_structs_[4].calcAcceleration(prev_velocity4_, delta_seconds);
         // std::cout << "forward dynamics example result: " << res_vec << std::endl;
 
         break;
@@ -446,6 +467,7 @@ namespace ros2_control_blue_reach_5
         hw_joint_structs_[3].current_state_.position,
         hw_joint_structs_[2].current_state_.position,
         hw_joint_structs_[1].current_state_.position,
+        
         hw_joint_structs_[4].current_state_.velocity,
         hw_joint_structs_[3].current_state_.velocity,
         hw_joint_structs_[2].current_state_.velocity,

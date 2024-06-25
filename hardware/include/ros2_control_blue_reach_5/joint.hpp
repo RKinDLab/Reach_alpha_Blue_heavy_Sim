@@ -4,6 +4,7 @@
 #include <string>
 #include <algorithm>
 #include <cmath> 
+#include <vector>
 
 class Joint
 {
@@ -19,11 +20,18 @@ public:
     struct State
     {
         double position = 0;
+        double filtered_position = 0;
         double velocity = 0;
-        double current = 0;
+        double filtered_velocity = 0;
+        double estimated_acceleration = 0;
         double acceleration = 0;
+        double current = 0;
         double effort = 0;
         double state_id = 0;
+        std::vector<double> covariance = {0.005, 0, 0, 0, 0.005, 0, 0, 0, 0.5};
+        std::vector<double> sigma_m = {0.0005, 0.0005};  
+        double sigma_a = 0.0005;
+        std::vector<double> KF_error = {0.0, 0.0};  
     };
 
     State default_state_{}, command_state_{}, current_state_{}, async_state_{};
@@ -67,7 +75,7 @@ public:
           has_position_limits(position_limits),
           soft_limits_(soft_limits) {}
 
-    void calcAcceleration(const double &prev_velocity_, const double &period_seconds);
+    void calcAcceleration(const double &cur_velocity, const double &prev_velocity_, const double &period_seconds);
 
     /**
      * @brief Enforce position, velocity, and effort limits for a joint that is not subject to soft limits.

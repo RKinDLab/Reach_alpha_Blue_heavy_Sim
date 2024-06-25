@@ -176,6 +176,11 @@ def generate_launch_description():
     #         executable='namor_node'
     #     )
 
+    mouse_control = Node(
+            package='namor',
+            executable='mouse_node'
+        )
+
     # Delay rviz start after `joint_state_broadcaster`
     delay_rviz_after_joint_state_broadcaster_spawner = RegisterEventHandler(
         event_handler=OnProcessExit(
@@ -193,6 +198,7 @@ def generate_launch_description():
     )
 
     nodes = [
+        mouse_control,
         control_node,
         robot_state_pub_node,
         joint_state_broadcaster_spawner,
