@@ -62,15 +62,6 @@ double Joint::enforce_hard_limits(const double &current_effort)
             max_eff = 0.0;
         }
     }
-    // if (current_state_.velocity < -limits_.velocity_max)
-    // {
-    //     min_eff = 0.0;
-    // }
-    // else if (current_state_.velocity > limits_.velocity_max)
-    // {
-    //     max_eff = 0.0;
-    // }
-
     double clamped = std::clamp(current_effort, min_eff, max_eff);
     return clamped;
 };

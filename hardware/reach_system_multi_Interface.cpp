@@ -478,22 +478,21 @@ namespace ros2_control_blue_reach_5
           // Get the target device
           const auto target_device = static_cast<alpha::driver::DeviceId>(hw_joint_structs_[i].device_id);
 
-          // enforce soft limit;
-          // const double target_current = hw_joint_structs_[i].enforce_soft_limits();
 
           // enforce hard limit;
-          const double enforced_target_current = hw_joint_structs_[i].enforce_hard_limits(hw_joint_structs_[i].command_state_.current);
-          if (enforced_target_current == 0)
+          // const double enforced_target_current = hw_joint_structs_[i].enforce_hard_limits(hw_joint_structs_[i].command_state_.current);
+
+          if (static_cast<int>(target_device) == 3)
           {
+            RCLCPP_INFO(rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "currents sent :::%f ", hw_joint_structs_[i].command_state_.current);
+            // RCLCPP_INFO(rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "state position :::%f ",hw_joint_structs_[i].async_state_.position);
+          }
+
+          driver_.setCurrent(hw_joint_structs_[i].command_state_.current, target_device);
+          if (hw_joint_structs_[i].command_state_.current == 0.0) 
+          {
+            driver_.setVelocity(0.0, target_device); // incase of currents leak
           };
-
-          // if (static_cast<int>(target_device) == 5)
-          // {
-          //   RCLCPP_INFO(rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "currents sent :::%f, %f ",enforced_target_current, hw_joint_structs_[i].command_state_.current);
-          //   RCLCPP_INFO(rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "state position :::%f ",hw_joint_structs_[i].async_state_.position);
-          // }
-
-          driver_.setCurrent(enforced_target_current, target_device);
         }
         break;
       case mode_level_t::MODE_FREE_EXCITE:
