@@ -37,7 +37,6 @@ add_library(
   hardware/packet.cpp
   hardware/serial_client.cpp
   hardware/vehicle_system_multi_interface.cpp
-  hardware/motor_control.cpp
   hardware/vehicle.cpp
   hardware/vehicle_parameters.cpp
 )

@@ -166,20 +166,20 @@ def generate_launch_description():
     )
 
     run_plotjuggler = ExecuteProcess(
-        cmd=['ros2', 'run', 'plotjuggler', 'plotjuggler'],
+        cmd=['ros2', 'run', 'plotjuggler', 'plotjuggler > /dev/null 2>&1'],
         output='screen',
         shell=True
     )
-
-    # namor_entity = Node(
-    #         package='namor',
-    #         executable='namor_node'
-    #     )
+    
+    namor_entity = Node(
+            package='namor',
+            executable='namor_node'
+        )
 
     mouse_control = Node(
-            package='namor',
-            executable='mouse_node'
-        )
+        package='namor',
+        executable='mouse_node'
+    )
 
     # Delay rviz start after `joint_state_broadcaster`
     delay_rviz_after_joint_state_broadcaster_spawner = RegisterEventHandler(
@@ -204,7 +204,8 @@ def generate_launch_description():
         joint_state_broadcaster_spawner,
         delay_rviz_after_joint_state_broadcaster_spawner,
         delay_robot_controller_spawner_after_joint_state_broadcaster_spawner,
-        run_plotjuggler
+        run_plotjuggler,
+        namor_entity
     ]
 
     return LaunchDescription(declared_arguments + nodes)

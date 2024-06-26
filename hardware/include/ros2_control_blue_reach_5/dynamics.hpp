@@ -22,6 +22,8 @@ namespace casadi_reach_alpha_5
         Function kalman_filter; // kalman filter for robotic arm sensor
         Function mhe; //moving horizon estimation
         Function vehicle_dynamics; // forward dynamics of the vehicle
+        Function torque2currentMap; // forward motor dynamics
+        Function current2torqueMap; // inverse motor dynamics
 
         Dynamics() = default;
         // Constructor with member initializer list

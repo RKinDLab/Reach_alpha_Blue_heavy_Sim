@@ -3,7 +3,7 @@
 
 #include <string>
 #include <algorithm>
-#include <cmath> 
+#include <cmath>
 #include <vector>
 
 class Joint
@@ -29,9 +29,9 @@ public:
         double effort = 0;
         double state_id = 0;
         std::vector<double> covariance = {0.005, 0, 0, 0, 0.005, 0, 0, 0, 0.5};
-        std::vector<double> sigma_m = {0.0005, 0.0005};  
+        std::vector<double> sigma_m = {0.0005, 0.0005};
         double sigma_a = 0.0005;
-        std::vector<double> KF_error = {0.0, 0.0};  
+        std::vector<double> KF_error = {0.0, 0.0};
     };
 
     State default_state_{}, command_state_{}, current_state_{}, async_state_{};
@@ -59,21 +59,31 @@ public:
 
     SoftLimits soft_limits_{};
 
+    struct MotorInfo
+    {
+        double kt = 0;
+        double I_static = 0;
+    };
+
+    MotorInfo actuator_Properties_{};
+
     Joint() = default;
     // Constructor with member initializer list
     Joint(std::string joint_name, uint8_t joint_id, State default_state)
         : name(std::move(joint_name)),
           device_id(joint_id),
-          default_state_(default_state){}
+          default_state_(default_state) {}
 
     // Constructor with member initializer list
-    Joint(std::string joint_name, uint8_t joint_id, State default_state, Limits limits, bool position_limits, SoftLimits soft_limits)
+    Joint(std::string joint_name, uint8_t joint_id, State default_state, Limits limits, bool position_limits,
+          SoftLimits soft_limits, MotorInfo actuator_Properties)
         : name(std::move(joint_name)),
           device_id(joint_id),
           default_state_(default_state),
           limits_(limits),
           has_position_limits(position_limits),
-          soft_limits_(soft_limits) {}
+          soft_limits_(soft_limits),
+          actuator_Properties_(actuator_Properties) {}
 
     void calcAcceleration(const double &cur_velocity, const double &prev_velocity_, const double &period_seconds);
 

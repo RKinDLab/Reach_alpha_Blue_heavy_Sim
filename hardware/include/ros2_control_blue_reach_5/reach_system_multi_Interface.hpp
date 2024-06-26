@@ -41,7 +41,6 @@
 #include "ros2_control_blue_reach_5/packet.hpp"
 #include "ros2_control_blue_reach_5/joint.hpp"
 #include "ros2_control_blue_reach_5/dynamics.hpp"
-#include "ros2_control_blue_reach_5/motor_control.hpp"
 #include "ros2_control_blue_reach_5/custom_hardware_interface_type_values.hpp"
 
 #include <casadi/casadi.hpp>
@@ -120,8 +119,6 @@ namespace ros2_control_blue_reach_5
       MODE_CURRENT,
       MODE_FREE_EXCITE
     };
-    
-    MotorControl motor_control;
 
     // Active control mode for each actuator
     std::vector<mode_level_t> control_modes_;

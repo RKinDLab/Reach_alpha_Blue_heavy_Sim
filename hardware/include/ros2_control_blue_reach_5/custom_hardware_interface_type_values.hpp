@@ -23,8 +23,6 @@ constexpr char HW_IF_CURRENT[] = "current";
 constexpr char HW_IF_DISABLE[] = "disable";
 /// Constant defining standby interface
 constexpr char HW_IF_STANDBY[] = "standby";
-/// Constant defining excite interface
-constexpr char HW_IF_FREE_EXCITE[] = "excite";
 /// Constant defining state counts for synchronizations purposes
 constexpr char HW_IF_STATE_ID[] = "stateId";
 /// Constant defining position without noise interface

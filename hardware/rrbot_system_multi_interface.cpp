@@ -208,7 +208,7 @@ namespace ros2_control_blue_reach_5
 
       state_interfaces.emplace_back(hardware_interface::StateInterface(
           info_.joints[i].name, hardware_interface::HW_IF_EFFORT, &hw_joint_structs_[i].current_state_.effort));
-          
+
       state_interfaces.emplace_back(hardware_interface::StateInterface(
           info_.joints[i].name, custom_hardware_interface::HW_IF_STATE_ID, &hw_joint_structs_[i].current_state_.state_id));
     }
@@ -359,7 +359,6 @@ namespace ros2_control_blue_reach_5
   hardware_interface::CallbackReturn RRBotSystemMultiInterfaceHardware::on_deactivate(
       const rclcpp_lifecycle::State & /*previous_state*/)
   {
-    // BEGIN: This part here is for exemplary purposes - Please do not copy to your production code
     RCLCPP_INFO(
         rclcpp::get_logger("RRBotSystemMultiInterfaceHardware"), "Deactivating... please wait...");
 
@@ -372,89 +371,27 @@ namespace ros2_control_blue_reach_5
     }
 
     RCLCPP_INFO(rclcpp::get_logger("RRBotSystemMultiInterfaceHardware"), "Successfully deactivated!");
-    // END: This part here is for exemplary purposes - Please do not copy to your production code
 
     return hardware_interface::CallbackReturn::SUCCESS;
   }
 
   hardware_interface::return_type RRBotSystemMultiInterfaceHardware::read(
-      const rclcpp::Time & /*time*/, const rclcpp::Duration &period)
+      const rclcpp::Time & /*time*/, const rclcpp::Duration & /*period*/)
   {
-    double delta_seconds = period.seconds();
+    // double delta_seconds = period.seconds();
     for (std::size_t i = 0; i < info_.joints.size(); i++)
     {
-      double prev_velocity0_;
-      double prev_velocity1_;
-      double prev_velocity2_;
-      double prev_velocity3_;
-      double prev_velocity4_;
-      switch (control_level_[i])
-      {
-      case mode_level_t::MODE_DISABLE:
-        // RCLCPP_INFO(
-        //   rclcpp::get_logger("RRBotSystemMultiInterfaceHardware"),
-        //   "Nothing is using the hardware interface!");
-        return hardware_interface::return_type::OK;
-        break;
-      case mode_level_t::MODE_POSITION:
-        hw_joint_structs_[i].current_state_.acceleration = 0;
-        hw_joint_structs_[i].current_state_.current = 0;
-        hw_joint_structs_[i].current_state_.velocity = 0;
-        hw_joint_structs_[i].current_state_.position +=
-            (hw_joint_structs_[i].command_state_.position - hw_joint_structs_[i].current_state_.position) / cfg_.hw_slowdown_;
-        break;
-      case mode_level_t::MODE_VELOCITY:
-        hw_joint_structs_[i].current_state_.acceleration = 0;
-        hw_joint_structs_[i].current_state_.current = 0;
-        hw_joint_structs_[i].current_state_.velocity = hw_joint_structs_[i].command_state_.velocity;
-        hw_joint_structs_[i].current_state_.position += (hw_joint_structs_[i].current_state_.velocity * period.seconds()) / cfg_.hw_slowdown_;
-        break;
-      case mode_level_t::MODE_CURRENT:
+      hw_joint_structs_[1].current_state_.position = forward_dynamics_res[3];
+      hw_joint_structs_[1].current_state_.velocity = forward_dynamics_res[7];
 
-        prev_velocity0_ = 0;
-        hw_joint_structs_[0].current_state_.velocity = 0;
-        hw_joint_structs_[0].current_state_.position += (hw_joint_structs_[i].current_state_.velocity * period.seconds()) / cfg_.hw_slowdown_;
-        // hw_joint_structs_[0].calcAcceleration(prev_velocity0_, delta_seconds);
+      hw_joint_structs_[2].current_state_.position = forward_dynamics_res[2];
+      hw_joint_structs_[2].current_state_.velocity = forward_dynamics_res[6];
 
-        prev_velocity1_ = hw_joint_structs_[1].current_state_.velocity;
-        hw_joint_structs_[1].current_state_.position = forward_dynamics_res[3];
-        hw_joint_structs_[1].current_state_.velocity = forward_dynamics_res[7];
-        // hw_joint_structs_[1].calcAcceleration(prev_velocity1_, delta_seconds);
+      hw_joint_structs_[3].current_state_.position = forward_dynamics_res[1];
+      hw_joint_structs_[3].current_state_.velocity = forward_dynamics_res[5];
 
-        prev_velocity2_ = hw_joint_structs_[2].current_state_.velocity;
-        hw_joint_structs_[2].current_state_.position = forward_dynamics_res[2];
-        hw_joint_structs_[2].current_state_.velocity = forward_dynamics_res[6];
-        // hw_joint_structs_[2].calcAcceleration(prev_velocity2_, delta_seconds);
-
-        prev_velocity3_ = hw_joint_structs_[3].current_state_.velocity;
-        hw_joint_structs_[3].current_state_.position = forward_dynamics_res[1];
-        hw_joint_structs_[3].current_state_.velocity = forward_dynamics_res[5];
-        // hw_joint_structs_[3].calcAcceleration(prev_velocity3_, delta_seconds);
-
-        prev_velocity4_ = hw_joint_structs_[4].current_state_.velocity;
-        hw_joint_structs_[4].current_state_.position = forward_dynamics_res[0];
-        hw_joint_structs_[4].current_state_.velocity = forward_dynamics_res[4];
-        // hw_joint_structs_[4].calcAcceleration(prev_velocity4_, delta_seconds);
-        // std::cout << "forward dynamics example result: " << res_vec << std::endl;
-
-        break;
-
-      case mode_level_t::MODE_STANDBY:
-        hw_joint_structs_[i].current_state_.current = hw_joint_structs_[i].command_state_.current;
-        hw_joint_structs_[i].current_state_.acceleration = hw_joint_structs_[i].command_state_.current / 2; // dummy
-        hw_joint_structs_[i].current_state_.velocity += (hw_joint_structs_[i].current_state_.acceleration * period.seconds()) / cfg_.hw_slowdown_;
-        hw_joint_structs_[i].current_state_.position += (hw_joint_structs_[i].current_state_.velocity * period.seconds()) / cfg_.hw_slowdown_;
-        break;
-      }
-      // BEGIN: This part here is for exemplary purposes - Please do not copy to your production code
-      // RCLCPP_INFO(
-      //   rclcpp::get_logger("RRBotSystemMultiInterfaceHardware"),
-      //   "Got pos: %.5f, vel: %.5f, acc: %.5f, cur: %.5f for joint %s!",
-      //   hw_joint_structs_[i].position_state_,
-      //   hw_joint_structs_[i].velocity_state_,
-      //   hw_joint_structs_[i].acceleration_state_,
-      //   hw_joint_structs_[i].current_state_, info_.joints[i].name.c_str());
-      // END: This part here is for exemplary purposes - Please do not copy to your production code
+      hw_joint_structs_[4].current_state_.position = forward_dynamics_res[0];
+      hw_joint_structs_[4].current_state_.velocity = forward_dynamics_res[4];
     }
     return hardware_interface::return_type::OK;
   }
@@ -467,7 +404,7 @@ namespace ros2_control_blue_reach_5
         hw_joint_structs_[3].current_state_.position,
         hw_joint_structs_[2].current_state_.position,
         hw_joint_structs_[1].current_state_.position,
-        
+
         hw_joint_structs_[4].current_state_.velocity,
         hw_joint_structs_[3].current_state_.velocity,
         hw_joint_structs_[2].current_state_.velocity,

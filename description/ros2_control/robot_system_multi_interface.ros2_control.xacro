@@ -37,6 +37,8 @@
         <param name="soft_k_velocity">10</param>
         <param name="soft_min_position">0.0004</param>
         <param name="soft_max_position">0.0137</param>
+        <param name="kt">50</param>  <!-- static friction current -->
+        <param name="I_static">43</param> <!-- static friction torque -->
         <!-- limit constraints -->
 
         <command_interface name="position">
@@ -76,6 +78,8 @@
         <param name="soft_k_velocity">15</param>
         <param name="soft_min_position">0.01</param>
         <param name="soft_max_position">5.70</param>
+        <param name="kt">50</param>  <!-- static friction current -->
+        <param name="I_static">43</param> <!-- static friction torque -->
         <!-- limit constraints -->
 
         <command_interface name="position">
@@ -115,6 +119,8 @@
         <param name="soft_k_velocity">10</param>
         <param name="soft_min_position">0.01</param>
         <param name="soft_max_position">3.400</param>
+        <param name="kt">90.6</param>  <!-- static friction current -->
+        <param name="I_static">43</param> <!-- static friction torque -->
         <!-- limit constraints -->
 
         <command_interface name="position">
@@ -154,6 +160,8 @@
         <param name="soft_k_velocity">10</param>
         <param name="soft_min_position">0.01</param>
         <param name="soft_max_position">3.400</param>
+        <param name="kt">90.6</param>  <!-- static friction current -->
+        <param name="I_static">43</param> <!-- static friction torque -->
         <!-- limit constraints -->
 
         <command_interface name="position">
@@ -193,6 +201,8 @@
         <param name="soft_k_velocity">10</param>
         <param name="soft_min_position">1.0</param>
         <param name="soft_max_position">5.5</param>
+        <param name="kt">90.6</param>  <!-- static friction current -->
+        <param name="I_static">43</param> <!-- static friction torque -->
         <!-- limit constraints -->
 
         <command_interface name="position">

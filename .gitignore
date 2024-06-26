@@ -41,3 +41,5 @@ libMHpE.so
 !libXnext.so
 !libVnext.so
 !libKFnext.so
+!libC2T.so
+!libT2C.so
