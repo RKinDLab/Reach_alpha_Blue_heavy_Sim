@@ -1,27 +1,23 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <root>
- <tabbed_widget parent="main_window" name="Main Window">
-  <Tab tab_name="tab1" containers="1">
+ <tabbed_widget name="Main Window" parent="main_window">
+  <Tab containers="1" tab_name="tab1">
    <Container>
-    <DockSplitter sizes="0.500566;0.499434" count="2" orientation="-">
+    <DockSplitter count="2" orientation="-" sizes="0.501699;0.498301">
      <DockArea name="...">
-      <plot flip_x="false" mode="TimeSeries" flip_y="false" style="Lines">
-       <range left="1719416100.464637" right="1719416105.455684" top="0.036458" bottom="-0.027198"/>
+      <plot flip_x="false" flip_y="false" style="Lines" mode="TimeSeries">
+       <range left="1719461712.500875" right="1719461717.619577" top="0.183537" bottom="-0.005363"/>
        <limitY/>
-       <curve name="/dynamic_joint_states/interface_values[13]/values[0]" color="#1f77b4"/>
-       <curve name="/dynamic_joint_states/interface_values[13]/values[7]" color="#d62728"/>
-       <curve name="/dynamic_joint_states/interface_values[13]/values[1]" color="#1ac938"/>
-       <curve name="/dynamic_joint_states/interface_values[13]/values[2]" color="#ff7f0e"/>
-       <curve name="/dynamic_joint_states/interface_values[13]/values[3]" color="#1f77b4"/>
-       <curve name="/dynamic_joint_states/interface_values[13]/values[4]" color="#d62728"/>
+       <curve name="/params_topic/data[5]" color="#d62728"/>
+       <curve name="/params_topic/data[0]" color="#1f77b4"/>
       </plot>
      </DockArea>
      <DockArea name="...">
-      <plot flip_x="false" mode="TimeSeries" flip_y="false" style="Lines">
-       <range left="1719416100.464637" right="1719416105.455684" top="0.100000" bottom="-0.100000"/>
-       <limitY/>
-       <curve name="/dynamic_joint_states/interface_values[13]/values[5]" color="#1ac938"/>
-       <curve name="/dynamic_joint_states/interface_values[13]/values[6]" color="#1f77b4"/>
+      <plot flip_x="false" flip_y="false" style="Lines" mode="TimeSeries">
+       <range left="1719461712.500875" right="1719461717.619577" top="1.500000" bottom="-1.500000"/>
+       <limitY max="1.5" min="-1.5"/>
+       <curve name="/dynamic_joint_states/interface_values[13]/values[6]" color="#ffeceb"/>
+       <curve name="/Model_torque_joint_b/data" color="#b4271f"/>
       </plot>
      </DockArea>
     </DockSplitter>
@@ -34,7 +30,7 @@
  <!-- - - - - - - - - - - - - - - -->
  <Plugins>
   <plugin ID="DataLoad CSV">
-   <parameters time_axis="" delimiter="0"/>
+   <parameters delimiter="0" time_axis=""/>
   </plugin>
   <plugin ID="DataLoad MCAP"/>
   <plugin ID="DataLoad ROS2 bags">
@@ -52,7 +48,7 @@
    <max_array_size value="100"/>
    <boolean_strings_to_number value="true"/>
    <remove_suffix_from_strings value="true"/>
-   <selected_topics value="/dynamic_joint_states"/>
+   <selected_topics value="/Model_torque_joint_b;/dynamic_joint_states;/params_topic"/>
   </plugin>
   <plugin ID="UDP Server"/>
   <plugin ID="WebSocket Server"/>
