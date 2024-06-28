@@ -115,7 +115,6 @@ def generate_launch_description():
             slowdown,
         ]
     )
-    robot_description = {"robot_description": robot_description_content}
 
     robot_controllers = PathJoinSubstitution(
         [
@@ -128,14 +127,7 @@ def generate_launch_description():
         [FindPackageShare("ros2_control_blue_reach_5"), "rviz", "rviz.rviz"]
     )
 
-    control_node = Node(
-        package="controller_manager",
-        executable="ros2_control_node",
-        parameters=[robot_description, robot_controllers],
-        # parameters=[{"robot_description": ""}, robot_controllers],
-        # remappings=[("~/robot_description", "/robot_description")],
-        output="both",
-    )
+    robot_description = {"robot_description": robot_description_content}
     robot_state_pub_node = Node(
         package="robot_state_publisher",
         executable="robot_state_publisher",
@@ -151,10 +143,25 @@ def generate_launch_description():
         condition=IfCondition(gui),
     )
 
+    control_node = Node(
+        package="controller_manager",
+        executable="ros2_control_node",
+        parameters=[robot_controllers, robot_description],
+        # remappings=[("~/robot_description", "/robot_description")],
+        output="both",
+    )
+    
     joint_state_broadcaster_spawner = Node(
         package="controller_manager",
         executable="spawner",
         arguments=["joint_state_broadcaster",
+                   "--controller-manager", "/controller_manager"],
+    )
+
+    transform_broadcaster_spawner = Node(
+        package="controller_manager",
+        executable="spawner",
+        arguments=["tf2_broadcaster",
                    "--controller-manager", "/controller_manager"],
     )
 
@@ -201,6 +208,7 @@ def generate_launch_description():
         # mouse_control,
         control_node,
         robot_state_pub_node,
+        # transform_broadcaster_spawner,
         joint_state_broadcaster_spawner,
         delay_rviz_after_joint_state_broadcaster_spawner,
         delay_robot_controller_spawner_after_joint_state_broadcaster_spawner,

@@ -355,7 +355,6 @@ namespace ros2_control_blue_reach_5
   hardware_interface::CallbackReturn ReachSystemMultiInterfaceHardware::on_activate(
       const rclcpp_lifecycle::State & /*previous_state*/)
   {
-    // BEGIN: This part here is for exemplary purposes - Please do not copy to your production code
     RCLCPP_INFO(
         rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "Activating... please wait...");
     try

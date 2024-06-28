@@ -24,6 +24,7 @@
   <exec_depend>controller_manager</exec_depend>
   <exec_depend>udwadia_kalaba_controller</exec_depend>
   <exec_depend>joint_state_broadcaster</exec_depend>
+  <exec_depend>tf2_broadcaster</exec_depend>
   <exec_depend>joint_state_publisher_gui</exec_depend>
   <exec_depend>robot_state_publisher</exec_depend>
   <exec_depend>ros2_controllers_test_nodes</exec_depend>

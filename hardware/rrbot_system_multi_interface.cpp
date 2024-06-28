@@ -376,10 +376,10 @@ namespace ros2_control_blue_reach_5
     //     hw_joint_structs_[2].current_state_.velocity,
     //     hw_joint_structs_[1].current_state_.velocity,
     // };
-    // std::vector<double> u = {hw_joint_structs_[4].command_state_.current,
-    //                          hw_joint_structs_[3].command_state_.current,
-    //                          hw_joint_structs_[2].command_state_.current,
-    //                          hw_joint_structs_[1].command_state_.current};
+    // std::vector<double> u = {hw_joint_structs_[4].command_state_.effort,
+    //                          hw_joint_structs_[3].command_state_.effort,
+    //                          hw_joint_structs_[2].command_state_.effort,
+    //                          hw_joint_structs_[1].command_state_.effort};
     // std::vector<DM> dynamic_arg = {DM(x), DM(u)};
 
     // std::vector<DM> dynamic_response = dynamics_service.forward_dynamics(dynamic_arg);
