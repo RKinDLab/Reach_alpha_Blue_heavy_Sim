@@ -129,40 +129,6 @@ namespace ros2_control_blue_reach_5
 
   hardware_interface::CallbackReturn RRBotSystemMultiInterfaceHardware::on_configure(const rclcpp_lifecycle::State &)
   {
-    // Start the driver
-    // try
-    // {
-    //   driver_.start(cfg_.serial_port_, 5, false);
-    // }
-    // catch (const std::exception &e)
-    // {
-    //   RCLCPP_FATAL( // NOLINT
-    //       rclcpp::get_logger("RRBotSystemMultiInterfaceHardware"),
-    //       "Failed to configure the serial driver for the AlphaHardware system interface.");
-
-    //   return hardware_interface::CallbackReturn::ERROR;
-    // }
-
-    // // Register callbacks for joint states
-    // driver_.subscribe(
-    //     alpha::driver::PacketId::PacketID_POSITION,
-    //     [this](const alpha::driver::Packet &packet) -> void
-    //     { updatePositionCb(packet, hw_joint_structs_); });
-
-    // driver_.subscribe(
-    //     alpha::driver::PacketId::PacketID_VELOCITY,
-    //     [this](const alpha::driver::Packet &packet) -> void
-    //     { updateVelocityCb(packet, hw_joint_structs_); });
-
-    // driver_.subscribe(
-    //     alpha::driver::PacketId::PacketID_CURRENT,
-    //     [this](const alpha::driver::Packet &packet) -> void
-    //     { updateCurrentCb(packet, hw_joint_structs_); });
-
-    // // Start a thread to request state updates
-    // running_.store(true);
-    // state_request_worker_ = std::thread(&RRBotSystemMultiInterfaceHardware::pollState, this, cfg_.state_update_freq_);
-
     RCLCPP_INFO( // NOLINT
         rclcpp::get_logger("RRBotSystemMultiInterfaceHardware"),
         "Successfully configured the RRBotSystemMultiInterfaceHardware system interface for serial communication!");
@@ -378,46 +344,46 @@ namespace ros2_control_blue_reach_5
   hardware_interface::return_type RRBotSystemMultiInterfaceHardware::read(
       const rclcpp::Time & /*time*/, const rclcpp::Duration & /*period*/)
   {
-    // double delta_seconds = period.seconds();
-    for (std::size_t i = 0; i < info_.joints.size(); i++)
-    {
-      hw_joint_structs_[1].current_state_.position = forward_dynamics_res[3];
-      hw_joint_structs_[1].current_state_.velocity = forward_dynamics_res[7];
+    // // double delta_seconds = period.seconds();
+    // for (std::size_t i = 0; i < info_.joints.size(); i++)
+    // {
+    //   hw_joint_structs_[1].current_state_.position = forward_dynamics_res[3];
+    //   hw_joint_structs_[1].current_state_.velocity = forward_dynamics_res[7];
 
-      hw_joint_structs_[2].current_state_.position = forward_dynamics_res[2];
-      hw_joint_structs_[2].current_state_.velocity = forward_dynamics_res[6];
+    //   hw_joint_structs_[2].current_state_.position = forward_dynamics_res[2];
+    //   hw_joint_structs_[2].current_state_.velocity = forward_dynamics_res[6];
 
-      hw_joint_structs_[3].current_state_.position = forward_dynamics_res[1];
-      hw_joint_structs_[3].current_state_.velocity = forward_dynamics_res[5];
+    //   hw_joint_structs_[3].current_state_.position = forward_dynamics_res[1];
+    //   hw_joint_structs_[3].current_state_.velocity = forward_dynamics_res[5];
 
-      hw_joint_structs_[4].current_state_.position = forward_dynamics_res[0];
-      hw_joint_structs_[4].current_state_.velocity = forward_dynamics_res[4];
-    }
+    //   hw_joint_structs_[4].current_state_.position = forward_dynamics_res[0];
+    //   hw_joint_structs_[4].current_state_.velocity = forward_dynamics_res[4];
+    // }
     return hardware_interface::return_type::OK;
   }
 
   hardware_interface::return_type RRBotSystemMultiInterfaceHardware::write(
       const rclcpp::Time & /*time*/, const rclcpp::Duration & /*period*/)
   {
-    std::vector<double> x = {
-        hw_joint_structs_[4].current_state_.position,
-        hw_joint_structs_[3].current_state_.position,
-        hw_joint_structs_[2].current_state_.position,
-        hw_joint_structs_[1].current_state_.position,
+    // std::vector<double> x = {
+    //     hw_joint_structs_[4].current_state_.position,
+    //     hw_joint_structs_[3].current_state_.position,
+    //     hw_joint_structs_[2].current_state_.position,
+    //     hw_joint_structs_[1].current_state_.position,
 
-        hw_joint_structs_[4].current_state_.velocity,
-        hw_joint_structs_[3].current_state_.velocity,
-        hw_joint_structs_[2].current_state_.velocity,
-        hw_joint_structs_[1].current_state_.velocity,
-    };
-    std::vector<double> u = {hw_joint_structs_[4].command_state_.current,
-                             hw_joint_structs_[3].command_state_.current,
-                             hw_joint_structs_[2].command_state_.current,
-                             hw_joint_structs_[1].command_state_.current};
-    std::vector<DM> dynamic_arg = {DM(x), DM(u)};
+    //     hw_joint_structs_[4].current_state_.velocity,
+    //     hw_joint_structs_[3].current_state_.velocity,
+    //     hw_joint_structs_[2].current_state_.velocity,
+    //     hw_joint_structs_[1].current_state_.velocity,
+    // };
+    // std::vector<double> u = {hw_joint_structs_[4].command_state_.current,
+    //                          hw_joint_structs_[3].command_state_.current,
+    //                          hw_joint_structs_[2].command_state_.current,
+    //                          hw_joint_structs_[1].command_state_.current};
+    // std::vector<DM> dynamic_arg = {DM(x), DM(u)};
 
-    std::vector<DM> dynamic_response = dynamics_service.forward_dynamics(dynamic_arg);
-    forward_dynamics_res = std::vector<double>(dynamic_response.at(0));
+    // std::vector<DM> dynamic_response = dynamics_service.forward_dynamics(dynamic_arg);
+    // forward_dynamics_res = std::vector<double>(dynamic_response.at(0));
     return hardware_interface::return_type::OK;
   }
 
