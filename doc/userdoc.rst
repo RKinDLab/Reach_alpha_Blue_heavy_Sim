@@ -12,10 +12,10 @@ For *reach alpha 5*, the hardware interface plugin is implemented having multipl
 * Data for all joints can be exchanged at once or independently.
 
 ## Dependencies
-```bash
+
+.. code-block:: shell
 cd ~/your_workspace/src
 git clone https://github.com/edxmorgan/tf2_broadcaster
-```
 
 
 Tutorial steps
