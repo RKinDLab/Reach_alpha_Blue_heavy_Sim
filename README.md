@@ -3,13 +3,7 @@
 ## Overview
 ![alt text](./doc/uvms.png?raw=true "Reach Alpha Blue")
 
-Welcome to the Reach alpha Blue heavy_Sim project. This initiative is dedicated to providing a robust and versatile interface for ROS2 control, tailored specifically for the *reach-alpha-5* platform. Our goal is to enable seamless integration and enhanced functionality across a range of applications.
-
-## Dependencies
-```bash
-cd ~/your_workspace/src
-git clone https://github.com/edxmorgan/tf2_broadcaster
-```
+A ros2_control simulator for blue rov heavy with an attached reach alpha 5 robot operating with underwater dynamics.
 
 ## Documentation
 

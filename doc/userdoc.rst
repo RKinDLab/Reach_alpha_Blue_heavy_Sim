@@ -1,17 +1,21 @@
 :github_url: https://github.com/Eddy-Morgan/reach-alpha-ros2-control/blob/master/doc/userdoc.rst
 
-.. _ros2_control_demos_example_3_userdoc:
+.. _ros2_control_RA5BHS_userdoc:
 
 ************************************************
 Reach Alpha 5 with multiple interfaces
 ************************************************
 
-The example shows how to implement multi-interface robot hardware taking care about interfaces used.
-
 For *reach alpha 5*, the hardware interface plugin is implemented having multiple interfaces.
 
 * The communication is done using proprietary API to communicate with the robot control box.
 * Data for all joints can be exchanged at once or independently.
+
+## Dependencies
+```bash
+cd ~/your_workspace/src
+git clone https://github.com/edxmorgan/tf2_broadcaster
+```
 
 
 Tutorial steps
