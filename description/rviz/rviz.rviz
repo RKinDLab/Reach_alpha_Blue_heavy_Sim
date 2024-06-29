@@ -470,7 +470,7 @@ Visualization Manager:
   Global Options:
     Background Color: 192; 191; 188
     Fixed Frame: world
-    Frame Rate: 30
+    Frame Rate: 90
   Name: root
   Tools:
     - Class: rviz_default_plugins/Interact
@@ -512,7 +512,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 8.932718276977539
+      Distance: 2.238013744354248
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -527,10 +527,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.5402035117149353
+      Pitch: 0.25020405650138855
       Target Frame: base_link
       Value: Orbit (rviz)
-      Yaw: 2.328620195388794
+      Yaw: 2.6404483318328857
     Saved: ~
 Window Geometry:
   Aruco Detection:
