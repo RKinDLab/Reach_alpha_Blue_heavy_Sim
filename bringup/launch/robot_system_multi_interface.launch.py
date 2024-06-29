@@ -189,8 +189,8 @@ def generate_launch_description():
     )
 
     nodes = [
-        # run_plotjuggler,
-        # mouse_control,
+        run_plotjuggler,
+        mouse_control,
         control_node,
         robot_state_pub_node,
         joint_state_broadcaster_spawner,

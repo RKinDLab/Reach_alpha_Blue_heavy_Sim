@@ -49,6 +49,10 @@
           <param name="min">-1</param>
           <param name="max">1</param>
         </command_interface>
+        <command_interface name="effort">
+          <param name="min">-1</param>
+          <param name="max">1</param>
+        </command_interface>
         <state_interface name="position"/>
         <state_interface name="filtered_position"/>
         <state_interface name="velocity"/>
@@ -87,6 +91,10 @@
           <param name="max">1</param>
         </command_interface>
         <command_interface name="current">
+          <param name="min">-1</param>
+          <param name="max">1</param>
+        </command_interface>
+        <command_interface name="effort">
           <param name="min">-1</param>
           <param name="max">1</param>
         </command_interface>
@@ -131,6 +139,10 @@
           <param name="min">-1</param>
           <param name="max">1</param>
         </command_interface>
+        <command_interface name="effort">
+          <param name="min">-1</param>
+          <param name="max">1</param>
+        </command_interface>
         <state_interface name="position"/>
         <state_interface name="filtered_position"/>
         <state_interface name="velocity"/>
@@ -172,6 +184,10 @@
           <param name="min">-1</param>
           <param name="max">1</param>
         </command_interface>
+        <command_interface name="effort">
+          <param name="min">-1</param>
+          <param name="max">1</param>
+        </command_interface>
         <state_interface name="position"/>
         <state_interface name="filtered_position"/>
         <state_interface name="velocity"/>
@@ -210,6 +226,10 @@
           <param name="max">1</param>
         </command_interface>
         <command_interface name="current">
+          <param name="min">-1</param>
+          <param name="max">1</param>
+        </command_interface>
+        <command_interface name="effort">
           <param name="min">-1</param>
           <param name="max">1</param>
         </command_interface>

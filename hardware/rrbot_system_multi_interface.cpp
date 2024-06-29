@@ -63,26 +63,27 @@ namespace ros2_control_blue_reach_5
       hw_joint_structs_.emplace_back(joint.name, device_id, initialState);
       // RRBotSystemMultiInterface has exactly 3 state interfaces
       // and 3 command interfaces on each joint
-      if (joint.command_interfaces.size() != 3)
+      if (joint.command_interfaces.size() != 4)
       {
         RCLCPP_FATAL(
             rclcpp::get_logger("RRBotSystemMultiInterfaceHardware"),
-            "Joint '%s' has %zu command interfaces. 3 expected.", joint.name.c_str(),
+            "Joint '%s' has %zu command interfaces. 4 expected.", joint.name.c_str(),
             joint.command_interfaces.size());
         return hardware_interface::CallbackReturn::ERROR;
       }
 
-      if (!(joint.command_interfaces[0].name == hardware_interface::HW_IF_POSITION ||
-            joint.command_interfaces[0].name == hardware_interface::HW_IF_VELOCITY ||
-            joint.command_interfaces[0].name == custom_hardware_interface::HW_IF_CURRENT))
-      {
-        RCLCPP_FATAL(
-            rclcpp::get_logger("RRBotSystemMultiInterfaceHardware"),
-            "Joint '%s' has %s command interface. Expected %s, %s, %s or %s.", joint.name.c_str(),
-            joint.command_interfaces[0].name.c_str(), hardware_interface::HW_IF_POSITION,
-            hardware_interface::HW_IF_VELOCITY, custom_hardware_interface::HW_IF_CURRENT, hardware_interface::HW_IF_ACCELERATION);
-        return hardware_interface::CallbackReturn::ERROR;
-      }
+      // if (!(joint.command_interfaces[0].name == hardware_interface::HW_IF_POSITION ||
+      //       joint.command_interfaces[0].name == hardware_interface::HW_IF_VELOCITY ||
+      //       joint.command_interfaces[0].name == hardware_interface::HW_IF_EFFORT ||
+      //       joint.command_interfaces[0].name == custom_hardware_interface::HW_IF_CURRENT))
+      // {
+      //   RCLCPP_FATAL(
+      //       rclcpp::get_logger("ReachSystemMultiInterfaceHardware"),
+      //       "Joint '%s' has %s command interface. Expected %s, %s, %s or %s.", joint.name.c_str(),
+      //       joint.command_interfaces[0].name.c_str(), hardware_interface::HW_IF_POSITION,
+      //       hardware_interface::HW_IF_VELOCITY, hardware_interface::HW_IF_EFFORT, custom_hardware_interface::HW_IF_CURRENT);
+      //   return hardware_interface::CallbackReturn::ERROR;
+      // }
 
       if (joint.state_interfaces.size() != 9)
       {
@@ -92,32 +93,32 @@ namespace ros2_control_blue_reach_5
             joint.state_interfaces.size());
         return hardware_interface::CallbackReturn::ERROR;
       }
-      if (!(joint.state_interfaces[0].name == hardware_interface::HW_IF_POSITION ||
-            joint.state_interfaces[1].name == custom_hardware_interface::HW_IF_FILTERED_POSITION ||
-            joint.state_interfaces[2].name == hardware_interface::HW_IF_VELOCITY ||
-            joint.state_interfaces[3].name == custom_hardware_interface::HW_IF_FILTERED_VELOCITY ||
-            joint.state_interfaces[4].name == hardware_interface::HW_IF_ACCELERATION ||
-            joint.state_interfaces[5].name == custom_hardware_interface::HW_IF_ESTIMATED_ACCELERATION ||
-            joint.state_interfaces[6].name == custom_hardware_interface::HW_IF_CURRENT ||
-            joint.state_interfaces[7].name == hardware_interface::HW_IF_EFFORT ||
-            joint.state_interfaces[8].name == custom_hardware_interface::HW_IF_STATE_ID))
-      {
-        RCLCPP_FATAL(
-            rclcpp::get_logger("ReachSystemMultiInterfaceHardware"),
-            "Joint '%s' has %ld state interfaces. Expected %s, %s, %s, %s, %s, %s, %s , %s or %s.",
-            joint.name.c_str(),
-            joint.state_interfaces.size(),
-            hardware_interface::HW_IF_POSITION,
-            custom_hardware_interface::HW_IF_FILTERED_POSITION,
-            hardware_interface::HW_IF_VELOCITY,
-            custom_hardware_interface::HW_IF_FILTERED_VELOCITY,
-            hardware_interface::HW_IF_ACCELERATION,
-            custom_hardware_interface::HW_IF_ESTIMATED_ACCELERATION,
-            custom_hardware_interface::HW_IF_CURRENT,
-            hardware_interface::HW_IF_EFFORT,
-            custom_hardware_interface::HW_IF_STATE_ID);
-        return hardware_interface::CallbackReturn::ERROR;
-      }
+      // if (!(joint.state_interfaces[0].name == hardware_interface::HW_IF_POSITION ||
+      //       joint.state_interfaces[1].name == custom_hardware_interface::HW_IF_FILTERED_POSITION ||
+      //       joint.state_interfaces[2].name == hardware_interface::HW_IF_VELOCITY ||
+      //       joint.state_interfaces[3].name == custom_hardware_interface::HW_IF_FILTERED_VELOCITY ||
+      //       joint.state_interfaces[4].name == hardware_interface::HW_IF_ACCELERATION ||
+      //       joint.state_interfaces[5].name == custom_hardware_interface::HW_IF_ESTIMATED_ACCELERATION ||
+      //       joint.state_interfaces[6].name == custom_hardware_interface::HW_IF_CURRENT ||
+      //       joint.state_interfaces[7].name == hardware_interface::HW_IF_EFFORT ||
+      //       joint.state_interfaces[8].name == custom_hardware_interface::HW_IF_STATE_ID))
+      // {
+      //   RCLCPP_FATAL(
+      //       rclcpp::get_logger("ReachSystemMultiInterfaceHardware"),
+      //       "Joint '%s' has %ld state interfaces. Expected %s, %s, %s, %s, %s, %s, %s , %s or %s.",
+      //       joint.name.c_str(),
+      //       joint.state_interfaces.size(),
+      //       hardware_interface::HW_IF_POSITION,
+      //       custom_hardware_interface::HW_IF_FILTERED_POSITION,
+      //       hardware_interface::HW_IF_VELOCITY,
+      //       custom_hardware_interface::HW_IF_FILTERED_VELOCITY,
+      //       hardware_interface::HW_IF_ACCELERATION,
+      //       custom_hardware_interface::HW_IF_ESTIMATED_ACCELERATION,
+      //       custom_hardware_interface::HW_IF_CURRENT,
+      //       hardware_interface::HW_IF_EFFORT,
+      //       custom_hardware_interface::HW_IF_STATE_ID);
+      //   return hardware_interface::CallbackReturn::ERROR;
+      // }
     }
 
     return hardware_interface::CallbackReturn::SUCCESS;

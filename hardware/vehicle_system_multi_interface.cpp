@@ -111,18 +111,18 @@ namespace ros2_control_blue_reach_5
         return hardware_interface::CallbackReturn::ERROR;
       }
 
-      if (!(joint.state_interfaces[0].name == hardware_interface::HW_IF_POSITION ||
-            joint.state_interfaces[0].name == hardware_interface::HW_IF_VELOCITY ||
-            joint.state_interfaces[0].name == hardware_interface::HW_IF_ACCELERATION ||
-            joint.state_interfaces[0].name == custom_hardware_interface::HW_IF_CURRENT))
-      {
-        RCLCPP_FATAL(
-            rclcpp::get_logger("VehicleSystemMultiInterfaceHardware"),
-            "Joint '%s' has %s state interface. Expected %s, %s, or %s.", joint.name.c_str(),
-            joint.state_interfaces[0].name.c_str(), hardware_interface::HW_IF_POSITION,
-            hardware_interface::HW_IF_VELOCITY, custom_hardware_interface::HW_IF_CURRENT);
-        return hardware_interface::CallbackReturn::ERROR;
-      }
+      // if (!(joint.state_interfaces[0].name == hardware_interface::HW_IF_POSITION ||
+      //       joint.state_interfaces[0].name == hardware_interface::HW_IF_VELOCITY ||
+      //       joint.state_interfaces[0].name == hardware_interface::HW_IF_ACCELERATION ||
+      //       joint.state_interfaces[0].name == custom_hardware_interface::HW_IF_CURRENT))
+      // {
+      //   RCLCPP_FATAL(
+      //       rclcpp::get_logger("VehicleSystemMultiInterfaceHardware"),
+      //       "Joint '%s' has %s state interface. Expected %s, %s, or %s.", joint.name.c_str(),
+      //       joint.state_interfaces[0].name.c_str(), hardware_interface::HW_IF_POSITION,
+      //       hardware_interface::HW_IF_VELOCITY, custom_hardware_interface::HW_IF_CURRENT);
+      //   return hardware_interface::CallbackReturn::ERROR;
+      // }
     }
 
     return hardware_interface::CallbackReturn::SUCCESS;
