@@ -4,7 +4,6 @@
   <!-- Enable setting arguments from the launch file -->
   <xacro:arg name="use_mock_hardware" default="false" />
   <xacro:arg name="prefix" default="alpha" />
-  <xacro:arg name="slowdown" default="100.0" />
   <xacro:arg name="serial_port" default="/dev/ttyUSB0"/>
   <xacro:arg name="state_update_frequency" default="250"/>
 
@@ -28,16 +27,14 @@
     prefix="$(arg prefix)"
     serial_port="$(arg serial_port)"
     state_update_frequency="$(arg state_update_frequency)"
-    use_mock_hardware="$(arg use_mock_hardware)"
-    slowdown="$(arg slowdown)" />
+    use_mock_hardware="$(arg use_mock_hardware)"/>
 
   <xacro:vehicle_system_multi_interface
     name="BlueSystemMultiInterface"
     prefix="$(arg prefix)"
     serial_port="$(arg serial_port)"
     state_update_frequency="$(arg state_update_frequency)"
-    use_mock_hardware="$(arg use_mock_hardware)"
-    slowdown="$(arg slowdown)" />
+    use_mock_hardware="$(arg use_mock_hardware)"/>
 
 </robot>
 

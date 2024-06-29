@@ -52,14 +52,6 @@ namespace ros2_control_blue_reach_5
   class VehicleSystemMultiInterfaceHardware : public hardware_interface::SystemInterface
   {
 
-    struct Config
-    {
-      // Parameters for the RRBot simulation
-      double hw_start_sec_;
-      double hw_stop_sec_;
-      double hw_slowdown_;
-    };
-
   public:
     RCLCPP_SHARED_PTR_DEFINITIONS(VehicleSystemMultiInterfaceHardware);
 
@@ -108,8 +100,6 @@ namespace ros2_control_blue_reach_5
         const rclcpp::Time &time, const rclcpp::Duration &period) override;
 
   private:
-    Config cfg_;
-
     // Enum defining at which control level we are
     // maintaining the command_interface type per thruster.
     enum mode_level_t : std::uint8_t

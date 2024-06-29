@@ -43,10 +43,6 @@ namespace ros2_control_blue_reach_5
         rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), "Successful initialization of robot kinematics & dynamics");
     cfg_.serial_port_ = info_.hardware_parameters["serial_port"];
     cfg_.state_update_freq_ = std::stoi(info_.hardware_parameters["state_update_frequency"]);
-    // BEGIN: This part here is for exemplary purposes - Please do not copy to your production code
-    cfg_.hw_start_sec_ = stod(info_.hardware_parameters["example_param_hw_start_duration_sec"]);
-    cfg_.hw_stop_sec_ = stod(info_.hardware_parameters["example_param_hw_stop_duration_sec"]);
-    cfg_.hw_slowdown_ = stod(info_.hardware_parameters["example_param_hw_slowdown"]);
 
     hw_joint_structs_.reserve(info_.joints.size());
     control_level_.resize(info_.joints.size(), mode_level_t::MODE_DISABLE);
@@ -327,14 +323,6 @@ namespace ros2_control_blue_reach_5
   {
     RCLCPP_INFO(
         rclcpp::get_logger("RRBotSystemMultiInterfaceHardware"), "Deactivating... please wait...");
-
-    for (int i = 0; i < cfg_.hw_stop_sec_; i++)
-    {
-      rclcpp::sleep_for(std::chrono::seconds(1));
-      RCLCPP_INFO(
-          rclcpp::get_logger("RRBotSystemMultiInterfaceHardware"), "%.1f seconds left...",
-          cfg_.hw_stop_sec_ - i);
-    }
 
     RCLCPP_INFO(rclcpp::get_logger("RRBotSystemMultiInterfaceHardware"), "Successfully deactivated!");
 

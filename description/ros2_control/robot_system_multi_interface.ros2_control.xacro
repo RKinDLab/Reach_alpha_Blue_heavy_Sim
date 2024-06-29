@@ -2,17 +2,13 @@
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
 
   <xacro:macro name="robot_system_multi_interface" 
-  params="name prefix serial_port state_update_frequency use_mock_hardware slowdown">
+  params="name prefix serial_port state_update_frequency use_mock_hardware">
 
     <ros2_control name="${name}" type="system">
 
       <hardware>
         <xacro:if value="${use_mock_hardware}">
           <plugin>ros2_control_blue_reach_5/RRBotSystemMultiInterfaceHardware</plugin>
-          <param name="example_param_hw_start_duration_sec">0.0</param>
-          <param name="example_param_hw_stop_duration_sec">3.0</param>
-          <param name="example_param_hw_slowdown">${slowdown}</param>
-          <param name="serial_port">${serial_port}</param>
           <param name="state_update_frequency">${state_update_frequency}</param>
         </xacro:if>
 

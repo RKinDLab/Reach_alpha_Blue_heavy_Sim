@@ -52,10 +52,6 @@ namespace ros2_control_blue_reach_5
     // dynamics_service.usage_cplusplus_checks("test", "libtest.so");
     dynamics_service.vehicle_dynamics = dynamics_service.load_casadi_fun("Vnext", "libVnext.so");
 
-    // BEGIN: This part here is for exemplary purposes - Please do not copy to your production code
-    cfg_.hw_start_sec_ = stod(info_.hardware_parameters["example_param_hw_start_duration_sec"]);
-    cfg_.hw_stop_sec_ = stod(info_.hardware_parameters["example_param_hw_stop_duration_sec"]);
-    cfg_.hw_slowdown_ = stod(info_.hardware_parameters["example_param_hw_slowdown"]);
 
     double no_vehicles = 1;
     hw_vehicle_structs_.reserve(no_vehicles);
@@ -303,14 +299,6 @@ namespace ros2_control_blue_reach_5
     RCLCPP_INFO(
         rclcpp::get_logger("VehicleSystemMultiInterfaceHardware"), "Deactivating... please wait...");
 
-    for (int i = 0; i < cfg_.hw_stop_sec_; i++)
-    {
-      rclcpp::sleep_for(std::chrono::seconds(1));
-      RCLCPP_INFO(
-          rclcpp::get_logger("VehicleSystemMultiInterfaceHardware"), "%.1f seconds left...",
-          cfg_.hw_stop_sec_ - i);
-    }
-
     RCLCPP_INFO(rclcpp::get_logger("VehicleSystemMultiInterfaceHardware"), "Successfully deactivated!");
     // END: This part here is for exemplary purposes - Please do not copy to your production code
 
@@ -318,51 +306,8 @@ namespace ros2_control_blue_reach_5
   }
 
   hardware_interface::return_type VehicleSystemMultiInterfaceHardware::read(
-      const rclcpp::Time & /*time*/, const rclcpp::Duration &period)
+      const rclcpp::Time & /*time*/, const rclcpp::Duration & /*period*/)
   {
-    for (std::size_t i = 0; i < info_.joints.size(); i++)
-    {
-      switch (control_level_[i])
-      {
-      case mode_level_t::MODE_DISABLE:
-        // RCLCPP_INFO(
-        //   rclcpp::get_logger("VehicleSystemMultiInterfaceHardware"),
-        //   "Nothing is using the hardware interface!");
-        return hardware_interface::return_type::OK;
-        break;
-      case mode_level_t::MODE_POSITION:
-        hw_vehicle_structs_[0].hw_thrust_structs_[i].current_state_.current = 0;
-        hw_vehicle_structs_[0].hw_thrust_structs_[i].current_state_.acceleration = 0;
-        hw_vehicle_structs_[0].hw_thrust_structs_[i].current_state_.velocity = 0;
-        hw_vehicle_structs_[0].hw_thrust_structs_[i].current_state_.position = hw_vehicle_structs_[0].hw_thrust_structs_[i].command_state_.position;
-        break;
-      case mode_level_t::MODE_VELOCITY:
-        hw_vehicle_structs_[0].hw_thrust_structs_[i].current_state_.acceleration = 0;
-        hw_vehicle_structs_[0].hw_thrust_structs_[i].current_state_.current = 0;
-        hw_vehicle_structs_[0].hw_thrust_structs_[i].current_state_.velocity = hw_vehicle_structs_[0].hw_thrust_structs_[i].command_state_.velocity;
-        hw_vehicle_structs_[0].hw_thrust_structs_[i].current_state_.position += (hw_vehicle_structs_[0].hw_thrust_structs_[i].current_state_.velocity * period.seconds());
-        break;
-      case mode_level_t::MODE_CURRENT:
-        hw_vehicle_structs_[0].hw_thrust_structs_[i].current_state_.current = hw_vehicle_structs_[0].hw_thrust_structs_[i].command_state_.current;
-        hw_vehicle_structs_[0].hw_thrust_structs_[i].current_state_.acceleration = hw_vehicle_structs_[0].hw_thrust_structs_[i].command_state_.current / 2; // dummy
-        hw_vehicle_structs_[0].hw_thrust_structs_[i].current_state_.velocity = (hw_vehicle_structs_[0].hw_thrust_structs_[i].current_state_.acceleration * period.seconds());
-        hw_vehicle_structs_[0].hw_thrust_structs_[i].current_state_.position += (hw_vehicle_structs_[0].hw_thrust_structs_[i].current_state_.velocity * period.seconds()) / cfg_.hw_slowdown_;
-        break;
-      case mode_level_t::MODE_STANDBY:
-        hw_vehicle_structs_[0].hw_thrust_structs_[i].current_state_.current = hw_vehicle_structs_[0].hw_thrust_structs_[i].command_state_.current;
-        hw_vehicle_structs_[0].hw_thrust_structs_[i].current_state_.acceleration = hw_vehicle_structs_[0].hw_thrust_structs_[i].command_state_.current / 2; // dummy
-        hw_vehicle_structs_[0].hw_thrust_structs_[i].current_state_.velocity = (hw_vehicle_structs_[0].hw_thrust_structs_[i].current_state_.acceleration * period.seconds());
-        hw_vehicle_structs_[0].hw_thrust_structs_[i].current_state_.position += (hw_vehicle_structs_[0].hw_thrust_structs_[i].current_state_.velocity * period.seconds()) / cfg_.hw_slowdown_;
-        break;
-      case mode_level_t::MODE_EFFORT:
-        hw_vehicle_structs_[0].hw_thrust_structs_[i].current_state_.velocity = 12*hw_vehicle_structs_[0].hw_thrust_structs_[i].command_state_.effort;
-        hw_vehicle_structs_[0].hw_thrust_structs_[i].current_state_.position += (hw_vehicle_structs_[0].hw_thrust_structs_[i].current_state_.velocity * period.seconds());
-        break;
-      default:
-        // Existing code for default case...
-        break;
-      }
-    }
     RCLCPP_DEBUG(
         rclcpp::get_logger("VehicleSystemMultiInterfaceHardware"),
         "Got commands: %.5f,  %.5f, %.5f, %.5f, %.5f,  %.5f, %.5f, %.5f ",

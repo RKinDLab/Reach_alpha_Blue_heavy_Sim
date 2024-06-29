@@ -59,11 +59,6 @@ def generate_launch_description():
     )
     declared_arguments.append(
         DeclareLaunchArgument(
-            "slowdown", default_value="50.0", description="Slowdown factor of the RRbot."
-        )
-    )
-    declared_arguments.append(
-        DeclareLaunchArgument(
             "robot_controller",
             default_value="forward_current_controller",
             description="Robot controller to start.",
@@ -80,7 +75,6 @@ def generate_launch_description():
     # Initialize Arguments
     prefix = LaunchConfiguration("prefix")
     use_mock_hardware = LaunchConfiguration("use_mock_hardware")
-    slowdown = LaunchConfiguration("slowdown")
     serial_port = LaunchConfiguration("serial_port")
     state_update_frequency = LaunchConfiguration("state_update_frequency")
     robot_controller = LaunchConfiguration("robot_controller")
@@ -109,10 +103,7 @@ def generate_launch_description():
             state_update_frequency,
             " ",
             "use_mock_hardware:=",
-            use_mock_hardware,
-            " ",
-            "slowdown:=",
-            slowdown,
+            use_mock_hardware
         ]
     )
 
@@ -208,7 +199,7 @@ def generate_launch_description():
         # mouse_control,
         control_node,
         robot_state_pub_node,
-        # transform_broadcaster_spawner,
+        transform_broadcaster_spawner,
         joint_state_broadcaster_spawner,
         delay_rviz_after_joint_state_broadcaster_spawner,
         delay_robot_controller_spawner_after_joint_state_broadcaster_spawner,

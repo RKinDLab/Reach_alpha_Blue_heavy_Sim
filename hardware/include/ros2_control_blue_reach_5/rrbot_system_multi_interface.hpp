@@ -51,9 +51,6 @@ namespace ros2_control_blue_reach_5
       // Parameters for the RRBot simulation
       std::string serial_port_;
       int state_update_freq_;
-      double hw_start_sec_;
-      double hw_stop_sec_;
-      double hw_slowdown_;
     };
 
   public:
