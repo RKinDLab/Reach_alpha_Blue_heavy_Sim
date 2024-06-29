@@ -31,6 +31,7 @@
 #include "hardware_interface/hardware_info.hpp"
 #include "hardware_interface/system_interface.hpp"
 #include "hardware_interface/types/hardware_interface_return_values.hpp"
+#include "rclcpp/rclcpp.hpp"
 #include "rclcpp/clock.hpp"
 #include "rclcpp/duration.hpp"
 #include "rclcpp/macros.hpp"
@@ -44,7 +45,13 @@
 #include "ros2_control_blue_reach_5/custom_hardware_interface_type_values.hpp"
 #include "ros2_control_blue_reach_5/dynamics.hpp"
 
+#include "realtime_tools/realtime_buffer.h"
+#include "realtime_tools/realtime_publisher.h"
+
+#include "tf2_msgs/msg/tf_message.hpp"
+
 #include <casadi/casadi.hpp>
+
 
 namespace ros2_control_blue_reach_5
 {
@@ -58,9 +65,9 @@ namespace ros2_control_blue_reach_5
     hardware_interface::CallbackReturn on_init(
         const hardware_interface::HardwareInfo &info) override;
 
-    // ROS2_CONTROL_BLUE_REACH_5_PUBLIC
-    // hardware_interface::CallbackReturn on_configure(
-    //     const rclcpp_lifecycle::State &previous_state) override;
+    ROS2_CONTROL_BLUE_REACH_5_PUBLIC
+    hardware_interface::CallbackReturn on_configure(
+        const rclcpp_lifecycle::State &previous_state) override;
 
     // ROS2_CONTROL_BLUE_REACH_5_PUBLIC
     // hardware_interface::CallbackReturn on_cleanup(
@@ -93,7 +100,7 @@ namespace ros2_control_blue_reach_5
     ROS2_CONTROL_BLUE_REACH_5_PUBLIC
     hardware_interface::return_type read(
         const rclcpp::Time &time, const rclcpp::Duration &period) override;
-        
+
     ROS2_CONTROL_BLUE_REACH_5_PUBLIC
     hardware_interface::return_type write(
         const rclcpp::Time &time, const rclcpp::Duration &period) override;
@@ -114,17 +121,21 @@ namespace ros2_control_blue_reach_5
 
     // Active control mode for each thruster
     std::vector<mode_level_t> control_level_;
-    
+
     // Store the dynamics function for the robot joints
     casadi_reach_alpha_5::Dynamics dynamics_service;
-    
+
     // Store the state & commands for the robot vehicle
     std::vector<blue::dynamics::Vehicle> hw_vehicle_structs_;
 
     std::vector<double> hw_sensor_states_;
-    
+
     // stores the dynamic response from the forward dynamics simulator
     std::vector<double> forward_dynamics_res;
+
+    std::shared_ptr<rclcpp::Publisher<tf2_msgs::msg::TFMessage>> odometry_transform_publisher_;
+    std::shared_ptr<realtime_tools::RealtimePublisher<tf2_msgs::msg::TFMessage>>
+        realtime_odometry_transform_publisher_;
   };
 
 } // namespace ros2_control_blue

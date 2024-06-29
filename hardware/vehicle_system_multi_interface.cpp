@@ -32,8 +32,14 @@
 
 using namespace casadi;
 
+namespace
+{
+  constexpr auto DEFAULT_TRANSFORM_TOPIC = "/tf";
+} // namespace
+
 namespace ros2_control_blue_reach_5
 {
+
   hardware_interface::CallbackReturn VehicleSystemMultiInterfaceHardware::on_init(
       const hardware_interface::HardwareInfo &info)
   {
@@ -51,7 +57,6 @@ namespace ros2_control_blue_reach_5
     // Use CasADi's "external" to load the compiled dynamics functions
     // dynamics_service.usage_cplusplus_checks("test", "libtest.so");
     dynamics_service.vehicle_dynamics = dynamics_service.load_casadi_fun("Vnext", "libVnext.so");
-
 
     double no_vehicles = 1;
     hw_vehicle_structs_.reserve(no_vehicles);
@@ -117,6 +122,40 @@ namespace ros2_control_blue_reach_5
       }
     }
 
+    return hardware_interface::CallbackReturn::SUCCESS;
+  }
+
+
+  hardware_interface::CallbackReturn VehicleSystemMultiInterfaceHardware::on_configure(
+    const rclcpp_lifecycle::State & /*previous_state*/)
+  {
+    // declare and get parameters needed for controller operations
+    // setup realtime buffers, ROS publishers, and ROS subscribers ...
+    try
+    {
+      auto node_topics_interface = rclcpp::Node("VehicleSystemMultiInterfaceHardware");
+      odometry_transform_publisher_ = rclcpp::create_publisher<tf2_msgs::msg::TFMessage>(node_topics_interface,
+          DEFAULT_TRANSFORM_TOPIC, rclcpp::SystemDefaultsQoS());
+
+      realtime_odometry_transform_publisher_ =
+          std::make_shared<realtime_tools::RealtimePublisher<tf2_msgs::msg::TFMessage>>(
+              odometry_transform_publisher_);
+
+      auto &odometry_transform_message = realtime_odometry_transform_publisher_->msg_;
+      odometry_transform_message.transforms.resize(1);
+      odometry_transform_message.transforms.front().header.frame_id = "world";
+      odometry_transform_message.transforms.front().child_frame_id = "base_link";
+    }
+    catch (const std::exception &e)
+    {
+      fprintf(
+          stderr, "Exception thrown during publisher creation at configure stage with message : %s \n",
+          e.what());
+      return CallbackReturn::ERROR;
+    }
+    
+    RCLCPP_INFO(
+        rclcpp::get_logger("VehicleSystemMultiInterfaceHardware"), "configure successful");
     return hardware_interface::CallbackReturn::SUCCESS;
   }
 
@@ -323,7 +362,7 @@ namespace ros2_control_blue_reach_5
   }
 
   hardware_interface::return_type VehicleSystemMultiInterfaceHardware::write(
-      const rclcpp::Time & /*time*/, const rclcpp::Duration &period)
+      const rclcpp::Time & time, const rclcpp::Duration &period)
   {
     double delta_seconds = period.seconds();
 
@@ -378,6 +417,20 @@ namespace ros2_control_blue_reach_5
     hw_vehicle_structs_[0].current_state_.p = forward_dynamics_res[10];
     hw_vehicle_structs_[0].current_state_.q = forward_dynamics_res[11];
     hw_vehicle_structs_[0].current_state_.r = forward_dynamics_res[12];
+
+    if (realtime_odometry_transform_publisher_->trylock())
+    {
+      auto &transform = realtime_odometry_transform_publisher_->msg_.transforms.front();
+      transform.header.stamp = time;
+      transform.transform.translation.x = hw_vehicle_structs_[0].current_state_.position_x;
+      transform.transform.translation.y = -hw_vehicle_structs_[0].current_state_.position_y;
+      transform.transform.translation.z = -hw_vehicle_structs_[0].current_state_.position_z;
+      transform.transform.rotation.x = hw_vehicle_structs_[0].current_state_.orientation_x;
+      transform.transform.rotation.y = hw_vehicle_structs_[0].current_state_.orientation_y;
+      transform.transform.rotation.z = hw_vehicle_structs_[0].current_state_.orientation_z;
+      transform.transform.rotation.w = hw_vehicle_structs_[0].current_state_.orientation_w;
+      realtime_odometry_transform_publisher_->unlockAndPublish();
+    }
 
     return hardware_interface::return_type::OK;
   }

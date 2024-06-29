@@ -14,6 +14,9 @@ set(THIS_PACKAGE_INCLUDE_DEPENDS
   casadi
   eigen3_cmake_module
   Eigen3
+  tf2_msgs
+  tf2
+  realtime_tools
 )
 
 # find dependencies

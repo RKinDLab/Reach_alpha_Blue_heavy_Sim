@@ -10,12 +10,6 @@ For *reach alpha 5*, the hardware interface plugin is implemented having multipl
 
 * The hybrid dynamics is done using Thor fossen for underwater vehicler & Featherstone's algorithm for manipulator with casadi.
 
-## Dependencies
-
-.. code-block:: shell
-cd ~/your_workspace/src
-git clone https://github.com/edxmorgan/tf2_broadcaster
-
 
 Tutorial steps
 --------------------------
