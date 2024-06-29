@@ -39,6 +39,9 @@ namespace blue::dynamics
   public:
     std::string name;  // Name of the device or component
     uint8_t device_id; // Unique identifier for the device
+    std::string world_frame; // origin frame
+    std::string body_frame; // body frame
+
 
     struct State
     {

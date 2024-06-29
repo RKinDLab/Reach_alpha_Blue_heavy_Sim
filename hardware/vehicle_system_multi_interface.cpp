@@ -64,6 +64,9 @@ namespace ros2_control_blue_reach_5
     blue::dynamics::Vehicle::State initialState{0.0, 0.0, 0.5, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
     hw_vehicle_structs_.emplace_back("blue ROV heavy 0", initialState);
 
+    hw_vehicle_structs_[0].world_frame = info_.hardware_parameters["world_frame"];
+    hw_vehicle_structs_[0].body_frame = info_.hardware_parameters["body_frame"];
+
     hw_vehicle_structs_[0].thrustSizeAllocation(info_.joints.size());
     // blue_parameters.setupParameters();
 
@@ -390,7 +393,7 @@ namespace ros2_control_blue_reach_5
                               hw_vehicle_structs_[0].hw_thrust_structs_[6].command_state_.effort,
                               hw_vehicle_structs_[0].hw_thrust_structs_[7].command_state_.effort};
     std::vector<DM> dynamic_arg = {DM(x0), DM(u0)};
-    RCLCPP_INFO(rclcpp::get_logger("VehicleSystemMultiInterfaceHardware"), "Got states: %.5f second interval, %.5f,  %.5f, %.5f, %.5f, %.5f,  %.5f, %.5f, %.5f ",
+    RCLCPP_DEBUG(rclcpp::get_logger("VehicleSystemMultiInterfaceHardware"), "Got states: %.5f second interval, %.5f,  %.5f, %.5f, %.5f, %.5f,  %.5f, %.5f, %.5f ",
                  delta_seconds,
                  hw_vehicle_structs_[0].current_state_.position_x,
                  hw_vehicle_structs_[0].current_state_.position_y,
@@ -425,6 +428,7 @@ namespace ros2_control_blue_reach_5
       transform.transform.translation.x = hw_vehicle_structs_[0].current_state_.position_x;
       transform.transform.translation.y = -hw_vehicle_structs_[0].current_state_.position_y;
       transform.transform.translation.z = -hw_vehicle_structs_[0].current_state_.position_z;
+      
       transform.transform.rotation.x = hw_vehicle_structs_[0].current_state_.orientation_x;
       transform.transform.rotation.y = hw_vehicle_structs_[0].current_state_.orientation_y;
       transform.transform.rotation.z = hw_vehicle_structs_[0].current_state_.orientation_z;
