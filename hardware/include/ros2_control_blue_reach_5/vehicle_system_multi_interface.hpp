@@ -41,7 +41,6 @@
 
 #include "ros2_control_blue_reach_5/thruster.hpp"
 #include "ros2_control_blue_reach_5/vehicle.hpp"
-#include "ros2_control_blue_reach_5/vehicle_parameters.hpp"
 #include "ros2_control_blue_reach_5/custom_hardware_interface_type_values.hpp"
 #include "ros2_control_blue_reach_5/dynamics.hpp"
 
@@ -119,8 +118,6 @@ namespace ros2_control_blue_reach_5
     // Store the dynamics function for the robot joints
     casadi_reach_alpha_5::Dynamics dynamics_service;
     
-    // vehicle dynamics object
-    Vehicle blue_parameters;
     // Store the state & commands for the robot vehicle
     std::vector<blue::dynamics::Vehicle> hw_vehicle_structs_;
 
