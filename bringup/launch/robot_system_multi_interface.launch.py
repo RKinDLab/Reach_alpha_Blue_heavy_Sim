@@ -149,13 +149,6 @@ def generate_launch_description():
                    "--controller-manager", "/controller_manager"],
     )
 
-    transform_broadcaster_spawner = Node(
-        package="controller_manager",
-        executable="spawner",
-        arguments=["tf2_broadcaster",
-                   "--controller-manager", "/controller_manager"],
-    )
-
     robot_controller_spawner = Node(
         package="controller_manager",
         executable="spawner",
@@ -200,7 +193,6 @@ def generate_launch_description():
         # mouse_control,
         control_node,
         robot_state_pub_node,
-        # transform_broadcaster_spawner,
         joint_state_broadcaster_spawner,
         delay_rviz_after_joint_state_broadcaster_spawner,
         delay_robot_controller_spawner_after_joint_state_broadcaster_spawner,
