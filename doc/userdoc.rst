@@ -1,4 +1,4 @@
-:github_url: https://github.com/Eddy-Morgan/reach-alpha-ros2-control/blob/master/doc/userdoc.rst
+:github_url: https://github.com/RKinDLab/Reach_alpha_Blue_heavy_Sim/blob/master/doc/userdoc.rst
 
 .. _ros2_control_RA5BHS_userdoc:
 
