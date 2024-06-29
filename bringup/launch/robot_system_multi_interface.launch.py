@@ -196,6 +196,8 @@ def generate_launch_description():
     )
 
     nodes = [
+        # run_plotjuggler,
+        # mouse_control,
         control_node,
         robot_state_pub_node,
         transform_broadcaster_spawner,
@@ -203,8 +205,5 @@ def generate_launch_description():
         delay_rviz_after_joint_state_broadcaster_spawner,
         delay_robot_controller_spawner_after_joint_state_broadcaster_spawner,
     ]
-
-    # if ~use_mock_hardware:
-    #     nodes.extend([mouse_control, run_plotjuggler, namor_entity])
 
     return LaunchDescription(declared_arguments + nodes)
