@@ -8,8 +8,7 @@ Reach Alpha 5 with multiple interfaces
 
 For *reach alpha 5*, the hardware interface plugin is implemented having multiple interfaces.
 
-* The communication is done using proprietary API to communicate with the robot control box.
-* Data for all joints can be exchanged at once or independently.
+* The hybrid dynamics is done using Thor fossen for underwater vehicler & Featherstone's algorithm for manipulator with casadi.
 
 ## Dependencies
 
@@ -21,7 +20,7 @@ git clone https://github.com/edxmorgan/tf2_broadcaster
 Tutorial steps
 --------------------------
 
-1. To check that *reach alpha 5* descriptions are working properly use following launch commands
+1. To check that *reach alpha blue heavy sim* descriptions are working properly use following launch commands
 
    .. code-block:: shell
 
@@ -44,15 +43,15 @@ Tutorial steps
    ``robot_controller:=forward_position_controller``
     starts demo and spawns position controller. Robot can be then controlled using ``forward_position_controller`` as described below.
 
-   ``robot_controller:=forward_current_controller``
-    starts demo and spawns current controller. Robot can be then controlled using ``forward_current_controller`` as described below.
+   ``robot_controller:=forward_effort_controller``
+    starts demo and spawns effort controller. Robot can be then controlled using ``forward_effort_controller`` as described below.
 
    The launch file loads and starts the robot hardware, controllers and opens *RViz*.
    In starting terminal you will see a lot of output from the hardware implementation showing its internal states.
    This is only of exemplary purposes and should be avoided as much as possible in a hardware interface implementation.
 
    If you can see two orange and one yellow rectangle in in *RViz* everything has started properly.
-   Still, to be sure, let's introspect the control system before moving *reach alpha 5*.
+   Still, to be sure, let's introspect the control system before moving *reach alpha blue heavy sim*.
 
 3. Check if the hardware interface loaded properly, by opening another terminal and executing
 
@@ -226,7 +225,7 @@ Tutorial steps
 
    Check how this output changes if you use the different launch file arguments described above.
 
-5. If you get output from above you can send commands to *Forward Command Controller*, either:
+5. If you get output from above you can send commands to *Forward Effort Controller*, either:
 
    #. Manually using ROS 2 CLI interface.
 
