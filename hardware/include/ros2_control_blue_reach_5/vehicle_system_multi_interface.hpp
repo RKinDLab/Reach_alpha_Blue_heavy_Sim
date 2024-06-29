@@ -50,6 +50,8 @@
 
 #include "tf2_msgs/msg/tf_message.hpp"
 
+#include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
+
 #include <casadi/casadi.hpp>
 
 

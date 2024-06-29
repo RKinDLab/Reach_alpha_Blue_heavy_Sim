@@ -23,6 +23,7 @@
   <depend>tf2_msgs</depend>
   <depend>tf2</depend>
   <depend>realtime_tools</depend>
+  <depend>tf2_geometry_msgs</depend>
   
   <exec_depend>controller_manager</exec_depend>
   <exec_depend>udwadia_kalaba_controller</exec_depend>

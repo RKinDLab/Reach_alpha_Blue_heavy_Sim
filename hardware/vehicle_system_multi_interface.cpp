@@ -423,16 +423,32 @@ namespace ros2_control_blue_reach_5
 
     if (realtime_odometry_transform_publisher_->trylock())
     {
+      // original pose in NED 
+      // RBIZ USES NWU
+      tf2::Quaternion q_orig, q_rot, q_new;
+
+      q_orig.setW(hw_vehicle_structs_[0].current_state_.orientation_w);
+      q_orig.setX(hw_vehicle_structs_[0].current_state_.orientation_x);
+      q_orig.setY(hw_vehicle_structs_[0].current_state_.orientation_y);
+      q_orig.setZ(hw_vehicle_structs_[0].current_state_.orientation_z);
+      // Rotate the previous pose by 180* about X
+      // q_rot.setRPY(3.14159, 0.0, 0.0);
+
+      // Rotate the previous pose by 0* about X
+      q_rot.setRPY(0.0, 0.0, 0.0);
+      q_new = q_rot * q_orig;
+      q_new.normalize();
+
       auto &transform = realtime_odometry_transform_publisher_->msg_.transforms.front();
       transform.header.stamp = time;
       transform.transform.translation.x = hw_vehicle_structs_[0].current_state_.position_x;
       transform.transform.translation.y = -hw_vehicle_structs_[0].current_state_.position_y;
       transform.transform.translation.z = -hw_vehicle_structs_[0].current_state_.position_z;
       
-      transform.transform.rotation.x = hw_vehicle_structs_[0].current_state_.orientation_x;
-      transform.transform.rotation.y = hw_vehicle_structs_[0].current_state_.orientation_y;
-      transform.transform.rotation.z = hw_vehicle_structs_[0].current_state_.orientation_z;
-      transform.transform.rotation.w = hw_vehicle_structs_[0].current_state_.orientation_w;
+      transform.transform.rotation.x = q_new.x();
+      transform.transform.rotation.y = q_new.y();
+      transform.transform.rotation.z = q_new.z();
+      transform.transform.rotation.w = q_new.w();
       realtime_odometry_transform_publisher_->unlockAndPublish();
     }
 
