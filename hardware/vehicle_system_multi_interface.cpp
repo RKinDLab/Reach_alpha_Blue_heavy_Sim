@@ -35,11 +35,12 @@ using namespace casadi;
 namespace
 {
   constexpr auto DEFAULT_TRANSFORM_TOPIC = "/tf";
+  constexpr auto DEFAULT_POSITION_PID_TOPIC = "~/position/reference";
+  constexpr auto DEFAULT_VELOCITY_PID_TOPIC = "~/velocity/reference";
 } // namespace
 
 namespace ros2_control_blue_reach_5
 {
-
   hardware_interface::CallbackReturn VehicleSystemMultiInterfaceHardware::on_init(
       const hardware_interface::HardwareInfo &info)
   {
@@ -61,11 +62,11 @@ namespace ros2_control_blue_reach_5
     double no_vehicles = 1;
     hw_vehicle_structs_.reserve(no_vehicles);
 
-    blue::dynamics::Vehicle::State initialState{0.0, 0.0, 0.5, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    blue::dynamics::Vehicle::State initialState{0.0, 0.0, 2.5, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
     hw_vehicle_structs_.emplace_back("blue ROV heavy 0", initialState);
 
-    hw_vehicle_structs_[0].world_frame = info_.hardware_parameters["world_frame"];
-    hw_vehicle_structs_[0].body_frame = info_.hardware_parameters["body_frame"];
+    // hw_vehicle_structs_[0].world_frame = info_.hardware_parameters["world_frame"];
+    // hw_vehicle_structs_[0].body_frame = info_.hardware_parameters["body_frame"];
 
     hw_vehicle_structs_[0].thrustSizeAllocation(info_.joints.size());
     // blue_parameters.setupParameters();
@@ -81,26 +82,25 @@ namespace ros2_control_blue_reach_5
       hw_vehicle_structs_[0].hw_thrust_structs_.emplace_back(joint.name, defaultState);
       // RRBotSystemMultiInterface has exactly 3 state interfaces
       // and 3 command interfaces on each joint
-      if (joint.command_interfaces.size() != 3)
+      if (joint.command_interfaces.size() != 2)
       {
         RCLCPP_FATAL(
             rclcpp::get_logger("VehicleSystemMultiInterfaceHardware"),
-            "Thruster '%s' has %zu command interfaces. 3 expected.", joint.name.c_str(),
+            "Thruster '%s' has %zu command interfaces. 2 expected.", joint.name.c_str(),
             joint.command_interfaces.size());
         return hardware_interface::CallbackReturn::ERROR;
       }
 
-      if (!(joint.command_interfaces[0].name == hardware_interface::HW_IF_VELOCITY ||
-            joint.command_interfaces[0].name == custom_hardware_interface::HW_IF_CURRENT ||
-            joint.command_interfaces[0].name == "effort"))
-      {
-        RCLCPP_FATAL(
-            rclcpp::get_logger("VehicleSystemMultiInterfaceHardware"),
-            "Thruster '%s' has %s command interface. Expected %s, %s or %s.", joint.name.c_str(),
-            joint.command_interfaces[0].name.c_str(),
-            hardware_interface::HW_IF_VELOCITY, custom_hardware_interface::HW_IF_CURRENT, hardware_interface::HW_IF_ACCELERATION);
-        return hardware_interface::CallbackReturn::ERROR;
-      }
+      // if (!(joint.command_interfaces[0].name == custom_hardware_interface::HW_IF_CURRENT ||
+      //       joint.command_interfaces[0].name == hardware_interface::HW_IF_EFFORT))
+      // {
+      //   RCLCPP_FATAL(
+      //       rclcpp::get_logger("VehicleSystemMultiInterfaceHardware"),
+      //       "Thruster '%s' has %s command interface. Expected %s, %s or %s.", joint.name.c_str(),
+      //       joint.command_interfaces[0].name.c_str(),
+      //       hardware_interface::HW_IF_VELOCITY, custom_hardware_interface::HW_IF_CURRENT, hardware_interface::HW_IF_ACCELERATION);
+      //   return hardware_interface::CallbackReturn::ERROR;
+      // }
 
       if (joint.state_interfaces.size() != 4)
       {
@@ -128,17 +128,35 @@ namespace ros2_control_blue_reach_5
     return hardware_interface::CallbackReturn::SUCCESS;
   }
 
-
   hardware_interface::CallbackReturn VehicleSystemMultiInterfaceHardware::on_configure(
-    const rclcpp_lifecycle::State & /*previous_state*/)
+      const rclcpp_lifecycle::State & /*previous_state*/)
   {
     // declare and get parameters needed for controller operations
     // setup realtime buffers, ROS publishers, and ROS subscribers ...
     try
     {
       auto node_topics_interface = rclcpp::Node("VehicleSystemMultiInterfaceHardware");
+
+      // topics QoS
+      auto subscribers_qos = rclcpp::SystemDefaultsQoS();
+      subscribers_qos.keep_last(1);
+      subscribers_qos.best_effort();
+
+      // position Reference Subscriber
+      position_ref_subscriber_ = rclcpp::create_subscription<RefType>(node_topics_interface,
+                                                                      DEFAULT_POSITION_PID_TOPIC, subscribers_qos,
+                                                                      [this](const RefType::SharedPtr msg)
+                                                                      { rt_position_ptr_.writeFromNonRT(msg); });
+
+      // velocity Reference Subscriber
+      velocity_ref_subscriber_ = rclcpp::create_subscription<RefType>(node_topics_interface,
+                                                                      DEFAULT_VELOCITY_PID_TOPIC, subscribers_qos,
+                                                                      [this](const RefType::SharedPtr msg)
+                                                                      { rt_velocity_ptr_.writeFromNonRT(msg); });
+
+      // tf publisher
       odometry_transform_publisher_ = rclcpp::create_publisher<tf2_msgs::msg::TFMessage>(node_topics_interface,
-          DEFAULT_TRANSFORM_TOPIC, rclcpp::SystemDefaultsQoS());
+                                                                                         DEFAULT_TRANSFORM_TOPIC, rclcpp::SystemDefaultsQoS());
 
       realtime_odometry_transform_publisher_ =
           std::make_shared<realtime_tools::RealtimePublisher<tf2_msgs::msg::TFMessage>>(
@@ -156,7 +174,7 @@ namespace ros2_control_blue_reach_5
           e.what());
       return CallbackReturn::ERROR;
     }
-    
+
     RCLCPP_INFO(
         rclcpp::get_logger("VehicleSystemMultiInterfaceHardware"), "configure successful");
     return hardware_interface::CallbackReturn::SUCCESS;
@@ -216,8 +234,6 @@ namespace ros2_control_blue_reach_5
     for (std::size_t i = 0; i < info_.joints.size(); i++)
     {
       command_interfaces.emplace_back(hardware_interface::CommandInterface(
-          info_.joints[i].name, hardware_interface::HW_IF_VELOCITY, &hw_vehicle_structs_[0].hw_thrust_structs_[i].command_state_.velocity));
-      command_interfaces.emplace_back(hardware_interface::CommandInterface(
           info_.joints[i].name, custom_hardware_interface::HW_IF_CURRENT, &hw_vehicle_structs_[0].hw_thrust_structs_[i].command_state_.current));
       command_interfaces.emplace_back(hardware_interface::CommandInterface(
           info_.joints[i].name, hardware_interface::HW_IF_EFFORT, &hw_vehicle_structs_[0].hw_thrust_structs_[i].command_state_.effort));
@@ -235,14 +251,6 @@ namespace ros2_control_blue_reach_5
     {
       for (std::size_t i = 0; i < info_.joints.size(); i++)
       {
-        if (key == info_.joints[i].name + "/" + hardware_interface::HW_IF_POSITION)
-        {
-          new_modes.push_back(mode_level_t::MODE_POSITION);
-        }
-        if (key == info_.joints[i].name + "/" + hardware_interface::HW_IF_VELOCITY)
-        {
-          new_modes.push_back(mode_level_t::MODE_VELOCITY);
-        }
         if (key == info_.joints[i].name + "/" + custom_hardware_interface::HW_IF_CURRENT)
         {
           new_modes.push_back(mode_level_t::MODE_CURRENT);
@@ -274,7 +282,6 @@ namespace ros2_control_blue_reach_5
       {
         if (key.find(info_.joints[i].name) != std::string::npos)
         {
-          hw_vehicle_structs_[0].hw_thrust_structs_[i].command_state_.velocity = 0;
           hw_vehicle_structs_[0].hw_thrust_structs_[i].command_state_.current = 0;
           control_level_[i] = mode_level_t::MODE_DISABLE; // Revert to undefined
         }
@@ -300,6 +307,12 @@ namespace ros2_control_blue_reach_5
     RCLCPP_INFO(
         rclcpp::get_logger("VehicleSystemMultiInterfaceHardware"), "Activating... please wait...");
 
+    // reset position buffer if a ref came through callback when controller was inactive
+    rt_position_ptr_ = realtime_tools::RealtimeBuffer<std::shared_ptr<RefType>>(nullptr);
+
+    // reset velocity buffer if a ref came through callback when controller was inactive
+    rt_velocity_ptr_ = realtime_tools::RealtimeBuffer<std::shared_ptr<RefType>>(nullptr);
+
     for (std::size_t i = 0; i < info_.joints.size(); i++)
     {
       if (std::isnan(hw_vehicle_structs_[0].hw_thrust_structs_[i].current_state_.position))
@@ -318,13 +331,14 @@ namespace ros2_control_blue_reach_5
       {
         hw_vehicle_structs_[0].hw_thrust_structs_[i].current_state_.acceleration = 0.0;
       }
-      if (std::isnan(hw_vehicle_structs_[0].hw_thrust_structs_[i].command_state_.velocity))
-      {
-        hw_vehicle_structs_[0].hw_thrust_structs_[i].command_state_.velocity = 0.0;
-      }
+
       if (std::isnan(hw_vehicle_structs_[0].hw_thrust_structs_[i].command_state_.current))
       {
         hw_vehicle_structs_[0].hw_thrust_structs_[i].command_state_.current = 0.0;
+      }
+      if (std::isnan(hw_vehicle_structs_[0].hw_thrust_structs_[i].command_state_.effort))
+      {
+        hw_vehicle_structs_[0].hw_thrust_structs_[i].command_state_.effort = 0.0;
       }
       control_level_[i] = mode_level_t::MODE_DISABLE;
     }
@@ -337,13 +351,13 @@ namespace ros2_control_blue_reach_5
   hardware_interface::CallbackReturn VehicleSystemMultiInterfaceHardware::on_deactivate(
       const rclcpp_lifecycle::State & /*previous_state*/)
   {
-    // BEGIN: This part here is for exemplary purposes - Please do not copy to your production code
     RCLCPP_INFO(
         rclcpp::get_logger("VehicleSystemMultiInterfaceHardware"), "Deactivating... please wait...");
-
+    // reset position buffer if a ref came through callback when controller was inactive
+    rt_position_ptr_ = realtime_tools::RealtimeBuffer<std::shared_ptr<RefType>>(nullptr);
+    // reset velocity buffer if a ref came through callback when controller was inactive
+    rt_velocity_ptr_ = realtime_tools::RealtimeBuffer<std::shared_ptr<RefType>>(nullptr);
     RCLCPP_INFO(rclcpp::get_logger("VehicleSystemMultiInterfaceHardware"), "Successfully deactivated!");
-    // END: This part here is for exemplary purposes - Please do not copy to your production code
-
     return hardware_interface::CallbackReturn::SUCCESS;
   }
 
@@ -365,9 +379,25 @@ namespace ros2_control_blue_reach_5
   }
 
   hardware_interface::return_type VehicleSystemMultiInterfaceHardware::write(
-      const rclcpp::Time & time, const rclcpp::Duration &period)
+      const rclcpp::Time &time, const rclcpp::Duration &period)
   {
     double delta_seconds = period.seconds();
+
+    // auto position_reference_state = rt_position_ptr_.readFromRT();
+
+    // // no positon reference received yet
+    // if (!position_reference_state || !(*position_reference_state))
+    // {
+    //   return hardware_interface::return_type::OK;
+    // }
+
+    // auto vel_reference_state = rt_velocity_ptr_.readFromRT();
+
+    // // no velocity reference received yet
+    // if (!vel_reference_state || !(*vel_reference_state))
+    // {
+    //   return hardware_interface::return_type::OK;
+    // }
 
     std::vector<double> x0 = {
         hw_vehicle_structs_[0].current_state_.position_x,
@@ -423,7 +453,7 @@ namespace ros2_control_blue_reach_5
 
     if (realtime_odometry_transform_publisher_->trylock())
     {
-      // original pose in NED 
+      // original pose in NED
       // RBIZ USES NWU
       tf2::Quaternion q_orig, q_rot, q_new;
 
@@ -444,7 +474,7 @@ namespace ros2_control_blue_reach_5
       transform.transform.translation.x = hw_vehicle_structs_[0].current_state_.position_x;
       transform.transform.translation.y = -hw_vehicle_structs_[0].current_state_.position_y;
       transform.transform.translation.z = -hw_vehicle_structs_[0].current_state_.position_z;
-      
+
       transform.transform.rotation.x = q_new.x();
       transform.transform.rotation.y = q_new.y();
       transform.transform.rotation.z = q_new.z();

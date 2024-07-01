@@ -17,10 +17,6 @@
       </hardware>
 
       <joint name="${prefix}thruster1_joint">
-        <command_interface name="velocity">
-          <param name="min">-1</param>
-          <param name="max">1</param>
-        </command_interface>
         <command_interface name="current">
           <param name="min">-1</param>
           <param name="max">1</param>
@@ -36,10 +32,6 @@
       </joint>
 
       <joint name="${prefix}thruster2_joint">
-        <command_interface name="velocity">
-          <param name="min">-1</param>
-          <param name="max">1</param>
-        </command_interface>
         <command_interface name="current">
           <param name="min">-1</param>
           <param name="max">1</param>
@@ -55,10 +47,6 @@
       </joint>
 
        <joint name="${prefix}thruster3_joint">
-        <command_interface name="velocity">
-          <param name="min">-1</param>
-          <param name="max">1</param>
-        </command_interface>
         <command_interface name="current">
           <param name="min">-1</param>
           <param name="max">1</param>
@@ -74,10 +62,6 @@
       </joint>
 
        <joint name="${prefix}thruster4_joint">
-        <command_interface name="velocity">
-          <param name="min">-1</param>
-          <param name="max">1</param>
-        </command_interface>
         <command_interface name="current">
           <param name="min">-1</param>
           <param name="max">1</param>
@@ -93,10 +77,6 @@
       </joint>
 
        <joint name="${prefix}thruster5_joint">
-        <command_interface name="velocity">
-          <param name="min">-1</param>
-          <param name="max">1</param>
-        </command_interface>
         <command_interface name="current">
           <param name="min">-1</param>
           <param name="max">1</param>
@@ -112,10 +92,6 @@
       </joint>
 
        <joint name="${prefix}thruster6_joint">
-        <command_interface name="velocity">
-          <param name="min">-1</param>
-          <param name="max">1</param>
-        </command_interface>
         <command_interface name="current">
           <param name="min">-1</param>
           <param name="max">1</param>
@@ -130,10 +106,6 @@
         <state_interface name="current"/>
       </joint>
        <joint name="${prefix}thruster7_joint">
-        <command_interface name="velocity">
-          <param name="min">-1</param>
-          <param name="max">1</param>
-        </command_interface>
         <command_interface name="current">
           <param name="min">-1</param>
           <param name="max">1</param>
@@ -149,10 +121,6 @@
       </joint>
 
        <joint name="${prefix}thruster8_joint">
-        <command_interface name="velocity">
-          <param name="min">-1</param>
-          <param name="max">1</param>
-        </command_interface>
         <command_interface name="current">
           <param name="min">-1</param>
           <param name="max">1</param>

@@ -1,6 +1,6 @@
 controller_manager:
   ros__parameters:
-    update_rate: 1000  #Hz
+    update_rate: 150  #Hz
     is_async: True
 
     forward_position_controller:
@@ -24,6 +24,7 @@ controller_manager:
     fts_broadcaster:
       type: force_torque_sensor_broadcaster/ForceTorqueSensorBroadcaster
 
+
 joint_state_broadcaster:
   ros__parameters:
     map_interface_to_joint_state:
@@ -42,14 +43,6 @@ forward_position_controller:
       - alpha_axis_c
       - alpha_axis_d
       - alpha_axis_e
-      - alphathruster1_joint
-      - alphathruster2_joint
-      - alphathruster3_joint
-      - alphathruster4_joint
-      - alphathruster5_joint
-      - alphathruster6_joint
-      - alphathruster7_joint
-      - alphathruster8_joint
     interface_name: position
 
 forward_velocity_controller:
@@ -60,14 +53,6 @@ forward_velocity_controller:
       - alpha_axis_c
       - alpha_axis_d
       - alpha_axis_e
-      - alphathruster1_joint
-      - alphathruster2_joint
-      - alphathruster3_joint
-      - alphathruster4_joint
-      - alphathruster5_joint
-      - alphathruster6_joint
-      - alphathruster7_joint
-      - alphathruster8_joint
     interface_name: velocity
 
 forward_current_controller:
