@@ -25,12 +25,16 @@ constexpr char HW_IF_DISABLE[] = "disable";
 constexpr char HW_IF_STANDBY[] = "standby";
 /// Constant defining state counts for synchronizations purposes
 constexpr char HW_IF_STATE_ID[] = "stateId";
-/// Constant defining position without noise interface
+/// Constant defining filtered_position interface
 constexpr char HW_IF_FILTERED_POSITION[] = "filtered_position";
-/// Constant defining velocity without noise interface
+/// Constant defining filtered_velocity interface
 constexpr char HW_IF_FILTERED_VELOCITY[] = "filtered_velocity";
-/// Constant defining acceleration without noise interface
+/// Constant defining estimated_acceleration interface
 constexpr char HW_IF_ESTIMATED_ACCELERATION[] = "estimated_acceleration";
+/// Constant defining estimated_torque interface
+constexpr char HW_IF_ESTIMATED_EFFORT[] = "estimated_effort";
+/// Constant defining estimated_inertia_zz interface
+constexpr char HW_IF_ESTIMATED_INERTIA_ZZ[] = "estimated_inertia_zz";
 }  // namespace hardware_interface
 
 #endif  // ROS2_CONTROL_BLUE_REACH_5__CUSTOM_HARDWARE_INTERFACE_TYPE_VALUES_HPP_

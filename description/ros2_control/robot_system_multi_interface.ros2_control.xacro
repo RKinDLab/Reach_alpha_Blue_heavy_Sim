@@ -62,6 +62,8 @@
         <state_interface name="current"/>
         <state_interface name="effort"/>
         <state_interface name="stateId"/>
+        <state_interface name="estimated_effort"/>
+        <state_interface name="estimated_inertia_zz"/>
       </joint>
 
       <joint name="${prefix}_axis_b">
@@ -107,6 +109,8 @@
         <state_interface name="current"/>
         <state_interface name="effort"/>
         <state_interface name="stateId"/>
+        <state_interface name="estimated_effort"/>
+        <state_interface name="estimated_inertia_zz"/>
       </joint>
 
       <joint name="${prefix}_axis_c">
@@ -152,7 +156,9 @@
         <state_interface name="current"/>
         <state_interface name="effort"/>
         <state_interface name="stateId"/>
-      </joint>      
+        <state_interface name="estimated_effort"/>
+        <state_interface name="estimated_inertia_zz"/>
+      </joint>   
 
       <joint name="${prefix}_axis_d">
         <param name="device_id">0x04</param>
@@ -197,7 +203,9 @@
         <state_interface name="current"/>
         <state_interface name="effort"/>
         <state_interface name="stateId"/>
-      </joint>      
+        <state_interface name="estimated_effort"/>
+        <state_interface name="estimated_inertia_zz"/>
+      </joint>     
       
       <joint name="${prefix}_axis_e">
         <param name="device_id">0x05</param>
@@ -242,6 +250,8 @@
         <state_interface name="current"/>
         <state_interface name="effort"/>
         <state_interface name="stateId"/>
+        <state_interface name="estimated_effort"/>
+        <state_interface name="estimated_inertia_zz"/>
       </joint>
     </ros2_control>
 

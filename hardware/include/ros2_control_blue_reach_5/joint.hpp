@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <cmath>
 #include <vector>
+#include <casadi/casadi.hpp>
 
 class Joint
 {
@@ -16,6 +17,7 @@ private:
 public:
     std::string name;  // Name of the device or component
     uint8_t device_id; // Unique identifier for the device
+    double gear_ratio = 340.4;
 
     struct State
     {
@@ -24,14 +26,18 @@ public:
         double velocity = 0;
         double filtered_velocity = 0;
         double estimated_acceleration = 0;
+        double estimated_jerk = 0;
         double acceleration = 0;
         double current = 0;
         double effort = 0;
+        double estimated_effort = 0;
         double state_id = 0;
-        std::vector<double> covariance = {0.005, 0, 0, 0, 0.005, 0, 0, 0, 0.5};
-        std::vector<double> sigma_m = {0.0005, 0.0005};
-        double sigma_a = 0.0005;
-        std::vector<double> KF_error = {0.0, 0.0};
+        double rotor_inertia_zz = 0;
+        casadi::DM covariance = 10 * casadi::DM::eye(18);
+        std::vector<double> sigma_m = {0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5}; //Measurement noise covariance matrix
+        std::vector<double> sigma_p = {0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5}; // Process noise covariance matrix
+
+        // casadi::DM KF_error = casadi::DM();
     };
 
     State default_state_{}, command_state_{}, current_state_{}, async_state_{};

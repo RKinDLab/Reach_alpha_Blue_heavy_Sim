@@ -1,34 +1,15 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <root>
  <tabbed_widget parent="main_window" name="Main Window">
-  <Tab containers="1" tab_name="Online Model Optimisation">
+  <Tab containers="1" tab_name="tab1">
    <Container>
-    <DockSplitter orientation="-" count="2" sizes="0.502831;0.497169">
-     <DockSplitter orientation="|" count="2" sizes="0.5;0.5">
-      <DockArea name="Estimated Parameters">
-       <plot style="Lines" flip_x="false" mode="TimeSeries" flip_y="false">
-        <range right="1719510483.494801" bottom="-0.008327" left="1719510478.485750" top="0.341325"/>
-        <limitY/>
-        <curve name="Inertia xx (Rigid Body &amp; Added Inertia)" color="#1f77b4"/>
-        <curve name="Inertia yy (Rigid Body &amp; Added Inertia)" color="#d62728"/>
-        <curve name="Inertia zz (Rigid Body &amp; Added Inertia)" color="#1ac938"/>
-        <curve name="mass &amp; added mass" color="#ff7f0e"/>
-       </plot>
-      </DockArea>
-      <DockArea name="Standard deviation of Estimated Parameters">
-       <plot style="Lines" flip_x="false" mode="TimeSeries" flip_y="false">
-        <range right="1719510483.494801" bottom="0.000000" left="1719510478.485750" top="0.000100"/>
-        <limitY min="0" max="0.0001"/>
-        <curve name="Inertia zz Uncertainty" color="#1ac938"/>
-       </plot>
-      </DockArea>
-     </DockSplitter>
-     <DockArea name="Model Verification Using Torques Computed from Current Readings &amp; Torque from Optimised Inverse Dynamic Model">
-      <plot style="Lines" flip_x="false" mode="TimeSeries" flip_y="false">
-       <range right="1719510483.494801" bottom="-0.000000" left="1719510478.485750" top="0.000000"/>
+    <DockSplitter count="1" orientation="-" sizes="1">
+     <DockArea name="...">
+      <plot mode="TimeSeries" style="Lines" flip_x="false" flip_y="false">
+       <range left="1719790953.920035" right="1719790958.911764" bottom="-0.100000" top="0.100000"/>
        <limitY/>
-       <curve name="Torque from Current Readings" color="#f14cc1"/>
-       <curve name="Torque from Optimised Model" color="#9467bd"/>
+       <curve color="#1f77b4" name="/dynamic_joint_states/interface_values[13]/values[5]"/>
+       <curve color="#d62728" name="/dynamic_joint_states/interface_values[13]/values[9]"/>
       </plot>
      </DockArea>
     </DockSplitter>
@@ -59,7 +40,7 @@
    <max_array_size value="100"/>
    <boolean_strings_to_number value="true"/>
    <remove_suffix_from_strings value="true"/>
-   <selected_topics value="/Model_torque_joint_b;/dynamic_joint_states;/params_topic"/>
+   <selected_topics value="/dynamic_joint_states"/>
   </plugin>
   <plugin ID="UDP Server"/>
   <plugin ID="WebSocket Server"/>
@@ -77,58 +58,7 @@
  <previouslyLoaded_Datafiles/>
  <previouslyLoaded_Streamer name="ROS2 Topic Subscriber"/>
  <!-- - - - - - - - - - - - - - - -->
- <customMathEquations>
-  <snippet name="mass Uncertainty">
-   <global></global>
-   <function>return value</function>
-   <linked_source>/params_topic/data[16]</linked_source>
-  </snippet>
-  <snippet name="Inertia yy Uncertainty">
-   <global></global>
-   <function>return value</function>
-   <linked_source>/params_topic/data[15]</linked_source>
-  </snippet>
-  <snippet name="Inertia xx Uncertainty">
-   <global></global>
-   <function>return value</function>
-   <linked_source>/params_topic/data[12]</linked_source>
-  </snippet>
-  <snippet name="Torque from Optimised Model">
-   <global></global>
-   <function>return value</function>
-   <linked_source>/Model_torque_joint_b/data</linked_source>
-  </snippet>
-  <snippet name="Torque from Current Readings">
-   <global></global>
-   <function>return value</function>
-   <linked_source>/dynamic_joint_states/interface_values[13]/values[6]</linked_source>
-  </snippet>
-  <snippet name="Inertia zz (Rigid Body &amp; Added Inertia)">
-   <global></global>
-   <function>return value</function>
-   <linked_source>/params_topic/data[5]</linked_source>
-  </snippet>
-  <snippet name="Inertia zz Uncertainty">
-   <global></global>
-   <function>return value</function>
-   <linked_source>/params_topic/data[17]</linked_source>
-  </snippet>
-  <snippet name="mass &amp; added mass">
-   <global></global>
-   <function>return value</function>
-   <linked_source>/params_topic/data[6]</linked_source>
-  </snippet>
-  <snippet name="Inertia yy (Rigid Body &amp; Added Inertia)">
-   <global></global>
-   <function>return value</function>
-   <linked_source>/params_topic/data[3]</linked_source>
-  </snippet>
-  <snippet name="Inertia xx (Rigid Body &amp; Added Inertia)">
-   <global></global>
-   <function>return value</function>
-   <linked_source>/params_topic/data[0]</linked_source>
-  </snippet>
- </customMathEquations>
+ <customMathEquations/>
  <snippets/>
  <!-- - - - - - - - - - - - - - - -->
 </root>

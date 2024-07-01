@@ -191,6 +191,7 @@ def generate_launch_description():
     nodes = [
         run_plotjuggler,
         mouse_control,
+        namor_entity,
         control_node,
         robot_state_pub_node,
         joint_state_broadcaster_spawner,

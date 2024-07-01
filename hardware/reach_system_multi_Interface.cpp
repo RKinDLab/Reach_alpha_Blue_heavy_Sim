@@ -43,24 +43,31 @@ namespace ros2_control_blue_reach_5
     dynamics_service.usage_cplusplus_checks("test", "libtest.so");
     dynamics_service.forward_dynamics = dynamics_service.load_casadi_fun("Xnext", "libXnext.so");
     dynamics_service.forward_kinematics = dynamics_service.load_casadi_fun("T_fk", "libTfk.so");
-    dynamics_service.kalman_filter = dynamics_service.load_casadi_fun("KF_PREDICT", "libKFnext.so");
+    dynamics_service.extended_kalman_filter = dynamics_service.load_casadi_fun("EKF_J3", "libEKFnext.so");
     dynamics_service.current2torqueMap = dynamics_service.load_casadi_fun("current_to_torque_map", "libC2T.so");
     dynamics_service.torque2currentMap = dynamics_service.load_casadi_fun("torque_to_current_map", "libT2C.so");
 
-    std::vector<double> x_est = {0.0, 0.0, 0.0};                                                         // Initial estimate of state
-    double dt = 0.1;                                                                                     // time step
-    double sigma_a = 0.5;                                                                                // acceleration process noise
-    std::vector<double> sigma_m = {0.5, 0.5};                                                            // position measurement noise
-    std::vector<double> p_0d = {5, 0, 0, 0, 5, 0, 0, 0, 10};                                             // initial covariance matrix
-    std::vector<double> z = {1, 0.5};                                                                    // example measurment (position and velocity)
-    std::vector<DM> arg = {DM(x_est), DM(z), reshape(DM(p_0d), 3, 3), DM(sigma_m), DM(sigma_a), DM(dt)}; // KF argument bundled
-    std::vector<DM> estimates_dm = dynamics_service.kalman_filter(arg);                                  // execute KF
+    std::vector<double> x_q = {0.0, 0.0, 0.0, 0.0}; // Initial estimate of state
+    std::vector<double> x_q_dot = {0.0, 0.0, 0.0, 0.0};
+    std::vector<double> x_q_ddot = {0.0, 0.0, 0.0, 0.0};
+    std::vector<double> x_q_dddot = {0.0, 0.0, 0.0, 0.0};
+    double G = 340;
+    double Ir = 0.001;
+    double tau = 0.1;
+    double dt = 0.0005;
+    casadi::DM P0 = 10 * DM::eye(18);
+    std::vector<double> sigma_m = {0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5};
+    std::vector<double> sigma_p = {0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5};
+    std::vector<double> y = {0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5}; // example measurment (position and velocity)
+    std::vector<DM> arg = {DM(x_q), DM(x_q_dot), DM(x_q_ddot), DM(x_q_dddot), DM(G), DM(Ir), DM(tau), DM(dt),
+                           P0, DM(sigma_m), DM(sigma_p), DM(y)};                 // KF argument bundled
+    std::vector<DM> estimates_dm = dynamics_service.extended_kalman_filter(arg); // execute KF
 
     std::cout << "*********************************************************" << std::endl;
-    std::cout << "Kalman filter example exercise" << std::endl;
-    std::cout << "Kalman filter estimate result: " << estimates_dm.at(0) << std::endl;
-    std::cout << "Kalman filter error result: " << estimates_dm.at(1) << std::endl;
-    std::cout << "Kalman filter Pk result: " << estimates_dm.at(2) << std::endl;
+    std::cout << "extended Kalman filter example exercise" << std::endl;
+    std::cout << "extended Kalman filter estimate result: " << estimates_dm.at(0) << std::endl;
+    // std::cout << "extended Kalman filter Pk result: " << estimates_dm.at(1) << std::endl;
+    std::cout << "extended Kalman filter error result: " << estimates_dm.at(2) << std::endl;
     std::cout << "*********************************************************" << std::endl;
 
     std::vector<double> x = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
@@ -113,7 +120,7 @@ namespace ros2_control_blue_reach_5
       Joint::SoftLimits jointSoftLimits{.position_k = soft_k_position, .velocity_k = soft_k_velocity, .position_min = soft_min_position, .position_max = soft_max_position};
       Joint::MotorInfo actuatorProp{.kt = kt, .I_static = I_static};
       hw_joint_structs_.emplace_back(joint.name, device_id, initialState, jointLimits, positionLimitsFlag, jointSoftLimits, actuatorProp);
-      // ReachSystemMultiInterface has exactly 3 state interfaces
+      // ReachSystemMultiInterface has exactly 4 state interfaces
       // and 3 command interfaces on each joint
       if (joint.command_interfaces.size() != 4)
       {
@@ -136,11 +143,11 @@ namespace ros2_control_blue_reach_5
       //       hardware_interface::HW_IF_VELOCITY, hardware_interface::HW_IF_EFFORT, custom_hardware_interface::HW_IF_CURRENT);
       //   return hardware_interface::CallbackReturn::ERROR;
       // }
-      if (joint.state_interfaces.size() != 9)
+      if (joint.state_interfaces.size() != 11)
       {
         RCLCPP_FATAL(
             rclcpp::get_logger("ReachSystemMultiInterfaceHardware"),
-            "Joint '%s'has %zu state interfaces. 9 expected.",
+            "Joint '%s'has %zu state interfaces. 11 expected.",
             joint.name.c_str(),
             joint.state_interfaces.size());
         return hardware_interface::CallbackReturn::ERROR;
@@ -333,6 +340,12 @@ namespace ros2_control_blue_reach_5
 
       state_interfaces.emplace_back(hardware_interface::StateInterface(
           info_.joints[i].name, custom_hardware_interface::HW_IF_STATE_ID, &hw_joint_structs_[i].current_state_.state_id));
+
+      state_interfaces.emplace_back(hardware_interface::StateInterface(
+          info_.joints[i].name, custom_hardware_interface::HW_IF_ESTIMATED_EFFORT, &hw_joint_structs_[i].current_state_.estimated_effort));
+
+      state_interfaces.emplace_back(hardware_interface::StateInterface(
+          info_.joints[i].name, custom_hardware_interface::HW_IF_ESTIMATED_INERTIA_ZZ, &hw_joint_structs_[i].current_state_.rotor_inertia_zz));
     }
 
     return state_interfaces;
@@ -399,45 +412,92 @@ namespace ros2_control_blue_reach_5
   hardware_interface::return_type ReachSystemMultiInterfaceHardware::read(
       const rclcpp::Time & /*time*/, const rclcpp::Duration &period)
   {
-
+    double delta_seconds = period.seconds();
     // Get access to the real-time states
     const std::lock_guard<std::mutex> lock(access_async_states_);
     for (std::size_t i = 0; i < info_.joints.size(); i++)
     {
-      double delta_seconds = period.seconds();
-      hw_joint_structs_[i].current_state_.state_id++;
-      double prev_velocity_ = hw_joint_structs_[i].current_state_.filtered_velocity;
+      // hw_joint_structs_[i].current_state_.state_id++;
+      // double prev_velocity_ = hw_joint_structs_[i].current_state_.filtered_velocity;
       hw_joint_structs_[i].current_state_.position = hw_joint_structs_[i].async_state_.position;
-
       hw_joint_structs_[i].current_state_.velocity = hw_joint_structs_[i].async_state_.velocity;
       hw_joint_structs_[i].current_state_.current = hw_joint_structs_[i].async_state_.current;
+
       std::vector<DM> T2C_arg = {DM(hw_joint_structs_[i].actuator_Properties_.kt),
                                  DM(hw_joint_structs_[i].actuator_Properties_.I_static),
                                  DM(hw_joint_structs_[i].current_state_.current)};
       std::vector<DM> torque = dynamics_service.current2torqueMap(T2C_arg);
       hw_joint_structs_[i].current_state_.effort = torque.at(0).scalar();
 
-      std::vector<double> x_est = {hw_joint_structs_[i].current_state_.filtered_position,
-                                   hw_joint_structs_[i].current_state_.filtered_velocity,
-                                   hw_joint_structs_[i].current_state_.estimated_acceleration};
-      double dt = delta_seconds;
-      double sigma_a = hw_joint_structs_[i].current_state_.sigma_a;
-      std::vector<double> sigma_m = hw_joint_structs_[i].current_state_.sigma_m;
-      std::vector<double> p_k = hw_joint_structs_[i].current_state_.covariance;
-      std::vector<double> yk = {hw_joint_structs_[i].current_state_.position, hw_joint_structs_[i].current_state_.velocity};
-      std::vector<DM> kf_arg = {DM(x_est), DM(yk), reshape(DM(p_k), 3, 3), DM(sigma_m), DM(sigma_a), DM(dt)};
-
-      std::vector<DM> estimates_dm = dynamics_service.kalman_filter(kf_arg);
-
-      hw_joint_structs_[i].current_state_.filtered_position = estimates_dm.at(0).nonzeros()[0];
-      hw_joint_structs_[i].current_state_.filtered_velocity = estimates_dm.at(0).nonzeros()[1];
-      hw_joint_structs_[i].current_state_.estimated_acceleration = estimates_dm.at(0).nonzeros()[2];
-      hw_joint_structs_[i].current_state_.KF_error = estimates_dm.at(1).nonzeros();
-      hw_joint_structs_[i].current_state_.covariance = estimates_dm.at(2).nonzeros();
-      hw_joint_structs_[i].calcAcceleration(hw_joint_structs_[i].current_state_.filtered_velocity, prev_velocity_, delta_seconds);
-      //  RCLCPP_INFO(rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), " %d acceleration %f",hw_joint_structs_[i].device_id,
+      //  RCLCPP_DEBUG(rclcpp::get_logger("ReachSystemMultiInterfaceHardware"), " %d acceleration %f",hw_joint_structs_[i].device_id,
       //   hw_joint_structs_[i].acceleration_state_);
     }
+
+    std::vector<double> x_q = {hw_joint_structs_[0].current_state_.filtered_position,
+                               hw_joint_structs_[1].current_state_.filtered_position,
+                               hw_joint_structs_[2].current_state_.filtered_position,
+                               hw_joint_structs_[3].current_state_.filtered_position}; // Initial estimate of state
+    std::vector<double> x_q_dot = {hw_joint_structs_[0].current_state_.filtered_velocity,
+                                   hw_joint_structs_[1].current_state_.filtered_velocity,
+                                   hw_joint_structs_[2].current_state_.filtered_velocity,
+                                   hw_joint_structs_[3].current_state_.filtered_velocity};
+    std::vector<double> x_q_ddot = {hw_joint_structs_[0].current_state_.estimated_acceleration,
+                                    hw_joint_structs_[1].current_state_.estimated_acceleration,
+                                    hw_joint_structs_[2].current_state_.estimated_acceleration,
+                                    hw_joint_structs_[3].current_state_.estimated_acceleration};
+    std::vector<double> x_q_dddot = {hw_joint_structs_[0].current_state_.estimated_jerk,
+                                     hw_joint_structs_[1].current_state_.estimated_jerk,
+                                     hw_joint_structs_[2].current_state_.estimated_jerk,
+                                     hw_joint_structs_[3].current_state_.estimated_jerk};
+    double G = hw_joint_structs_[3].gear_ratio;
+    double Ir = hw_joint_structs_[3].current_state_.rotor_inertia_zz;
+    double tau = hw_joint_structs_[3].current_state_.estimated_effort;
+    double dt = delta_seconds;
+    casadi::DM P0 = hw_joint_structs_[3].current_state_.covariance;
+    std::vector<double> sigma_m = hw_joint_structs_[3].current_state_.sigma_m;
+    std::vector<double> sigma_p = hw_joint_structs_[3].current_state_.sigma_p;
+    std::vector<double> y = {hw_joint_structs_[0].current_state_.position,
+                               hw_joint_structs_[1].current_state_.position,
+                               hw_joint_structs_[2].current_state_.position,
+                               hw_joint_structs_[3].current_state_.position,
+                                hw_joint_structs_[0].current_state_.velocity,
+                               hw_joint_structs_[1].current_state_.velocity,
+                               hw_joint_structs_[2].current_state_.velocity,
+                               hw_joint_structs_[3].current_state_.velocity,
+                               hw_joint_structs_[3].current_state_.effort}; // example measurment (position and velocity)
+    std::vector<DM> ekf_arg = {DM(x_q), DM(x_q_dot), DM(x_q_ddot), DM(x_q_dddot), DM(G), DM(Ir), DM(tau), DM(dt),
+                           P0, DM(sigma_m), DM(sigma_p), DM(y)};                 // KF argument bundled
+    std::vector<DM> estimates_dm = dynamics_service.extended_kalman_filter(ekf_arg); // execute KF
+
+    hw_joint_structs_[0].current_state_.filtered_position = estimates_dm.at(0).nonzeros()[0];
+    hw_joint_structs_[1].current_state_.filtered_position = estimates_dm.at(0).nonzeros()[1];
+    hw_joint_structs_[2].current_state_.filtered_position = estimates_dm.at(0).nonzeros()[2];
+    hw_joint_structs_[3].current_state_.filtered_position = estimates_dm.at(0).nonzeros()[3];
+
+    hw_joint_structs_[0].current_state_.filtered_velocity = estimates_dm.at(0).nonzeros()[4];
+    hw_joint_structs_[1].current_state_.filtered_velocity = estimates_dm.at(0).nonzeros()[5];
+    hw_joint_structs_[2].current_state_.filtered_velocity = estimates_dm.at(0).nonzeros()[6];
+    hw_joint_structs_[3].current_state_.filtered_velocity = estimates_dm.at(0).nonzeros()[7];
+
+    hw_joint_structs_[0].current_state_.estimated_acceleration = estimates_dm.at(0).nonzeros()[8];
+    hw_joint_structs_[1].current_state_.estimated_acceleration = estimates_dm.at(0).nonzeros()[9];
+    hw_joint_structs_[2].current_state_.estimated_acceleration = estimates_dm.at(0).nonzeros()[10];
+    hw_joint_structs_[3].current_state_.estimated_acceleration = estimates_dm.at(0).nonzeros()[11];
+
+    hw_joint_structs_[3].current_state_.rotor_inertia_zz = estimates_dm.at(0).nonzeros()[12];
+
+    hw_joint_structs_[0].current_state_.estimated_jerk = estimates_dm.at(0).nonzeros()[13];
+    hw_joint_structs_[1].current_state_.estimated_jerk = estimates_dm.at(0).nonzeros()[14];
+    hw_joint_structs_[2].current_state_.estimated_jerk = estimates_dm.at(0).nonzeros()[15];
+    hw_joint_structs_[3].current_state_.estimated_jerk = estimates_dm.at(0).nonzeros()[16];
+
+    hw_joint_structs_[3].current_state_.estimated_effort = estimates_dm.at(0).nonzeros()[17];
+
+    hw_joint_structs_[3].current_state_.covariance = estimates_dm.at(1);
+    // hw_joint_structs_[3].current_state_.KF_error = estimates_dm.at(2).nonzeros();
+
+    // hw_joint_structs_[i].calcAcceleration(hw_joint_structs_[i].current_state_.filtered_velocity, prev_velocity_, delta_seconds);
+
     return hardware_interface::return_type::OK;
   }
 
