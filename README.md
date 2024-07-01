@@ -13,14 +13,14 @@ For detailed information on setup, configuration, and usage, please refer to our
 
 ### Online Documentation
 
-For additional resources, including extended examples and in-depth tutorials, please visit the dedicated ROS section on [control.ros.org](https://control.ros.org/master/doc/ros2_control_demos/example_3/doc/userdoc.html).
+For additional resources, including extended ros2_control capabilities, please visit the dedicated ROS section on [control.ros.org](https://control.ros.org/rolling/index.html).
 
 ## Disclaimer
 
 ### Independence Declaration
 
-This project is developed and maintained independently and is not officially affiliated with Reach Robotics. It is an open-source initiative designed to supplement the official Reach Robotics offerings with community-driven enhancements and solutions.
+This project is developed and maintained independently and is not officially affiliated with Reach Robotics and Blue Robotics. It is an open-source project designed to supplement the official Reach Robotics & blue Robotics offerings with community-driven enhancements and solutions.
 
 ### Official Support Reference
 
-For users seeking official software and support from Reach Robotics, please refer to the [Reach Robotics SDK](https://github.com/Reach-Robotics/reach_robotics_sdk/tree/master). This SDK provides authorized tools and resources directly from Reach Robotics.
+For users seeking official software and support from Reach Robotics or blue Robotics, please refer to the [Reach Robotics](https://github.com/Reach-Robotics/reach_robotics_sdk/tree/master) & [Blue Robotics](https://github.com/Bluerobotics)
