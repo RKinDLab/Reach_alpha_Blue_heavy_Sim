@@ -3,12 +3,10 @@
 .. _ros2_control_RA5BHS_userdoc:
 
 ************************************************
-Reach Alpha 5 with multiple interfaces
+Reach Alpha Blue heavy Simulator
 ************************************************
 
-For *reach alpha 5*, the hardware interface plugin is implemented having multiple interfaces.
-
-* The hybrid dynamics is done using Thor fossen for underwater vehicler & Featherstone's algorithm for manipulator with casadi.
+For *Reach Alpha Blue heavy Simulator*, the hardware interface plugin is implemented having multiple interfaces.
 
 
 Tutorial steps
